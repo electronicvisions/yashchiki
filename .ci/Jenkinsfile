@@ -1,0 +1,31 @@
+pipeline {
+	agent { label 'conviz' }
+	stages {
+		stage('Clone') {
+			steps {
+				sh ".ci/clone.sh"
+			}
+		}
+		stage('Create visionary Recipe') {
+			steps {
+				sh ".ci/create_visionary_recipe.sh"
+			}
+		}
+		stage('Build Container') {
+			steps {
+				sh ".ci/build_container.sh"
+			}
+		}
+		stage('Update Build Cache') {
+			steps {
+				echo "TODO: not calling .ci/create_binary_cache.sh"
+			}
+		}
+		stage('Export') {
+			steps {
+				sh ".ci/deploy_container.sh"
+				echo "TODO skipping (due to disk usage problems on jenviz): archiveArtifacts artifacts: '*.img', onlyIfSuccessful: true"
+			}
+		}
+	}
+}
