@@ -32,7 +32,6 @@ if [ ! -d ${DOWNLOAD_CACHE_DIR} ]; then
     exit 1
 fi
 
-umask 000
 mkdir -p $HOME
 mkdir -p $TMPDIR
 chmod 1777 $TMPDIR
@@ -130,6 +129,10 @@ ${MY_SPACK_BIN} install visionary-dls-demos || exit 1
 echo "CREATING VIEWS OF META PACKAGES"
 cd ${MY_SPACK_FOLDER}
 
+# make views writable for non-spack users in container
+OLD_UMASK=$(umask)
+umask 000
+
 # hack to allow "tensorflow" to fail build -> FIXME!
 ${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults visionary-defaults@0.2.18~tensorflow~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults gcc@7.2.0
@@ -167,9 +170,16 @@ ${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-wafer visio
 ${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-wafer gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-wafer gccxml
 
+umask ${OLD_UMASK}
+
 # non-spack user/group shall be allowed to read/execute everything we installed here
 chmod -R o+rX spackview_visionary-*/
 chmod -R o+rX opt
+
+# allow non-spack users to install new packages
+# Note: modified packages can be loaded by bind-mounting the /var-subdirectory
+# of a locally checked out spack-repo at /opt/spack_${SPACK_BRANCH} in the container
+chmod 777 ${MY_SPACK_FOLDER}/opt/spack/{*/*,*,}
 
 # shrink image: remove downloaded packages from container
 rm -rf ${MY_SPACK_FOLDER}/var/spack/cache/*
