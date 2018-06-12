@@ -14,6 +14,15 @@ SOURCE_DIR=$(dirname "$0")
 
 RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
+views=( visionary-defaults
+        visionary-defaults-analysis
+        visionary-defaults-developmisc
+        visionary-defaults-dls
+        visionary-defaults-simulation
+        visionary-defaults-spikey
+        visionary-defaults-wafer
+        )
+
 # create container description file
 # * based on Debian stretch (minimal) + a few extra packages (e.g. git, python, ...)
 # * bind mount spack's fetch-cache and ccache into the container -> speed up stuff
@@ -45,6 +54,8 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
 %post
     adduser spack --no-create-home --disabled-password --system --shell /bin/bash
     chown spack:nogroup /opt
+    mkdir /opt/spack_views
+    chown spack:nogroup /opt/spack_views
     chmod go=rwx /opt
     chown -R spack:nogroup /opt/spack_${SPACK_BRANCH}
     chmod +x /install_visionary_spack.sh
@@ -55,14 +66,15 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
 EOF
 
 # create appenvs for all views...
-for view in visionary-defaults visionary-defaults-analysis visionary-defaults-developmisc visionary-defaults-dls visionary-defaults-simulation visionary-defaults-spikey visionary-defaults-wafer; do
+for view in "${views[@]}"; do
 
     # append apps for each spackview...
 cat <<EOF >>${RECIPE_FILENAME}
 
 %appenv ${view}
-    export VISIONARY_ENV=${view}\${VISIONARY_ENV:+:}\${VISIONARY_ENV}
-    SVF=/opt/spack_${SPACK_BRANCH}/spackview_\${VISIONARY_ENV}
+    # there can only be one app loaded at any time
+    export VISIONARY_ENV=${view}
+    SVF=/opt/spack_views/\${VISIONARY_ENV}
     export PATH=\${SVF}/bin\${PATH:+:}\${PATH}
     export PYTHONPATH=\${SVF}/lib/python2.7/site-packages\${PYTHONPATH:+:}\${PYTHONPATH}
     export PYTHONUSERBASE=\${SVF}\${PYTHONUSERBASE:+:}\${PYTHONUSERBASE}

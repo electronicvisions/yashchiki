@@ -16,6 +16,7 @@ export MY_SPACK_FOLDER=/opt/spack_${SPACK_BRANCH}
 export MY_SPACK_BIN=/opt/spack_${SPACK_BRANCH}/bin/spack
 export CCACHE_DIR="/opt/ccache"
 export DOWNLOAD_CACHE_DIR="/opt/download_cache"
+export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 if [ ! -d ${MY_SPACK_FOLDER} ]; then
     echo "${MY_SPACK_FOLDER} does not exist!"
@@ -134,41 +135,41 @@ OLD_UMASK=$(umask)
 umask 000
 
 # hack to allow "tensorflow" to fail build -> FIXME!
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults visionary-defaults~tensorflow~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults gcc@7.2.0
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults gccxml
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults tensorflow
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults~tensorflow~gccxml
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults tensorflow
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-analysis visionary-defaults-analysis
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-analysis gcc@7.2.0
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-analysis visionary-defaults-analysis
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-analysis gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-developmisc visionary-defaults-developmisc
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-developmisc gcc@7.2.0
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-developmisc visionary-defaults-developmisc
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-developmisc gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-dls visionary-defaults-dls~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-dls gcc@7.2.0
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-dls gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls visionary-defaults-dls~gccxml
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls gccxml
 
-#${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-nux visionary-defaults-nux
+#${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-nux visionary-defaults-nux
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-dls-demos visionary-dls-demos
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-dls-demos gcc@7.2.0
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-dls-demos gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos visionary-dls-demos
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gccxml
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-simulation visionary-defaults-simulation
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-simulation gcc@7.2.0
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-simulation visionary-defaults-simulation
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-simulation gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-spikey visionary-defaults-spikey
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-spikey gcc@7.2.0
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-spikey visionary-defaults-spikey
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-spikey gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-wafer visionary-defaults-wafer~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-wafer gcc@7.2.0
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-wafer gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer visionary-defaults-wafer~gccxml
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer gccxml
 
 umask ${OLD_UMASK}
 
 # non-spack user/group shall be allowed to read/execute everything we installed here
-chmod -R o+rX spackview_visionary-*/
+chmod -R o+rX ${MY_SPACK_VIEW_PREFIX}/*
 chmod -R o+rX opt
 
 # allow non-spack users to install new packages
