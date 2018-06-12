@@ -12,6 +12,8 @@ fi
 
 SOURCE_DIR=$(dirname "$0")
 
+RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
+
 # create container description file
 # * based on Debian stretch (minimal) + a few extra packages (e.g. git, python, ...)
 # * bind mount spack's fetch-cache and ccache into the container -> speed up stuff
@@ -19,7 +21,7 @@ SOURCE_DIR=$(dirname "$0")
 # * create "spack" user in the container and run spack installation script as spack user
 #   (-> installs to /opt/spack_SPACK_BRANCH, and creates views)
 # * provide "apps" which set environment variables to appropriate views
-cat <<EOF >${WORKSPACE}/visionary_recipe.def
+cat <<EOF >${RECIPE_FILENAME}
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
@@ -54,7 +56,7 @@ EOF
 for view in visionary-defaults visionary-defaults-testing visionary-defaults-analysis visionary-defaults-developmisc visionary-defaults-dls visionary-defaults-simulation visionary-defaults-spikey visionary-defaults-wafer; do
 
     # append apps for each spackview...
-cat <<EOF >>visionary_recipe.def
+cat <<EOF >>${RECIPE_FILENAME}
 
 %appenv ${view}
     export VISIONARY_ENV=${view}\${VISIONARY_ENV:+:}\${VISIONARY_ENV}
