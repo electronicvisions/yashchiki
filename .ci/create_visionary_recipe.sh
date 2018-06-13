@@ -49,6 +49,8 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
     chown -R spack:nogroup /opt/spack_${SPACK_BRANCH}
     chmod +x /install_visionary_spack.sh
     export SPACK_BRANCH=${SPACK_BRANCH}
+    # symbolic link for convenience
+    ln -s /opt/spack_\${SPACK_BRANCH} /opt/spack
     sudo -Eu spack /install_visionary_spack.sh
 EOF
 
