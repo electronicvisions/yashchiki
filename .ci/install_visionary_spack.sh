@@ -134,15 +134,10 @@ OLD_UMASK=$(umask)
 umask 000
 
 # hack to allow "tensorflow" to fail build -> FIXME!
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults visionary-defaults@0.2.18~tensorflow~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults visionary-defaults~tensorflow~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults gccxml
 ${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults tensorflow
-
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-testing visionary-defaults@0.2.19~tensorflow~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-testing gcc@7.2.0
-${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-testing gccxml
-${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-testing tensorflow
 
 ${MY_SPACK_BIN} view -d yes hardlink -i spackview_visionary-defaults-analysis visionary-defaults-analysis
 ${MY_SPACK_BIN} view -d no  hardlink -i spackview_visionary-defaults-analysis gcc@7.2.0

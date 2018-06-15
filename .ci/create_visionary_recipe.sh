@@ -55,7 +55,7 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
 EOF
 
 # create appenvs for all views...
-for view in visionary-defaults visionary-defaults-testing visionary-defaults-analysis visionary-defaults-developmisc visionary-defaults-dls visionary-defaults-simulation visionary-defaults-spikey visionary-defaults-wafer; do
+for view in visionary-defaults visionary-defaults-analysis visionary-defaults-developmisc visionary-defaults-dls visionary-defaults-simulation visionary-defaults-spikey visionary-defaults-wafer; do
 
     # append apps for each spackview...
 cat <<EOF >>${RECIPE_FILENAME}
