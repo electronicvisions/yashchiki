@@ -65,8 +65,7 @@ ${MY_SPACK_BIN} bootstrap
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
 ${MY_SPACK_BIN} fetch --dependencies gcc@7.2.0
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults@0.2.18+tensorflow+gccxml
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults@0.2.19+tensorflow+gccxml
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml
 ${MY_SPACK_BIN} fetch --dependencies visionary-defaults-analysis
 ${MY_SPACK_BIN} fetch --dependencies visionary-defaults-developmisc
 ${MY_SPACK_BIN} fetch --dependencies visionary-defaults-dls+gccxml
@@ -85,12 +84,9 @@ ccache -s
 
 # check if it can be specialized
 echo "SHOW SPEC OF META PACKAGES"
-${MY_SPACK_BIN} spec -I visionary-defaults@0.2.18 || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults@0.2.18+gccxml || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults@0.2.18+tensorflow || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults@0.2.19 || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults@0.2.19+gccxml || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults@0.2.19+tensorflow || exit 1
+${MY_SPACK_BIN} spec -I visionary-defaults || exit 1
+${MY_SPACK_BIN} spec -I visionary-defaults+gccxml || exit 1
+${MY_SPACK_BIN} spec -I visionary-defaults+tensorflow || exit 1
 ${MY_SPACK_BIN} spec -I visionary-defaults-analysis || exit 1
 ${MY_SPACK_BIN} spec -I visionary-defaults-developmisc || exit 1
 ${MY_SPACK_BIN} spec -I visionary-defaults-dls || exit 1
@@ -100,13 +96,9 @@ ${MY_SPACK_BIN} spec -I visionary-defaults-wafer || exit 1
 
 # do the work... (FIXME: we ignore fail of tensorflow for now)
 echo "INSTALLING META PACKAGES"
-${MY_SPACK_BIN} install visionary-defaults@0.2.18 || exit 1
-${MY_SPACK_BIN} install visionary-defaults@0.2.18+gccxml || exit 1
-${MY_SPACK_BIN} install visionary-defaults@0.2.18+tensorflow
-
-${MY_SPACK_BIN} install visionary-defaults@0.2.19 || exit 1
-${MY_SPACK_BIN} install visionary-defaults@0.2.19+gccxml || exit 1
-${MY_SPACK_BIN} install visionary-defaults@0.2.19+tensorflow
+${MY_SPACK_BIN} install visionary-defaults || exit 1
+${MY_SPACK_BIN} install visionary-defaults+gccxml || exit 1
+${MY_SPACK_BIN} install visionary-defaults+tensorflow
 
 ${MY_SPACK_BIN} install visionary-defaults-analysis || exit 1
 
