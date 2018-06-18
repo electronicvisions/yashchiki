@@ -10,7 +10,7 @@ export MY_GERRIT_BASE_URL="ssh://hudson@brainscales-r.kip.uni-heidelberg.de:2941
 # clone spack installation ouside and copy into the container
 MY_GERRIT_URL="${MY_GERRIT_BASE_URL}/spack"
 rm -rf spack_${SPACK_BRANCH}
-git clone ${MY_GERRIT_URL} --depth=1 -b ${SPACK_BRANCH} spack_${SPACK_BRANCH}
+git clone ${MY_GERRIT_URL} -b ${SPACK_BRANCH} spack_${SPACK_BRANCH}
 
 # TODO: also watch for spack changes...
 if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then

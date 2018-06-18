@@ -12,6 +12,9 @@ fi
 
 SOURCE_DIR=$(dirname "$0")
 
+GITLOG="git_log_yashchiki.txt"
+git log > "${WORKSPACE}/${GITLOG}"
+
 RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
 views=( visionary-defaults
@@ -50,6 +53,7 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
 %files
     ${SOURCE_DIR}/install_visionary_spack.sh install_visionary_spack.sh
     ${WORKSPACE}/path_spack_tmpdir path_spack_tmpdir
+    ${WORKSPACE}/${GITLOG} ${GITLOG}
 
 %post
     adduser spack --no-create-home --disabled-password --system --shell /bin/bash
