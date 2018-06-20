@@ -13,7 +13,7 @@ fi
 SOURCE_DIR=$(dirname "$0")
 
 GITLOG="git_log_yashchiki.txt"
-git log > "${WORKSPACE}/${GITLOG}"
+( cd ${SOURCE_DIR} && git log > "${WORKSPACE}/${GITLOG}" )
 
 RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
