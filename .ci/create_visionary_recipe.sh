@@ -45,9 +45,7 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
 
 %setup
     mv ${WORKSPACE}/spack_${SPACK_BRANCH}/ \${SINGULARITY_ROOTFS}/opt/
-    mkdir \${SINGULARITY_ROOTFS}/opt/download_cache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
-    mount --no-mtab --bind ${WORKSPACE}/download_cache \${SINGULARITY_ROOTFS}/opt/download_cache
     mount --no-mtab --bind ${WORKSPACE}/ccache \${SINGULARITY_ROOTFS}/opt/ccache
 
 %files

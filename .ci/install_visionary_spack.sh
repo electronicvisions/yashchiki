@@ -15,7 +15,6 @@ export MY_SPACK_BRANCH=${SPACK_BRANCH}
 export MY_SPACK_FOLDER=/opt/spack_${SPACK_BRANCH}
 export MY_SPACK_BIN=/opt/spack_${SPACK_BRANCH}/bin/spack
 export CCACHE_DIR="/opt/ccache"
-export DOWNLOAD_CACHE_DIR="/opt/download_cache"
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 if [ ! -d ${MY_SPACK_FOLDER} ]; then
@@ -28,15 +27,11 @@ if [ ! -d ${CCACHE_DIR} ]; then
     exit 1
 fi
 
-if [ ! -d ${DOWNLOAD_CACHE_DIR} ]; then
-    echo "${DOWNLOAD_CACHE_DIR} does not exist!"
-    exit 1
-fi
-
 mkdir -p $HOME
 mkdir -p $TMPDIR
 chmod 1777 $TMPDIR
 
+# pip alterrrr
 export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
 export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
@@ -53,25 +48,12 @@ ccache -s
 # activate ccache
 sed -i 's/ccache: false/ccache: true/' ${MY_SPACK_FOLDER}/etc/spack/defaults/config.yaml
 
-# set download mirror stuff
-${MY_SPACK_BIN} mirror rm --scope site global
-${MY_SPACK_BIN} mirror add --scope site job_mirror file://${DOWNLOAD_CACHE_DIR}
+# add system compiler
 ${MY_SPACK_BIN} compiler add --scope site /usr/bin
 
 # provide spack support for environment modules
 echo "BOOTSTRAPPING"
 ${MY_SPACK_BIN} bootstrap
-
-# fetch "everything" (except for pip shitness)
-echo "FETCHING..."
-${MY_SPACK_BIN} fetch --dependencies gcc@7.2.0
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-analysis
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-developmisc
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-dls+gccxml
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-simulation
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-spikey
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-wafer+gccxml
 
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
