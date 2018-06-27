@@ -4,11 +4,6 @@ echo "creating visionary-recipe.def"
 SOURCE_DIR=$(dirname "$0")
 ${SOURCE_DIR}/create_visionary_recipe.sh || exit 1
 
-# create ccache dir if not already existing... make accessible for all (WTF)
-# -> spack will be built by uid "spack" within the container
-# -> should be owned by spack but we don't know the uid yet...
-if [ ! -d ccache/ ]; then mkdir ccache; chmod 777 ccache; fi
-
 # create some jenkins-owned temp folder for spack build
 mkdir /tmp/spack || true
 
@@ -45,3 +40,6 @@ sudo chown -R vis_jenkins singularity_spack_*.img
 
 # after building we can delete our spack tmp folder
 sudo rm -rf ${SPACK_TMPDIR}/ || exit 1
+
+# update global ccache
+rsync -rv ${PWD}/ccache/ ${HOME}/ccache/

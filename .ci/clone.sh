@@ -53,3 +53,11 @@ ${MY_SPACK_BIN} mirror rm --scope site job_mirror
 
 # remove f***ing compiler config
 rm ${PWD}/spack_${SPACK_BRANCH}/etc/spack/compilers.yaml
+
+# create hardlinked ccache folder
+if [ -d ${HOME}/ccache ]; then
+    cp -rl ${HOME}/ccache .
+else
+    mkdir ccache/
+fi
+chmod -R 777 ccache/
