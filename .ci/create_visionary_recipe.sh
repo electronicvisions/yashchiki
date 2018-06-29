@@ -57,7 +57,7 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
     ${WORKSPACE}/${GITLOG} ${GITLOG}
 
 %post
-    adduser spack --no-create-home --disabled-password --system --shell /bin/bash
+    adduser spack --no-create-home --home /tmp/spack --disabled-password --system --shell /bin/bash
     chown spack:nogroup /opt
     mkdir /opt/spack_views
     chown spack:nogroup /opt/spack_views
