@@ -5,7 +5,9 @@ if [ -z "${SPACK_BRANCH}" ]; then
     exit 1
 fi
 
-export MY_GERRIT_BASE_URL="ssh://hudson@brainscales-r.kip.uni-heidelberg.de:29418/"
+if [ -z "${MY_GERRIT_BASE_URL}" ]; then
+    export MY_GERRIT_BASE_URL="ssh://hudson@brainscales-r.kip.uni-heidelberg.de:29418/"
+fi
 
 # clone spack installation ouside and copy into the container
 MY_GERRIT_URL="${MY_GERRIT_BASE_URL}/spack"
