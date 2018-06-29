@@ -29,6 +29,7 @@ views=( visionary-defaults
 # create container description file
 # * based on Debian stretch (minimal) + a few extra packages (e.g. git, python, ...)
 # * bind mount spack's fetch-cache and ccache into the container -> speed up stuff
+# * bind mount spack's buildcache into the container -> speed up stuff
 # * copy spack installation script into container
 # * create "spack" user in the container and run spack installation script as spack user
 #   (-> installs to /opt/spack_SPACK_BRANCH, and creates views)
@@ -47,6 +48,8 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
     mv ${WORKSPACE}/spack_${SPACK_BRANCH}/ \${SINGULARITY_ROOTFS}/opt/
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind ${WORKSPACE}/ccache \${SINGULARITY_ROOTFS}/opt/ccache
+    mkdir \${SINGULARITY_ROOTFS}/opt/build_cache
+    mount --no-mtab --bind ${WORKSPACE}/build_cache \${SINGULARITY_ROOTFS}/opt/build_cache
 
 %files
     ${SOURCE_DIR}/install_visionary_spack.sh install_visionary_spack.sh

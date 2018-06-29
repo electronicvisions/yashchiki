@@ -43,3 +43,5 @@ sudo rm -rf ${SPACK_TMPDIR}/ || exit 1
 
 # update global ccache
 rsync -rv ${PWD}/ccache/ ${HOME}/ccache/
+
+# TODO: update global build_cache (needs creation of build_cache in container, and mode fixing)

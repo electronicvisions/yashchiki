@@ -15,6 +15,7 @@ export MY_SPACK_BRANCH=${SPACK_BRANCH}
 export MY_SPACK_FOLDER=/opt/spack_${SPACK_BRANCH}
 export MY_SPACK_BIN=/opt/spack_${SPACK_BRANCH}/bin/spack
 export CCACHE_DIR="/opt/ccache"
+export BUILD_CACHE_DIR="/opt/build_cache"
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 if [ ! -d ${MY_SPACK_FOLDER} ]; then
@@ -24,6 +25,11 @@ fi
 
 if [ ! -d ${CCACHE_DIR} ]; then
     echo "${CCACHE_DIR} does not exist!"
+    exit 1
+fi
+
+if [ ! -d ${BUILD_CACHE_DIR} ]; then
+    echo "${BUILD_CACHE_DIR} does not exist!"
     exit 1
 fi
 
@@ -55,50 +61,64 @@ ${MY_SPACK_BIN} compiler add --scope site /usr/bin
 echo "BOOTSTRAPPING"
 ${MY_SPACK_BIN} bootstrap
 
+# add build_cache
+${MY_SPACK_BIN} mirror add --scope site build_mirror file://${BUILD_CACHE_DIR}
+
+# extract all available package hashes from buildcache
+find ${BUILD_CACHE_DIR} -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > package_hashes_in_buildcache_uniq
+
+function install_from_buildcache {
+    echo "" > spack_packages_hashes
+    for package in "${spack_packages[@]}"; do
+        ${MY_SPACK_BIN} spec -y ${package} | tee tmp_file
+        cat tmp_file | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> spack_packages_hashes
+    done
+
+    # make each unique
+    cat spack_packages_hashes | sort | uniq > spack_packages_hashes_uniq
+
+    # install if available in buildcache
+    for available_package in $(cat spack_packages_hashes_uniq package_hashes_in_buildcache_uniq | sort | uniq -d); do
+        ${MY_SPACK_BIN} buildcache install -y /${available_package} || true
+    done
+}
+
+# check if it can be specialized
+spack_packages=(
+    "gcc@7.2.0"
+)
+install_from_buildcache
+
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
 ${MY_SPACK_BIN} install gcc@7.2.0
 
+# add fresh compiler to spack
 ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-7.2.0-*
 
-# print stats
-ccache -s
-
 # check if it can be specialized
-echo "SHOW SPEC OF META PACKAGES"
-${MY_SPACK_BIN} spec -I visionary-defaults || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults+gccxml || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults+tensorflow || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults-analysis || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults-developmisc || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults-dls || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults-simulation || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults-spikey || exit 1
-${MY_SPACK_BIN} spec -I visionary-defaults-wafer || exit 1
+spack_packages=(
+    "visionary-defaults %gcc@7.2.0"
+    "visionary-defaults+gccxml %gcc@7.2.0"
+    "visionary-defaults+tensorflow %gcc@7.2.0"
+    "visionary-defaults-analysis %gcc@7.2.0"
+    "visionary-defaults-developmisc %gcc@7.2.0"
+    "visionary-defaults-dls %gcc@7.2.0"
+    "visionary-defaults-dls+gccxml %gcc@7.2.0"
+    "visionary-defaults-simulation %gcc@7.2.0"
+    "visionary-defaults-spikey %gcc@7.2.0"
+    "visionary-defaults-wafer %gcc@7.2.0"
+    "visionary-defaults-wafer+gccxml %gcc@7.2.0"
+    "visionary-dls-demos %gcc@7.2.0"
+)
+# tensorflow fails
+# visionary-defaults-nux
+install_from_buildcache
 
-# do the work... (FIXME: we ignore fail of tensorflow for now)
-echo "INSTALLING META PACKAGES"
-${MY_SPACK_BIN} install visionary-defaults || exit 1
-${MY_SPACK_BIN} install visionary-defaults+gccxml || exit 1
-${MY_SPACK_BIN} install visionary-defaults+tensorflow
-
-${MY_SPACK_BIN} install visionary-defaults-analysis || exit 1
-
-${MY_SPACK_BIN} install visionary-defaults-developmisc || exit 1
-
-${MY_SPACK_BIN} install visionary-defaults-dls || exit 1
-${MY_SPACK_BIN} install visionary-defaults-dls+gccxml || exit 1
-
-#${MY_SPACK_BIN} install visionary-defaults-nux
-
-${MY_SPACK_BIN} install visionary-defaults-simulation || exit 1
-
-${MY_SPACK_BIN} install visionary-defaults-spikey || exit 1
-
-${MY_SPACK_BIN} install visionary-defaults-wafer || exit 1
-${MY_SPACK_BIN} install visionary-defaults-wafer+gccxml || exit 1
-
-${MY_SPACK_BIN} install visionary-dls-demos || exit 1
+echo "INSTALLING PACKAGES"
+for package in "${spack_packages[@]}"; do
+    ${MY_SPACK_BIN} install ${package} || ( echo "FAILED TO INSTALL: ${package}" | tee -a ${MY_SPACK_FOLDER}/install_failed.log )
+done
 
 # create the filesystem views (exposed via singularity --app option)
 echo "CREATING VIEWS OF META PACKAGES"
