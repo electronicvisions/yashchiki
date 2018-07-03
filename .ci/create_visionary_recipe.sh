@@ -55,6 +55,8 @@ Include: git-core, curl, ca-certificates, python, procps, gcc, g++, file, make, 
     ${SOURCE_DIR}/install_visionary_spack.sh install_visionary_spack.sh
     ${WORKSPACE}/path_spack_tmpdir path_spack_tmpdir
     ${WORKSPACE}/${GITLOG} ${GITLOG}
+    # provide spack command to login shells
+    ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/
 
 %post
     adduser spack --no-create-home --home /tmp/spack --disabled-password --system --shell /bin/bash
