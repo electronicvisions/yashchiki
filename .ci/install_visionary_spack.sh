@@ -162,6 +162,9 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaul
 
 umask ${OLD_UMASK}
 
+# rebuild all modules
+${MY_SPACK_BIN} module refresh -y
+
 # non-spack user/group shall be allowed to read/execute everything we installed here
 chmod -R o+rX ${MY_SPACK_VIEW_PREFIX}/*
 chmod -R o+rX opt
