@@ -10,8 +10,17 @@ get_container_name()
 {
     local local_num="$1"
     local cprefix="${CONTAINER_PREFIX}"
+    local change_num="undefined"
     if [ "${cprefix}" = "gerrit" ]; then
-        cprefix="${CONTAINER_PREFIX}_cs_${GERRIT_CHANGE_NUMBER}"
+        if [ -z "${GERRIT_CHANGE_NUMBER}" ]; then
+            if [ ! -z "${GERRIT_REFSPEC}" ]; then
+                # extract gerrit change number from refspec
+                change_num="$(echo ${GERRIT_REFSPEC} | cut -f 4 -d / )"
+            fi
+        else
+            change_num="${GERRIT_CHANGE_NUMBER}"
+        fi
+        cprefix="${CONTAINER_PREFIX}_cs_${change_num}"
     fi
     echo -n "$INSTALL_DIR/singularity_spack_${cprefix:+${cprefix}_}${SPACK_BRANCH}-${DATE}-${local_num}.img"
 }
