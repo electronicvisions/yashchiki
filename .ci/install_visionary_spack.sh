@@ -122,6 +122,7 @@ spack_packages=(
     "visionary-wafer^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "visionary-wafer-visu %gcc@7.2.0"
     "visionary-dls-demos^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %gcc@7.2.0"
 )
