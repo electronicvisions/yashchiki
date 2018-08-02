@@ -38,11 +38,7 @@ cat <<EOF >${RECIPE_FILENAME}
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
-Include: ca-certificates, ccache, curl, file, g++, gcc, git-core, iproute2, lbzip2, less, libc6-dev, libusb-1.0-0-dev, make, patch, procps, python, ssh, strace, sudo, unzip, vim-nox, xz-utils
-
-%environment
-    export LANG=C
-    export LC_ALL=C
+Include: ca-certificates, ccache, curl, file, g++, gcc, git-core, iproute2, lbzip2, less, libc6-dev, libusb-1.0-0-dev, locales, make, patch, procps, python, ssh, strace, sudo, unzip, vim-nox, xz-utils
 
 %setup
     mv ${WORKSPACE}/spack_${SPACK_BRANCH}/ \${SINGULARITY_ROOTFS}/opt/
@@ -57,8 +53,12 @@ Include: ca-certificates, ccache, curl, file, g++, gcc, git-core, iproute2, lbzi
     ${WORKSPACE}/${GITLOG} ${GITLOG}
     # provide spack command to login shells
     ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/
+    ${WORKSPACE}/misc-files/locale.gen /etc/
 
 %post
+    # install locales
+    locale-gen
+    # spack stuff
     adduser spack --no-create-home --home /tmp/spack --disabled-password --system --shell /bin/bash
     chown spack:nogroup /opt
     mkdir /opt/spack_views

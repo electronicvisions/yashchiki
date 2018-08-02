@@ -1,5 +1,9 @@
 #!/bin/bash -x
 
+# set generic locale for building
+export LANG=C
+export LC_ALL=C
+
 echo "creating visionary-recipe.def"
 SOURCE_DIR=$(dirname "$0")
 ${SOURCE_DIR}/create_visionary_recipe.sh || exit 1
