@@ -38,7 +38,7 @@ cat <<EOF >${RECIPE_FILENAME}
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
-Include: ca-certificates, ccache, curl, file, g++, gcc, git-core, iproute2, lbzip2, less, libc6-dev, libusb-1.0-0-dev, make, patch, procps, python, ssh, sudo, unzip, vim-nox, xz-utils
+Include: ca-certificates, ccache, curl, file, g++, gcc, git-core, iproute2, lbzip2, less, libc6-dev, libusb-1.0-0-dev, make, patch, procps, python, ssh, strace, sudo, unzip, vim-nox, xz-utils
 
 %environment
     export LANG=C
