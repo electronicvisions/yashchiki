@@ -101,14 +101,14 @@ spack_packages=(
     "visionary-defaults %gcc@7.2.0"
     "visionary-defaults+gccxml %gcc@7.2.0"
     "visionary-defaults+tensorflow %gcc@7.2.0"
-    "visionary-defaults-analysis %gcc@7.2.0"
-    "visionary-defaults-developmisc %gcc@7.2.0"
-    "visionary-defaults-dls %gcc@7.2.0"
-    "visionary-defaults-dls+gccxml %gcc@7.2.0"
-    "visionary-defaults-simulation %gcc@7.2.0"
-    "visionary-defaults-spikey %gcc@7.2.0"
-    "visionary-defaults-wafer %gcc@7.2.0"
-    "visionary-defaults-wafer+gccxml %gcc@7.2.0"
+    "visionary-defaults-analysis+dev %gcc@7.2.0"
+    "visionary-defaults-dev-tools %gcc@7.2.0"
+    "visionary-defaults-dls+dev %gcc@7.2.0"
+    "visionary-defaults-dls+dev+gccxml %gcc@7.2.0"
+    "visionary-defaults-simulation+dev %gcc@7.2.0"
+    "visionary-defaults-spikey+dev %gcc@7.2.0"
+    "visionary-defaults-wafer+dev %gcc@7.2.0"
+    "visionary-defaults-wafer+dev+gccxml %gcc@7.2.0"
     "visionary-dls-demos %gcc@7.2.0"
 )
 # tensorflow fails
@@ -134,13 +134,10 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaul
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gccxml
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults tensorflow
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-analysis visionary-defaults-analysis
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-analysis visionary-defaults-analysis+dev
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-analysis gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-developmisc visionary-defaults-developmisc
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-developmisc gcc@7.2.0
-
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls visionary-defaults-dls~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls visionary-defaults-dls+dev~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-dls gccxml
 
@@ -150,13 +147,13 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-de
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gccxml
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-simulation visionary-defaults-simulation
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-simulation visionary-defaults-simulation+dev
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-simulation gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-spikey visionary-defaults-spikey
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-spikey visionary-defaults-spikey+dev
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-spikey gcc@7.2.0
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer visionary-defaults-wafer~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer visionary-defaults-wafer+dev~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer gccxml
 

@@ -38,12 +38,12 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 echo "FETCHING..."
 ${MY_SPACK_BIN} fetch --dependencies gcc@7.2.0 || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-analysis || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-developmisc || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-dls+gccxml || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-simulation || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-spikey || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults-wafer+gccxml || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults-analysis+dev || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults-dev-tools || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults-dls+gccxml+dev || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults-simulation+dev || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults-spikey+dev || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults-wafer+gccxml+dev || exit 1
 
 # update download_cache
 rsync -rv ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/

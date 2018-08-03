@@ -19,7 +19,7 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
 views=( visionary-defaults
         visionary-defaults-analysis
-        visionary-defaults-developmisc
+        visionary-defaults-dev-tools
         visionary-defaults-dls
         visionary-defaults-simulation
         visionary-defaults-spikey
