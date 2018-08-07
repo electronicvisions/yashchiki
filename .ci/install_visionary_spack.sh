@@ -106,6 +106,7 @@ spack_packages=(
     "visionary-defaults-dls+dev %gcc@7.2.0"
     "visionary-defaults-dls+dev+gccxml %gcc@7.2.0"
     "visionary-defaults-simulation+dev %gcc@7.2.0"
+    "visionary-defaults-slurmviz %gcc@7.2.0"
     "visionary-defaults-spikey+dev %gcc@7.2.0"
     "visionary-defaults-wafer+dev %gcc@7.2.0"
     "visionary-defaults-wafer+dev+gccxml %gcc@7.2.0"
@@ -156,6 +157,10 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaul
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer visionary-defaults-wafer+dev~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-wafer gccxml
+
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-slurmviz visionary-defaults-slurmviz
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults-slurmviz gcc@7.2.0
+
 
 umask ${OLD_UMASK}
 
