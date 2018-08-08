@@ -78,9 +78,8 @@ function install_from_buildcache {
     cat spack_packages_hashes | sort | uniq > spack_packages_hashes_uniq
 
     # install if available in buildcache
-    for available_package in $(cat spack_packages_hashes_uniq package_hashes_in_buildcache_uniq | sort | uniq -d); do
-        ${MY_SPACK_BIN} buildcache install -y /${available_package} || true
-    done
+    hashes_to_install=$(cat spack_packages_hashes_uniq package_hashes_in_buildcache_uniq | sort | uniq -d | sed "s:^:/:g" | tr '\n' ' ')
+    ${MY_SPACK_BIN} buildcache install -y -w -j$(nproc) ${hashes_to_install} || true
 }
 
 # check if it can be specialized
