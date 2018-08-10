@@ -72,9 +72,14 @@ if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
     popd
 fi
 
+# hard-link download cache into spack folder to avoid duplication
+mkdir -p ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
+cp -vrl $HOME/download_cache/{.*,*} ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
+
 # set download mirror stuff to prefill outside of container
 export MY_SPACK_BIN=$PWD/spack_${SPACK_BRANCH}/bin/spack
 ${MY_SPACK_BIN} mirror rm --scope site global
+# TODO: delme (download cache is handled manually)
 ${MY_SPACK_BIN} mirror add --scope site job_mirror file://${HOME}/download_cache
 
 # add system compiler (needed for fetching)
@@ -96,7 +101,7 @@ ${MY_SPACK_BIN} fetch --dependencies visionary-defaults-spikey+dev || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-defaults-wafer+gccxml+dev || exit 1
 
 # update download_cache
-rsync -rv ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/
+rsync -av ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/
 
 # remove job_mirror again (re-added in container)
 ${MY_SPACK_BIN} mirror rm --scope site job_mirror
