@@ -19,7 +19,7 @@ pipeline {
 		}
 		stage('Update Build Cache') {
 			steps {
-				echo "TODO: not calling .ci/create_binary_cache.sh"
+				sh ".ci/update_build_cache.sh"
 			}
 		}
 		stage('Export') {

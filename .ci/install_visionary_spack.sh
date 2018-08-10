@@ -64,21 +64,28 @@ ${MY_SPACK_BIN} bootstrap -j$(nproc)
 # add build_cache
 ${MY_SPACK_BIN} mirror add --scope site build_mirror file://${BUILD_CACHE_DIR}
 
+# setup tempfiles
+FILE_HASHES_BUILDCACHE=$(mktemp)
+FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE=$(mktemp)
+FILE_HASHES_SPACK=$(mktemp)
+FILE_HASHES_SPACK_ALL=$(mktemp)
+
 # extract all available package hashes from buildcache
-find ${BUILD_CACHE_DIR} -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > package_hashes_in_buildcache_uniq
+find ${BUILD_CACHE_DIR} -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > ${FILE_HASHES_BUILDCACHE}
 
 function install_from_buildcache {
-    echo "" > spack_packages_hashes
+    echo "" > ${FILE_HASHES_SPACK_ALL}
     for package in "${spack_packages[@]}"; do
         ${MY_SPACK_BIN} spec -y ${package} | tee tmp_file
-        cat tmp_file | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> spack_packages_hashes
+        cat tmp_file | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> ${FILE_HASHES_SPACK_ALL}
     done
 
     # make each unique
-    cat spack_packages_hashes | sort | uniq > spack_packages_hashes_uniq
+    cat ${FILE_HASHES_SPACK_ALL} | sort | uniq > ${FILE_HASHES_SPACK}
 
     # install if available in buildcache
-    hashes_to_install=$(cat spack_packages_hashes_uniq package_hashes_in_buildcache_uniq | sort | uniq -d | sed "s:^:/:g" | tr '\n' ' ')
+    cat ${FILE_HASHES_SPACK} ${FILE_HASHES_BUILDCACHE} | sort | uniq -d > ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}
+    hashes_to_install=$(sed "s:^:/:g" < ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE} | tr '\n' ' ')
     ${MY_SPACK_BIN} buildcache install -y -w -j$(nproc) ${hashes_to_install} || true
 }
 
@@ -187,3 +194,9 @@ chmod -R 777 ${MY_SPACK_FOLDER}/var/spack/{cache,stage}
 chmod -R 777 ${MY_SPACK_FOLDER}/opt/spack/.spack-db
 # module files also need to be updated if the user installs packages
 chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules
+
+# remove tempfiles
+rm ${FILE_HASHES_BUILDCACHE}
+rm ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}
+rm ${FILE_HASHES_SPACK}
+rm ${FILE_HASHES_SPACK_ALL}
