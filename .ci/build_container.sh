@@ -45,7 +45,8 @@ sudo chown -R vis_jenkins singularity_spack_*.img
 # after building we can delete our spack tmp folder
 sudo rm -rf ${SPACK_TMPDIR}/ || exit 1
 
-# update global ccache
-rsync -rv ${PWD}/ccache/ ${HOME}/ccache/
+# update global ccache (via diffs) and delete files not present anymore to
+# prevent cache from growing endlessly
+rsync -av --delete ${PWD}/ccache/ ${HOME}/ccache/
 
 # TODO: update global build_cache (needs creation of build_cache in container, and mode fixing)
