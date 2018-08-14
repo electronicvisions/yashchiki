@@ -114,6 +114,8 @@ spack_packages=(
     "visionary-dls %gcc@7.2.0"
     "visionary-dls~dev+gccxml %gcc@7.2.0"
     "visionary-dls+gccxml %gcc@7.2.0"
+    "visionary-nux~dev %gcc@7.2.0"
+    "visionary-nux %gcc@7.2.0"
     "visionary-simulation~dev %gcc@7.2.0"
     "visionary-simulation %gcc@7.2.0"
     "visionary-spikey~dev %gcc@7.2.0"
@@ -126,7 +128,6 @@ spack_packages=(
     "visionary-slurmviz %gcc@7.2.0"
 )
 # tensorflow fails
-# visionary-nux
 install_from_buildcache
 
 echo "INSTALLING PACKAGES"
@@ -159,8 +160,6 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls gc
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev visionary-dls~dev~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev gccxml
-
-#${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-nux visionary-nux
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos visionary-dls-demos
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gcc@7.2.0
