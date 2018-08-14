@@ -18,12 +18,17 @@ GITLOG="git_log_yashchiki.txt"
 RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
 views=( visionary-defaults
-        visionary-defaults-analysis
-        visionary-defaults-dev-tools
-        visionary-defaults-dls
-        visionary-defaults-simulation
-        visionary-defaults-spikey
-        visionary-defaults-wafer
+        visionary-dev-tools
+        visionary-analysis
+        visionary-analysis-without-dev
+        visionary-dls
+        visionary-dls-without-dev
+        visionary-simulation
+        visionary-simulation-without-dev
+        visionary-spikey
+        visionary-spikey-without-dev
+        visionary-wafer
+        visionary-wafer-without-dev
         )
 
 # create container description file
