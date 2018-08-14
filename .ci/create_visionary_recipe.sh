@@ -63,6 +63,9 @@ Include: ca-certificates, ccache, curl, file, fxload, g++, gawk, gcc, git-core, 
 %post
     # for premium software (e.g. Xilinx impact)
     ln -s /lib/x86_64-linux-gnu/libusb-0.1.so.4 /lib/x86_64-linux-gnu/libusb.so
+    echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
+    apt-get update
+    apt-get install -y singularity-container/stretch-backports
     # install locales
     locale-gen
     # spack stuff
