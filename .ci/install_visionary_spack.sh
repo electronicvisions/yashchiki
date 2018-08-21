@@ -76,8 +76,7 @@ find ${BUILD_CACHE_DIR} -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\
 function install_from_buildcache {
     echo "" > ${FILE_HASHES_SPACK_ALL}
     for package in "${spack_packages[@]}"; do
-        ${MY_SPACK_BIN} spec -y ${package} | tee tmp_file
-        cat tmp_file | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> ${FILE_HASHES_SPACK_ALL}
+        ${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> ${FILE_HASHES_SPACK_ALL}
     done
 
     # make each unique
