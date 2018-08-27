@@ -74,7 +74,7 @@ fi
 
 # hard-link download cache into spack folder to avoid duplication
 mkdir -p ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
-cp -vrl $HOME/download_cache/{.*,*} ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
+cp -vrl $HOME/download_cache/* ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
 
 # set download mirror stuff to prefill outside of container
 export MY_SPACK_BIN=$PWD/spack_${SPACK_BRANCH}/bin/spack
