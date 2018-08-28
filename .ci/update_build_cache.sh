@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 # taken from ./deploy_container.sh -> TODO: move all variables to single file!
-IMAGE_NAME=singularity_spack_${SPACK_BRANCH}.img
+IMAGE_NAME=singularity_spack_temp.img
 BUILD_CACHE_DIR=${WORKSPACE}/build_cache
 
 # do not fail the build if some updates in the build-cache fail

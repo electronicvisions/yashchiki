@@ -2,6 +2,11 @@ pipeline {
 	agent { label 'conviz' }
 
 	stages {
+		stage('Validate environment') {
+			steps {
+				sh ".ci/validate_environment.sh"
+			}
+		}
 		stage('Clone') {
 			steps {
 				sh ".ci/clone.sh"

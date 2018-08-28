@@ -1,10 +1,5 @@
 #!/bin/bash -x
 
-if [ -z "${SPACK_BRANCH}" ]; then
-    echo "SPACK_BRANCH not set?!?"
-    exit 1
-fi
-
 if [ -z "${GERRIT_USERNAME}" ]; then
     GERRIT_USERNAME="hudson"
 fi
@@ -16,7 +11,6 @@ fi
 if [ -z "${GERRIT_HOSTNAME}" ]; then
     GERRIT_HOSTNAME="brainscales-r.kip.uni-heidelberg.de"
 fi
-
 
 if [ -z "${GERRIT_BASE_URL}" ]; then
     export GERRIT_BASE_URL="ssh://${GERRIT_USERNAME}@${GERRIT_HOSTNAME}:${GERRIT_PORT}"
