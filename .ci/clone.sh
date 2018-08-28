@@ -93,7 +93,6 @@ ${MY_SPACK_BIN} fetch --dependencies visionary-dls+gccxml || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-simulation || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-spikey || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-wafer+gccxml || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-slurmviz || exit 1
 
 # update download_cache
 rsync -av ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/

@@ -105,7 +105,6 @@ ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*
 spack_packages=(
     "visionary-defaults %gcc@7.2.0"
     "visionary-defaults+gccxml %gcc@7.2.0"
-    "visionary-defaults+tensorflow %gcc@7.2.0"
     "visionary-analysis~dev %gcc@7.2.0"
     "visionary-analysis %gcc@7.2.0"
     "visionary-dev-tools %gcc@7.2.0"
@@ -115,8 +114,6 @@ spack_packages=(
     "visionary-dls+gccxml %gcc@7.2.0"
     "visionary-nux~dev %gcc@7.2.0"
     "visionary-nux %gcc@7.2.0"
-    "visionary-simulation~dev %gcc@7.2.0"
-    "visionary-simulation %gcc@7.2.0"
     "visionary-spikey~dev %gcc@7.2.0"
     "visionary-spikey %gcc@7.2.0"
     "visionary-wafer~dev %gcc@7.2.0"
@@ -124,14 +121,13 @@ spack_packages=(
     "visionary-wafer~dev+gccxml %gcc@7.2.0"
     "visionary-wafer+gccxml %gcc@7.2.0"
     "visionary-dls-demos %gcc@7.2.0"
-    "visionary-slurmviz %gcc@7.2.0"
 )
 # tensorflow fails
 install_from_buildcache
 
 echo "INSTALLING PACKAGES"
 for package in "${spack_packages[@]}"; do
-    ${MY_SPACK_BIN} install -j$(nproc) ${package} || ( echo "FAILED TO INSTALL: ${package}" | tee -a ${MY_SPACK_FOLDER}/install_failed.log )
+    ${MY_SPACK_BIN} install -j$(nproc) ${package} || exit 1 # no silent fails!
 done
 
 # create the filesystem views (exposed via singularity --app option)
@@ -142,11 +138,9 @@ cd ${MY_SPACK_FOLDER}
 OLD_UMASK=$(umask)
 umask 000
 
-# hack to allow "tensorflow" to fail build -> FIXME!
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults~tensorflow~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gccxml
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults tensorflow
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis visionary-analysis+dev
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis gcc@7.2.0
@@ -163,11 +157,6 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-wi
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos visionary-dls-demos
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gccxml
-
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation visionary-simulation+dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation gcc@7.2.0
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev visionary-simulation~dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev gcc@7.2.0
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey visionary-spikey+dev
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey gcc@7.2.0
