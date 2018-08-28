@@ -21,7 +21,12 @@ MY_GERRIT_URL="${GERRIT_BASE_URL}/spack"
 rm -rf spack_${SPACK_BRANCH}
 git clone ${MY_GERRIT_URL} -b ${SPACK_BRANCH} spack_${SPACK_BRANCH}
 
-# Order of importance:
+
+# Checkout specific spack change in case we have a testing build.
+#
+# Please note that stable builds should ALWAYS build stable!
+#
+# order of importance:
 # 1. jenkins-specified SPACK_GERRIT_REFSPEC
 # 2. jenkins-specified SPACK_GERRIT_CHANGE
 # 3. commit-specified  Depends-On
@@ -33,7 +38,7 @@ if [ -z "${SPACK_GERRIT_CHANGE}" ] && [ -z "${SPACK_GERRIT_REFSPEC}" ]; then
     # see if the commit message contains a "Depends-On: xy" line
     # if there are several lines, concatenate with commas
     SPACK_GERRIT_CHANGE=$(git log -1 --pretty=%B \
-        | awk '$1 ~ "Depends-On:" { print $2 }' | tr '\n' ',' | tr -d \[:space:\])
+        | awk '$1 ~ "Depends-On:" { $1 = ""; print $0 }' | tr '\n' ',' | tr -d \[:space:\])
 else
     echo "SPACK_GERRIT_CHANGE or SPACK_GERRIT_REFSPEC specified, ignoring "\
          "possible 'Depends-On'-line in commit message!"
@@ -42,26 +47,41 @@ fi
 # if there is a spack gerrit change specified and no refspec -> resolve!
 if [ -n "${SPACK_GERRIT_CHANGE}" ] && [ -z "${SPACK_GERRIT_REFSPEC}" ]; then
     # convert spack change id to latest patchset
-    pushd spack_${SPACK_BRANCH}
+    pushd "spack_${SPACK_BRANCH}"
+
+    gerrit_query=$(mktemp)
 
     for change in ${SPACK_GERRIT_CHANGE//,/ }; do
-        SPACK_GERRIT_REFSPEC=$(ssh -p ${GERRIT_PORT} \
-                ${GERRIT_USERNAME}@${GERRIT_HOSTNAME} gerrit query \
-                --current-patch-set ${change} \
-            | grep "^[[:space:]]*ref:" | cut -d : -f 2 | tr -d \[:space:\])
+        ssh -p ${GERRIT_PORT} \
+               ${GERRIT_USERNAME}@${GERRIT_HOSTNAME} gerrit query \
+               --current-patch-set ${change} > ${gerrit_query}
+
+        SPACK_GERRIT_REFSPEC=$(grep "^[[:space:]]*ref:" ${gerrit_query} \
+            | cut -d : -f 2 | tr -d \[:space:\])
 
         # break as soon as we have the change for the spack repo
         if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
+            # in case we have a stable build, just make sure that the change we
+            # depend on has been merged, if not -> fail early!
+            if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
+                if [ "$(awk '$1 ~ "status:" { print $2 }' "${gerrit_query}")" != "MERGED" ]; then
+                    echo "This change depends on unmerged spack changeset! Aborting.." >&2
+                    rm "${gerrit_query}"
+                    exit 1
+                fi
+            fi
             break
         fi
     done
 
+    rm "${gerrit_query}"
+
     popd
 fi
 
-if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
+if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
     echo "SPACK_GERRIT_REFSPEC was specified: ${SPACK_GERRIT_REFSPEC} -> checking out"
-    pushd spack_${SPACK_BRANCH}
+    pushd "spack_${SPACK_BRANCH}"
     git fetch  ${MY_GERRIT_URL} ${SPACK_GERRIT_REFSPEC} && git checkout FETCH_HEAD
     popd
 fi
