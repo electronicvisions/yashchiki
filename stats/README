@@ -1,0 +1,4 @@
+This folder contains utility scripts to gather stats and provide maintenance
+capabilities for deployed containers.
+
+They are deployed with any new stable container build.

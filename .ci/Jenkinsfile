@@ -7,6 +7,12 @@ pipeline {
 				sh ".ci/validate_environment.sh"
 			}
 		}
+		stage('Deploy utilities')
+		{
+			steps {
+				sh ".ci/deploy_utilities.sh"
+			}
+		}
 		stage('Clone') {
 			steps {
 				sh ".ci/clone.sh"
