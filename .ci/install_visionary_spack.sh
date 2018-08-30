@@ -123,6 +123,7 @@ spack_packages=(
     "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-dls-demos^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "visionary-slurmviz^${DEPENDENCY_PYTHON} %gcc@7.2.0"
 )
 # tensorflow fails
 install_from_buildcache
@@ -177,6 +178,9 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simula
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev "visionary-simulation~dev %gcc@7.2.0"
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "visionary-dev-tools %gcc@7.2.0"
+
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %gcc@7.2.0"
+
 
 umask ${OLD_UMASK}
 

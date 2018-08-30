@@ -114,6 +114,7 @@ ${MY_SPACK_BIN} fetch --dependencies visionary-dls+gccxml^${DEPENDENCY_PYTHON} |
 ${MY_SPACK_BIN} fetch --dependencies visionary-simulation^${DEPENDENCY_PYTHON} || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-spikey^${DEPENDENCY_PYTHON} || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-wafer+gccxml^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-slurmviz^${DEPENDENCY_PYTHON} || exit 1
 
 # update download_cache
 rsync -av ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/
