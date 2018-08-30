@@ -41,5 +41,5 @@ cp -v "${IMAGE_NAME}" ${CONTAINER_NAME}
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     echo "Linking latest.."
-    ln -sfv "./$(basename \"${CONTAINER_NAME}\")" /containers/stable/latest
+    ln -sfv "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
 fi
