@@ -11,6 +11,10 @@
 # This might help in the future when to decide which containers to retire to
 # slow storage media.
 #
+# Possible arguments:
+#  reset        reset modification time on all images to track if they still
+#               get accessed
+#
 
 CONTAINER_PATH="/containers"
 CONTAINER_HOST="comicsans"
