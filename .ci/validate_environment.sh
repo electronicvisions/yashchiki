@@ -13,7 +13,7 @@ if [ "${CONTAINER_BUILD_TYPE}" != "testing" ] && \
     exit 1
 fi
 
-if [ "${CONTAINER_BUILD_TYPE}}" = "testing" ]; then
+if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
     if [[ -z "${GERRIT_CHANGE_NUMBER}" &&
         ( -z "${GERRIT_REFSPEC}" || -z "${GERRIT_PATCHSET_NUMBER}" )
         ]]; then
