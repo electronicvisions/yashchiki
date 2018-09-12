@@ -43,29 +43,37 @@ access_reset()
 # print names of files that were accessed after last modification flag reset
 show_accessed()
 {
-    get_images | xargs stat -c "%n %X %Y" | awk '($2 >= $3) { print $1 }'
-}
+    FILE_AWK="$(mktemp)"
 
-show_accessed_detail()
+    # Small awk script that adjusts the first column of output to fit the
+    # longest path. Also hides the seconds-since epoch column that is not
+    # really human readable
+    cat <<EOF >"${FILE_AWK}"
 {
-    get_images | xargs stat -c "%n %X %Y %y" \
-        | awk '($2 >= $3) { print $1 " accessed since " $4 " " $5 " " $6 }'
+    \$1="";
+    maxlen = ( maxlen < length(\$2) ) ? length(\$2) : maxlen;
+    names[++num_elems] = \$2;
+    access[num_elems] = \$3 " " \$4
 }
 
+END {
+    for (i = 1; i<num_elems; ++i) {
+        printf("%-" maxlen "s accessed at %s\\n", names[i], access[i])
+    }
+}
+EOF
+
+    # sort on seconds since epoch and then have awk present the human readable
+    # format in prettified way
+    get_images | xargs stat -c "%X %n %x" | sort -n | awk -f "${FILE_AWK}"
+    rm "${FILE_AWK}"
+}
 
 if [ "$1" = "reset" ]; then
     access_reset
 else
-    LAST_RESET=$(get_last_access_reset)
-    if [ "$(echo "${LAST_RESET}" | wc -l)" -gt 1 ]; then
-        echo "# " >&2
-        echo "# Warning: Found multiple modification timestamps!" >&2
-        echo "# " >&2
-        show_accessed_detail
-    else
-        echo "# " >&2
-        echo "# Containers accessed since ${LAST_RESET}:" >&2
-        echo "# " >&2
-        show_accessed
-    fi
+    echo "# " >&2
+    echo "# Sorted container access times:" >&2
+    echo "# " >&2
+    show_accessed
 fi
