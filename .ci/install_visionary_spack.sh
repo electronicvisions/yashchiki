@@ -96,7 +96,7 @@ install_from_buildcache
 
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
-${MY_SPACK_BIN} install -j$(nproc) gcc@7.2.0
+${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) gcc@7.2.0
 
 # add fresh compiler to spack
 ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-7.2.0-*
@@ -127,7 +127,8 @@ install_from_buildcache
 
 echo "INSTALLING PACKAGES"
 for package in "${spack_packages[@]}"; do
-    ${MY_SPACK_BIN} install -j$(nproc) ${package} || exit 1 # no silent fails!
+    ${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) ${package}\
+        || exit 1 # fail the script if any package fails to install
 done
 
 # create the filesystem views (exposed via singularity --app option)
