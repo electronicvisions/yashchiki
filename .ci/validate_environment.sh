@@ -14,10 +14,20 @@ if [ "${CONTAINER_BUILD_TYPE}" != "testing" ] && \
 fi
 
 if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
-    if [[ -z "${GERRIT_CHANGE_NUMBER}" &&
-        ( -z "${GERRIT_REFSPEC}" || -z "${GERRIT_PATCHSET_NUMBER}" )
-        ]]; then
-        echo -n "Neither GERRIT_REFSPEC nor GERRIT_CHANGE_NUMBER/GERRIT_PATCHSET_NUMBER specified " >&2
+    # In case of testing builds we need to include change number and patchset
+    # level into the final image name. Hence we check beforehand if we have all
+    # information to generate the image name.
+    #
+    # We need to have either:
+    # * both change number AND patchset number
+    # * a refspec from which we extract changeset number and patchset
+    # therefore we have to fail both cases fail.
+    #
+    if [[ ! (( -n "${GERRIT_CHANGE_NUMBER}"
+              && -n "${GERRIT_PATCHSET_NUMBER}" )
+             || -n "${GERRIT_REFSPEC}" ) ]]; then
+        echo -n "Neither GERRIT_REFSPEC nor GERRIT_CHANGE_NUMBER/" >&2
+        echo -n "GERRIT_PATCHSET_NUMBER specified " >&2
         echo    "for testing build." >&2
         exit 1
     fi
