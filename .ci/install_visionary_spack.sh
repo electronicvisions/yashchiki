@@ -109,6 +109,8 @@ SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON} %${VISIO
 spack_packages=(
     "visionary-defaults^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-defaults+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-defaults+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-defaults+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-analysis~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-analysis^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
@@ -125,7 +127,11 @@ spack_packages=(
     "visionary-wafer~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer~dev+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer~dev+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer-visu %${VISIONARY_GCC}"
     "visionary-dls-demos^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
@@ -146,7 +152,7 @@ cd ${MY_SPACK_FOLDER}
 OLD_UMASK=$(umask)
 umask 000
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults~tensorflow~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults+tensorflow~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gccxml
 
@@ -171,10 +177,10 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev visionary-spikey~dev
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev ${VISIONARY_GCC}
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer visionary-wafer+dev~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer visionary-wafer+dev+tensorflow~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer gccxml
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev visionary-wafer~dev~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev visionary-wafer~dev+tensorflow~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gccxml
 
