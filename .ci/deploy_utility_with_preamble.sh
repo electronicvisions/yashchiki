@@ -14,7 +14,7 @@ make_preamble()
 {
 echo "#"
 echo "# auto-deployed on $(date --iso) via"
-echo "# https://brainscales-r.kip.uni-heidelberg.de:11443/job/p-ecm_test-spack-in-singularity-pipeline-master/"
+echo "# https://brainscales-r.kip.uni-heidelberg.de:11443/job/bld_install-yashchiki/"
 echo -n "# from git-commit: "
 git log --no-decorate --oneline -n 1
 echo "#"
