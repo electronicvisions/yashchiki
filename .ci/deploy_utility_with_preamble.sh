@@ -27,3 +27,6 @@ len_preamble=$(awk -f "$(git rev-parse --show-toplevel)/.ci/find_num_lines_sheba
 head -n "${len_preamble}" "${src}" > "${dst}"
 make_preamble >> "${dst}"
 tail -n +$(( len_preamble + 1 )) "${src}" >> "${dst}"
+
+# make scripts executable
+chmod +x "${dst}"
