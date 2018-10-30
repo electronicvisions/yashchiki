@@ -1,8 +1,8 @@
 #!/bin/bash -x
 
-SOURCE_FOLDER="stats"
+SOURCE_FOLDER="utils"
 
-TARGET_FOLDER="/containers/stats"
+TARGET_FOLDER="/containers/utils"
 NAME_FILTER="*.sh"
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
