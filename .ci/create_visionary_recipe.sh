@@ -90,8 +90,7 @@ cat <<EOF >>${RECIPE_FILENAME}
     export VISIONARY_ENV=${view}
     SVF=/opt/spack_views/\${VISIONARY_ENV}
     export PATH=\${SVF}/bin\${PATH:+:}\${PATH}
-    export PYTHONPATH=\${SVF}/lib/python2.7/site-packages\${PYTHONPATH:+:}\${PYTHONPATH}
-    export PYTHONUSERBASE=\${SVF}\${PYTHONUSERBASE:+:}\${PYTHONUSERBASE}
+    export PYTHONHOME=\${SVF}
     export MANPATH=\${SVF}/man:\${SVF}/share/man\${MANPATH:+:}\${MANPATH}
     export LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LIBRARY_PATH:+:}\${LIBRARY_PATH}
     export LD_LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LD_LIBRARY_PATH:+:}\${LD_LIBRARY_PATH}
