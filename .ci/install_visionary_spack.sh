@@ -91,44 +91,44 @@ function install_from_buildcache {
 
 # check if it can be specialized
 spack_packages=(
-    "gcc@7.2.0"
+    $VISIONARY_GCC
 )
 install_from_buildcache
 
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
-${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) gcc@7.2.0
+${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) ${VISIONARY_GCC}
 
 # add fresh compiler to spack
-${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-7.2.0-*
+${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
 
 # the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
 
 # check if it can be specialized
 spack_packages=(
-    "visionary-defaults^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-defaults+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-analysis~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-analysis^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "visionary-defaults^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-defaults+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-analysis~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-analysis^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
-    "visionary-dls~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-dls^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-dls+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-nux~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-nux^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-simulation~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-simulation^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-spikey~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-spikey^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-wafer~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-wafer^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-wafer-visu %gcc@7.2.0"
-    "visionary-dls-demos^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-slurmviz^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "visionary-dls~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-dls^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-dls+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-nux~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-nux^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-simulation~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-simulation^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-spikey~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-spikey^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-wafer-visu %${VISIONARY_GCC}"
+    "visionary-dls-demos^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
 )
 # tensorflow fails
 install_from_buildcache
@@ -147,41 +147,41 @@ OLD_UMASK=$(umask)
 umask 000
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults~tensorflow~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis visionary-analysis+dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis-without-dev visionary-analysis~dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis-without-dev gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis-without-dev ${VISIONARY_GCC}
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls visionary-dls+dev~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls gccxml
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev visionary-dls~dev~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos visionary-dls-demos
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey visionary-spikey+dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev visionary-spikey~dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev ${VISIONARY_GCC}
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer visionary-wafer+dev~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer gccxml
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev visionary-wafer~dev~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gcc@7.2.0
+${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gccxml
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation "visionary-simulation+dev %gcc@7.2.0"
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev "visionary-simulation~dev %gcc@7.2.0"
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation "visionary-simulation+dev %${VISIONARY_GCC}"
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev "visionary-simulation~dev %${VISIONARY_GCC}"
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %gcc@7.2.0"
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %${VISIONARY_GCC}"
 
 # ensure that only one version of visionary-dev-tools is installed as view even
 # if several are installed due to different contstraints in other packages

@@ -105,7 +105,7 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
-${MY_SPACK_BIN} fetch --dependencies gcc@7.2.0 || exit 1
+${MY_SPACK_BIN} fetch --dependencies ${VISIONARY_GCC} || exit 1
 # FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
 ${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml^${DEPENDENCY_PYTHON} || exit 1
 ${MY_SPACK_BIN} fetch --dependencies visionary-analysis^${DEPENDENCY_PYTHON} || exit 1

@@ -82,6 +82,8 @@ Include: ca-certificates, ccache, curl, file, fxload, g++, gawk, gcc, git-core, 
     chown spack:nogroup /opt/shell
     # propagate environment variables to container recipe
     export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
+    export VISIONARY_GCC="${VISIONARY_GCC}"
+    export VISIONARY_GCC_VERSION="${VISIONARY_GCC_VERSION}"
     sudo -Eu spack /install_visionary_spack.sh
 EOF
 
