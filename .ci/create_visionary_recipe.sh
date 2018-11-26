@@ -74,6 +74,8 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, iproute2
     export SPACK_BRANCH=${SPACK_BRANCH}
     # symbolic link for convenience
     ln -s /opt/spack_\${SPACK_BRANCH} /opt/spack
+    # propagate environment variables to container recipe
+    export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
     sudo -Eu spack /install_visionary_spack.sh
 EOF
 

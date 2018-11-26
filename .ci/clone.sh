@@ -106,14 +106,14 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
 ${MY_SPACK_BIN} fetch --dependencies gcc@7.2.0 || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml^python@2.7.15 || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-analysis^python@2.7.15 || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-dev-tools^python@2.7.15 || exit 1
-# FIXME: ^python@2.7.15 is a workaround for an invalid spectrum-mpi concretization
-${MY_SPACK_BIN} fetch --dependencies visionary-dls+gccxml^python@2.7.15 || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-simulation^python@2.7.15 || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-spikey^python@2.7.15 || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-wafer+gccxml^python@2.7.15 || exit 1
+# FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
+${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-analysis^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-dev-tools^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-dls+gccxml^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-simulation^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-spikey^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies visionary-wafer+gccxml^${DEPENDENCY_PYTHON} || exit 1
 
 # update download_cache
 rsync -av ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/
