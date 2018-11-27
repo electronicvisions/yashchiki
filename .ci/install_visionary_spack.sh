@@ -171,6 +171,7 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gccxml
 
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "visionary-dev-tools %gcc@7.2.0"
 
 umask ${OLD_UMASK}
 
