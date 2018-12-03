@@ -3,7 +3,6 @@ pipeline {
 	environment {
 		/* FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization */
 		DEPENDENCY_PYTHON="python@2.7.15"
-		SINGULARITYENV_DEPENDENCY_PYTHON="${env.DEPENDENCY_PYTHON}"
 	}
 	stages {
 		stage('Validate environment') {

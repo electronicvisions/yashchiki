@@ -13,14 +13,6 @@ if [ "${CONTAINER_BUILD_TYPE}" != "testing" ] && \
     exit 1
 fi
 
-if [ "${DEPENDENCY_PYTHON}" != "${SINGULARITYENV_DEPENDENCY_PYTHON}" ]; then
-    echo "${DEPENDENCY_PYTHON} will not be successfully set in singularity!" >&2
-    echo "\$DEPENDENCY_PYTHON = ${DEPENDENCY_PYTHON}" >&2
-    echo "\$SINGULARITYENV_DEPENDENCY_PYTHON = ${SINGULARITYENV_DEPENDENCY_PYTHON}" >&2
-    exit 1
-fi
-
-
 if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
     # In case of testing builds we need to include change number and patchset
     # level into the final image name. Hence we check beforehand if we have all
