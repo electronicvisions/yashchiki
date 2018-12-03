@@ -114,6 +114,8 @@ spack_packages=(
     "visionary-dls+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-nux~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-nux^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "visionary-simulation~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "visionary-simulation^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-spikey~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-spikey^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-wafer~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
@@ -170,6 +172,9 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev visionary-wafer~dev~gccxml
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gcc@7.2.0
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gccxml
+
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation "visionary-simulation+dev %gcc@7.2.0"
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev "visionary-simulation~dev %gcc@7.2.0"
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "visionary-dev-tools %gcc@7.2.0"
 
