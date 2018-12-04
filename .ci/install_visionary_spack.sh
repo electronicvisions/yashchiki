@@ -200,6 +200,13 @@ chmod -R 777 ${MY_SPACK_FOLDER}/opt/spack/.spack-db
 # module files also need to be updated if the user installs packages
 chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules
 
+# Have convience symlinks for shells for user sessions so that they can be
+# executed via:
+# $ singularity shell -s /opt/shell/${SHELL} /containers/stable/latest
+# which is independent of any app. Especially, this allows custom loading of
+# modules within the container.
+ln -s "$(${MY_SPACK_BIN} location -i zsh)/bin/zsh" /opt/shell/zsh
+
 # remove tempfiles
 rm ${FILE_HASHES_BUILDCACHE}
 rm ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}
