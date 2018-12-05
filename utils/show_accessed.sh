@@ -57,7 +57,7 @@ show_accessed()
 }
 
 END {
-    for (i = 1; i<num_elems; ++i) {
+    for (i = 1; i<=num_elems; ++i) {
         printf("%-" maxlen "s last accessed at %s\\n", names[i], access[i])
     }
 }
