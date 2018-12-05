@@ -26,7 +26,7 @@ get_images()
 
 get_last_access_reset()
 {
-    get_images | xargs stat -c "%y" | sort | uniq
+    get_images | xargs stat -c "%x" | sort | uniq
 }
 
 access_reset()
@@ -58,7 +58,7 @@ show_accessed()
 
 END {
     for (i = 1; i<num_elems; ++i) {
-        printf("%-" maxlen "s accessed at %s\\n", names[i], access[i])
+        printf("%-" maxlen "s last accessed at %s\\n", names[i], access[i])
     }
 }
 EOF
