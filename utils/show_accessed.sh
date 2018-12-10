@@ -12,12 +12,15 @@
 # slow storage media.
 #
 # Possible arguments:
+#  archive      print commands to move containers into archive
 #  reset        reset modification time on all images to track if they still
 #               get accessed
+#  show         show access times of containers (default)
 #
 
 CONTAINER_PATH="/containers"
 CONTAINER_HOST="comicsans"
+CONTAINER_ARCHIVE="/ley/data/containers/archive"
 
 get_images()
 {
@@ -40,9 +43,19 @@ access_reset()
     fi
 }
 
-# print names of files that were accessed after last modification flag reset
-show_accessed()
+show_by_access()
 {
+    # Align given string by fist column, sorted by access.
+    #
+    # $1: string to be passed to awk script describing contents of first colum
+    # $2: prefix to be put between aligned first colum and access time
+    #
+    FIRST_COLUMN="${1}"
+    if (( "$#" > 1 )); then
+        PREFIX_ACCESS=${2}
+    else
+        PREFIX_ACCESS=" last accessed at "
+    fi
     FILE_AWK="$(mktemp)"
 
     # Small awk script that adjusts the first column of output to fit the
@@ -51,14 +64,15 @@ show_accessed()
     cat <<EOF >"${FILE_AWK}"
 {
     \$1="";
-    maxlen = ( maxlen < length(\$2) ) ? length(\$2) : maxlen;
-    names[++num_elems] = \$2;
+    first_column=${FIRST_COLUMN};
+    maxlen = ( maxlen < length(first_column) ) ? length(first_column) : maxlen;
+    lines[++num_elems] = first_column;
     access[num_elems] = \$3 " " \$4
 }
 
 END {
     for (i = 1; i<=num_elems; ++i) {
-        printf("%-" maxlen "s last accessed at %s\\n", names[i], access[i])
+        printf("%-" maxlen "s${PREFIX_ACCESS}%s\\n", lines[i], access[i])
     }
 }
 EOF
@@ -69,11 +83,43 @@ EOF
     rm "${FILE_AWK}"
 }
 
-if [ "$1" = "reset" ]; then
+# print names of files that were accessed after last modification flag reset
+show_accessed()
+{
+    if [ -t 1 ]; then
+        # helper text when outputting to terminal
+        echo "# " >&2
+        echo "# Sorted container access times:" >&2
+        echo "# " >&2
+    fi
+    show_by_access "\$2"
+}
+
+show_archive_cmds()
+{
+    if [ -t 1 ]; then
+        # helper text when outputting to terminal
+        echo "# " >&2
+        echo "# Use as user vis_jenkins: bash <($0 archive | head -n \${NUMBER_OF_CONTAINERS_TO_ARCHIVE})" >&2
+        echo "# " >&2
+    fi
+    show_by_access "\"mv -v \" \$2" " ${CONTAINER_ARCHIVE}  # last accessed at "
+}
+
+case "$1" in
+"reset")
     access_reset
-else
-    echo "# " >&2
-    echo "# Sorted container access times:" >&2
-    echo "# " >&2
+;;
+"archive")
+    show_archive_cmds
+;;
+"show")
     show_accessed
-fi
+;;
+"")
+    show_accessed
+;;
+*)
+    echo "# Unrecognized command: $1"
+    echo "# Valid commands: archive, reset, show (default)"
+esac
