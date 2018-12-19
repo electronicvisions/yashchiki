@@ -1,4 +1,5 @@
 #!/bin/bash -x
+set -euo pipefail
 
 if [ -z "${SPACK_BRANCH}" ]; then
     echo "SPACK_BRANCH variable isn't set!"
@@ -131,8 +132,7 @@ install_from_buildcache
 
 echo "INSTALLING PACKAGES"
 for package in "${spack_packages[@]}"; do
-    ${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) ${package}\
-        || exit 1 # fail the script if any package fails to install
+    ${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) ${package}
 done
 
 # create the filesystem views (exposed via singularity --app option)
@@ -181,7 +181,6 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simula
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "visionary-dev-tools %gcc@7.2.0"
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %gcc@7.2.0"
-
 
 umask ${OLD_UMASK}
 
