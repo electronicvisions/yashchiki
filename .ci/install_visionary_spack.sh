@@ -102,13 +102,16 @@ ${MY_SPACK_BIN} install --show-log-on-error -j$(nproc) gcc@7.2.0
 # add fresh compiler to spack
 ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-7.2.0-*
 
+# the version of dev tools we want in our view
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+
 # check if it can be specialized
 spack_packages=(
     "visionary-defaults^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-defaults+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-analysis~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-analysis^${DEPENDENCY_PYTHON} %gcc@7.2.0"
-    "visionary-dev-tools^${DEPENDENCY_PYTHON} %gcc@7.2.0"
+    "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
     "visionary-dls~dev^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-dls^${DEPENDENCY_PYTHON} %gcc@7.2.0"
     "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON} %gcc@7.2.0"
@@ -178,9 +181,12 @@ ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation "visionary-simulation+dev %gcc@7.2.0"
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev "visionary-simulation~dev %gcc@7.2.0"
 
-${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "visionary-dev-tools %gcc@7.2.0"
-
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %gcc@7.2.0"
+
+# ensure that only one version of visionary-dev-tools is installed as view even
+# if several are installed due to different contstraints in other packages
+hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L ${SPEC_VIEW_VISIONARY_DEV_TOOLS} | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "/${hash_visionary_dev_tools}"
 
 umask ${OLD_UMASK}
 
