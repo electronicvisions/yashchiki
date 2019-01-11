@@ -43,7 +43,7 @@ cat <<EOF >${RECIPE_FILENAME}
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
-Include: ca-certificates, ccache, cpio, curl, file, fxload, g++, gawk, gcc, git-core, iproute2, iptables, iputils-ping, lbzip2, less, libc6-dev, libusb-dev, libusb-1.0-0-dev, locales, make, netbase, net-tools, patch, procps, python, ssh, strace, sudo, udev, unzip, vim-nox, xz-utils, zsh
+Include: ca-certificates, ccache, cpio, curl, file, fxload, g++, gawk, gcc, git-core, iproute2, iptables, iputils-ping, lbzip2, less, libc6-dev, libusb-dev, libusb-1.0-0-dev, locales, make, man-db, netbase, net-tools, patch, procps, python, ssh, strace, sudo, udev, unzip, vim-nox, xz-utils, zsh
 
 %setup
     mv ${WORKSPACE}/spack_${SPACK_BRANCH}/ \${SINGULARITY_ROOTFS}/opt/
