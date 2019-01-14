@@ -43,7 +43,7 @@ cat <<EOF >${RECIPE_FILENAME}
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
-Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, iproute2, iputils-ping, lbzip2, less, libc6-dev, libusb-1.0-0-dev, locales, make, netbase, patch, procps, python, ssh, strace, sudo, udev, unzip, vim-nox, xz-utils
+Include: ca-certificates, ccache, curl, file, fxload, g++, gawk, gcc, git-core, iproute2, iputils-ping, lbzip2, less, libc6-dev, libusb-dev, libusb-1.0-0-dev, locales, make, netbase, patch, procps, python, ssh, strace, sudo, udev, unzip, vim-nox, xz-utils
 
 %setup
     mv ${WORKSPACE}/spack_${SPACK_BRANCH}/ \${SINGULARITY_ROOTFS}/opt/
@@ -61,6 +61,8 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, iproute2
     ${WORKSPACE}/misc-files/locale.gen /etc/
 
 %post
+    # for premium software (e.g. Xilinx impact)
+    ln -s /lib/x86_64-linux-gnu/libusb-0.1.so.4 /lib/x86_64-linux-gnu/libusb.so
     # install locales
     locale-gen
     # spack stuff
