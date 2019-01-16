@@ -59,8 +59,12 @@ Include: ca-certificates, ccache, curl, file, fxload, g++, gawk, gcc, git-core, 
     # provide spack command to login shells
     ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/
     ${WORKSPACE}/misc-files/locale.gen /etc/
+    ${WORKSPACE}/misc-files/sudoers /etc
 
 %post
+    # cannot specify permissions in %files section
+    chmod 440 /etc/sudoers
+    chown root:root /etc/sudoers
     # for premium software (e.g. Xilinx impact)
     ln -s /lib/x86_64-linux-gnu/libusb-0.1.so.4 /lib/x86_64-linux-gnu/libusb.so
     echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
