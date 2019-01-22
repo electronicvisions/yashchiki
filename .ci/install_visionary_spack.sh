@@ -71,6 +71,15 @@ FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE=$(mktemp)
 FILE_HASHES_SPACK=$(mktemp)
 FILE_HASHES_SPACK_ALL=$(mktemp)
 
+remove_tmp_files() {
+    # remove tempfiles
+    rm "${FILE_HASHES_BUILDCACHE}"
+    rm "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
+    rm "${FILE_HASHES_SPACK}"
+    rm "${FILE_HASHES_SPACK_ALL}"
+}
+trap remove_tmp_files EXIT
+
 # extract all available package hashes from buildcache
 find ${BUILD_CACHE_DIR} -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > ${FILE_HASHES_BUILDCACHE}
 
@@ -190,7 +199,7 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simula
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %${VISIONARY_GCC}"
 
 # ensure that only one version of visionary-dev-tools is installed as view even
-# if several are installed due to different contstraints in other packages
+# if several are installed due to different constraints in other packages
 hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L ${SPEC_VIEW_VISIONARY_DEV_TOOLS} | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "/${hash_visionary_dev_tools}"
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools ${VISIONARY_GCC}
@@ -230,9 +239,3 @@ chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules
 # which is independent of any app. Especially, this allows custom loading of
 # modules within the container.
 ln -s "$(${MY_SPACK_BIN} location -i zsh)/bin/zsh" /opt/shell/zsh
-
-# remove tempfiles
-rm ${FILE_HASHES_BUILDCACHE}
-rm ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}
-rm ${FILE_HASHES_SPACK}
-rm ${FILE_HASHES_SPACK_ALL}
