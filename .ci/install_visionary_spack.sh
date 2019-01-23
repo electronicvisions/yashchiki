@@ -212,6 +212,8 @@ rm -rf ${MY_SPACK_FOLDER}/var/spack/{cache,stage}/*
 chmod -R 777 ${MY_SPACK_FOLDER}/var/spack/{cache,stage}
 # locks and indices have to be writable for local user when trying to install
 chmod -R 777 ${MY_SPACK_FOLDER}/opt/spack/.spack-db
+# same goes for local caches
+chmod -R 777 ${MY_SPACK_FOLDER}/.spack
 # module files also need to be updated if the user installs packages
 chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules
 

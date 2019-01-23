@@ -73,7 +73,7 @@ Include: ca-certificates, ccache, cpio, curl, file, fxload, g++, gawk, gcc, git-
     # install locales
     locale-gen
     # spack stuff
-    adduser spack --no-create-home --home /tmp/spack --disabled-password --system --shell /bin/bash
+    adduser spack --uid 102 --no-create-home --home /tmp/spack --disabled-password --system --shell /bin/bash
     chown spack:nogroup /opt
     mkdir /opt/spack_views
     chown spack:nogroup /opt/spack_views
