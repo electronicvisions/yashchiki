@@ -132,11 +132,3 @@ else
     mkdir ccache/
 fi
 chmod -R 777 ccache/
-
-# create hardlinked build_cache folder (owned by spack user)
-if [ -d ${HOME}/build_cache ]; then
-    cp -rl ${HOME}/build_cache .
-else
-    mkdir build_cache/
-    chmod -R 777 build_cache/
-fi

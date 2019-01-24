@@ -50,7 +50,7 @@ Include: ca-certificates, ccache, cpio, curl, file, fxload, g++, gawk, gcc, git-
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind ${WORKSPACE}/ccache \${SINGULARITY_ROOTFS}/opt/ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/build_cache
-    mount --no-mtab --bind ${WORKSPACE}/build_cache \${SINGULARITY_ROOTFS}/opt/build_cache
+    mount --no-mtab --bind -o ro ${HOME}/build_cache \${SINGULARITY_ROOTFS}/opt/build_cache
 
 %files
     ${SOURCE_DIR}/install_visionary_spack.sh install_visionary_spack.sh
