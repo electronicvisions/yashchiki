@@ -1,3 +1,12 @@
+Closure cleanupSteps = {
+	sh ".ci/remove_sandboxes.sh"
+	sh ".ci/remove_tmp_spack.sh"
+	sh ".ci/remove_ccache.sh"
+	cleanWs(patterns: [[pattern: 'ccache/', type: 'EXCLUDE'],
+	                   [pattern: 'download_cache/', type: 'EXCLUDE']],
+	        deleteDirs: true)
+}
+
 pipeline {
 	agent { label 'conviz' }
 	environment {
@@ -12,15 +21,23 @@ pipeline {
 				sh ".ci/validate_environment.sh"
 			}
 		}
-		stage('Deploy utilities')
-		{
+		stage('Pre-build Cleanup') {
 			steps {
-				sh ".ci/deploy_utilities.sh"
+				script {
+					cleanupSteps()
+				}
 			}
 		}
 		stage('Clone') {
 			steps {
+				checkout scm
 				sh ".ci/clone.sh"
+			}
+		}
+		stage('Deploy utilities')
+		{
+			steps {
+				sh ".ci/deploy_utilities.sh"
 			}
 		}
 		stage('Create visionary Recipe') {
@@ -48,12 +65,9 @@ pipeline {
 
 	post {
 		cleanup {
-			sh ".ci/remove_sandboxes.sh"
-			sh ".ci/remove_tmp_spack.sh"
-			sh ".ci/remove_ccache.sh"
-			cleanWs(patterns: [[pattern: 'ccache/', type: 'EXCLUDE'],
-			                  [pattern: 'download_cache/', type: 'EXCLUDE']],
-			        deleteDirs: true)
+			script {
+				cleanupSteps()
+			}
 		}
 	}
 }
