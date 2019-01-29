@@ -6,7 +6,7 @@ if [ -z "${SPACK_BRANCH}" ]; then
     exit 1
 fi
 
-SPACK_TMPDIR=$(cat /path_spack_tmpdir)
+export SPACK_TMPDIR=$(cat /path_spack_tmpdir)
 # TODO: check for empty folder
 
 export OLD_HOME=$HOME
