@@ -1,6 +1,9 @@
 #!/bin/bash -x
 set -euo pipefail
 
+# prevent readarray from being executed in pipe subshell
+shopt -s lastpipe
+
 if [ -z "${SPACK_BRANCH}" ]; then
     echo "SPACK_BRANCH variable isn't set!"
     exit 1
@@ -100,7 +103,7 @@ function install_from_buildcache {
 
 # check if it can be specialized
 spack_packages=(
-    $VISIONARY_GCC
+    ${VISIONARY_GCC}
 )
 install_from_buildcache
 
@@ -145,6 +148,15 @@ spack_packages=(
     "visionary-dls-demos^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
 )
+
+spack_views_no_default_gcc=(
+    "visionary-nux"
+)
+
+# get spack_package_names from spack_packages
+printf "%s\n" "${spack_packages[@]}" | awk -F '~|+| |\\^|%' '{ print $1 }' \
+    | sort | uniq | readarray -t spack_package_names
+
 # tensorflow fails
 install_from_buildcache
 
@@ -162,35 +174,25 @@ OLD_UMASK=$(umask)
 umask 000
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults+tensorflow~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis visionary-analysis+dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis-without-dev visionary-analysis~dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-analysis-without-dev ${VISIONARY_GCC}
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls visionary-dls+dev~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls gccxml
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev visionary-dls~dev~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos visionary-dls-demos
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-demos gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey visionary-spikey+dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev visionary-spikey~dev
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev ${VISIONARY_GCC}
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer visionary-wafer+dev+tensorflow~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer gccxml
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev visionary-wafer~dev+tensorflow~gccxml
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev ${VISIONARY_GCC}
 ${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev gccxml
 
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation "visionary-simulation+dev %${VISIONARY_GCC}"
@@ -202,7 +204,21 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmv
 # if several are installed due to different constraints in other packages
 hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L ${SPEC_VIEW_VISIONARY_DEV_TOOLS} | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "/${hash_visionary_dev_tools}"
-${MY_SPACK_BIN} view -d no  hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools ${VISIONARY_GCC}
+
+# Add visionary gcc into ALL views (if this causes an error in the future, we
+# can filter)
+for package_name in "${spack_package_names[@]}"; do
+    if printf "%s\n" "${spack_views_no_default_gcc[@]}" \
+            | grep -qF "${viewname}"; then
+        continue
+    fi
+    for viewname in ${package_name}{,-without-dev}; do
+        if [ -d "${MY_SPACK_VIEW_PREFIX}/${viewname}" ]; then
+            ${MY_SPACK_BIN} view -d no  hardlink -i \
+                "${MY_SPACK_VIEW_PREFIX}/${viewname}" "${VISIONARY_GCC}"
+        fi
+    done
+done
 
 umask ${OLD_UMASK}
 

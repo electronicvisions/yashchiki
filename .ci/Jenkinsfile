@@ -13,7 +13,7 @@ pipeline {
 		/* FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization */
 		DEPENDENCY_PYTHON="python@2.7.15"
 		VISIONARY_GCC_VERSION="8.2.0"
-		VISIONARY_GCC="gcc@8.2.0"
+		VISIONARY_GCC="gcc@${VISIONARY_GCC_VERSION}"
 	}
 	stages {
 		stage('Validate environment') {
