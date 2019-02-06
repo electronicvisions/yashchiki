@@ -1,18 +1,21 @@
 #!/bin/bash -x
 
-if [ -z "${GERRIT_USERNAME}" ]; then
+SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
+source "${SOURCE_DIR}/commons.sh"
+
+if [ -z "${GERRIT_USERNAME:-}" ]; then
     GERRIT_USERNAME="hudson"
 fi
 
-if [ -z "${GERRIT_PORT}" ]; then
+if [ -z "${GERRIT_PORT:-}" ]; then
     GERRIT_PORT=29418
 fi
 
-if [ -z "${GERRIT_HOSTNAME}" ]; then
+if [ -z "${GERRIT_HOSTNAME:-}" ]; then
     GERRIT_HOSTNAME="brainscales-r.kip.uni-heidelberg.de"
 fi
 
-if [ -z "${GERRIT_BASE_URL}" ]; then
+if [ -z "${GERRIT_BASE_URL:-}" ]; then
     export GERRIT_BASE_URL="ssh://${GERRIT_USERNAME}@${GERRIT_HOSTNAME}:${GERRIT_PORT}"
 fi
 
@@ -34,7 +37,7 @@ git clone ${MY_GERRIT_URL} -b ${SPACK_BRANCH} spack_${SPACK_BRANCH}
 # If multiple are specified, take the first variable defined according the
 # order above.
 
-if [ -z "${SPACK_GERRIT_CHANGE}" ] && [ -z "${SPACK_GERRIT_REFSPEC}" ]; then
+if [ -z "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
     # see if the commit message contains a "Depends-On: xy" line
     # if there are several lines, concatenate with commas
     SPACK_GERRIT_CHANGE=$(git log -1 --pretty=%B \
@@ -45,7 +48,7 @@ else
 fi
 
 # if there is a spack gerrit change specified and no refspec -> resolve!
-if [ -n "${SPACK_GERRIT_CHANGE}" ] && [ -z "${SPACK_GERRIT_REFSPEC}" ]; then
+if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
     # convert spack change id to latest patchset
     pushd "spack_${SPACK_BRANCH}"
 
@@ -79,7 +82,7 @@ if [ -n "${SPACK_GERRIT_CHANGE}" ] && [ -z "${SPACK_GERRIT_REFSPEC}" ]; then
     popd
 fi
 
-if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
+if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC:-}" ]; then
     echo "SPACK_GERRIT_REFSPEC was specified: ${SPACK_GERRIT_REFSPEC} -> checking out"
     pushd "spack_${SPACK_BRANCH}"
     git fetch  ${MY_GERRIT_URL} ${SPACK_GERRIT_REFSPEC} && git checkout FETCH_HEAD
@@ -124,11 +127,3 @@ ${MY_SPACK_BIN} mirror rm --scope site job_mirror
 
 # remove f***ing compiler config
 rm ${PWD}/spack_${SPACK_BRANCH}/etc/spack/compilers.yaml
-
-# create hardlinked ccache folder
-if [ -d ${HOME}/ccache ]; then
-    cp -rl ${HOME}/ccache .
-else
-    mkdir ccache/
-fi
-chmod -R 777 ccache/

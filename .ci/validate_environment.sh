@@ -1,4 +1,6 @@
 #!/bin/bash -x
+set -euo pipefail
+
 #
 # Some early checks to make sure all needed environment variables are defined.
 #
@@ -32,3 +34,7 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
         exit 1
     fi
 fi
+
+# source file for early validation
+SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
+source "${SOURCE_DIR}/commons.sh"

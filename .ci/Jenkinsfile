@@ -1,19 +1,19 @@
 Closure cleanupSteps = {
 	sh ".ci/remove_sandboxes.sh"
 	sh ".ci/remove_tmp_spack.sh"
-	sh ".ci/remove_ccache.sh"
-	cleanWs(patterns: [[pattern: 'ccache/', type: 'EXCLUDE'],
-	                   [pattern: 'download_cache/', type: 'EXCLUDE']],
+	cleanWs(patterns: [[pattern: 'download_cache/', type: 'EXCLUDE']],
 	        deleteDirs: true)
 }
 
 pipeline {
-	agent { label 'conviz' }
+	agent { label 'conviz||conviz2' }
 	environment {
 		/* FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization */
 		DEPENDENCY_PYTHON="python@2.7.15"
 		VISIONARY_GCC_VERSION="8.2.0"
 		VISIONARY_GCC="gcc@${VISIONARY_GCC_VERSION}"
+		JOB_TMP_SPACK=sh(script: "mktemp -d /tmp/spack-XXXXXXXXXX",
+				returnStdout: true).trim()
 	}
 	stages {
 		stage('Validate environment') {
@@ -26,6 +26,7 @@ pipeline {
 				script {
 					cleanupSteps()
 				}
+				sh "mkdir \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
 			}
 		}
 		stage('Clone') {
@@ -40,17 +41,17 @@ pipeline {
 				sh ".ci/deploy_utilities.sh"
 			}
 		}
-		stage('Create visionary Recipe') {
+		stage('Create visionary recipe') {
 			steps {
 				sh ".ci/create_visionary_recipe.sh"
 			}
 		}
-		stage('Build Container') {
+		stage('Build container') {
 			steps {
 				sh ".ci/build_container.sh"
 			}
 		}
-		stage('Update Build Cache') {
+		stage('Update build cache') {
 			steps {
 				sh ".ci/update_build_cache.sh"
 			}
