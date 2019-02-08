@@ -191,3 +191,34 @@ _install_from_buildcache() {
     # TODO verify that -j reads from default config, if not -> add
     ${MY_SPACK_BIN} buildcache install -y -w -j$(nproc) ${hashes_to_install} || true
 }
+
+#############
+# UTILITIES #
+#############
+
+# copied from slurmviz-commons.sh
+get_latest_version() {
+  # Usage: get_latest_version <pkg-name>
+  #
+  # Get the latest version of a given package in the spack installation. This
+  # takes into account compiler version, so if a package is available by two
+  # compiler versions, the newer one is taken.
+  FILE_AWK=$(mktemp)
+  cat >"${FILE_AWK}" <<EOF
+/^--/ {
+  # \`spack find\` sorts installed specs by compiler, these lines start with
+  # two dashes and we can hence identify the compiler name in the fourth field.
+  compiler=\$4
+}
+
+/^[a-zA-Z]/ {
+  # insert compiler name into spec name at appropriate position (i.e., prior to
+  # specifying any variants)
+  idx = match(\$1, /(\\+|\\~|$)/);
+  printf("%s%%%s%s\\n", substr(\$1, 0, idx-1), compiler, substr(\$1, idx))
+}
+EOF
+
+  ${MY_SPACK_BIN} find -v "$1" | awk -f "${FILE_AWK}"| sort -V | tail -n 1
+  rm "${FILE_AWK}"
+}

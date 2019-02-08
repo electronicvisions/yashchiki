@@ -11,19 +11,23 @@ export TMPDIR=${SPACK_TMPDIR}/tmp
 export CCACHE_DIR="/opt/ccache"
 export BUILD_CACHE_DIR="/opt/build_cache"
 
-if [ ! -d ${MY_SPACK_FOLDER} ]; then
+if [ ! -d "${MY_SPACK_FOLDER}" ]; then
     echo "${MY_SPACK_FOLDER} does not exist!"
     exit 1
 fi
 
-if [ ! -d ${CCACHE_DIR} ]; then
+if [ ! -d "${CCACHE_DIR}" ]; then
     echo "${CCACHE_DIR} does not exist!"
     exit 1
 fi
 
-if [ ! -d ${BUILD_CACHE_DIR} ]; then
+if [ ! -d "${BUILD_CACHE_DIR}" ]; then
     echo "${BUILD_CACHE_DIR} does not exist!"
     exit 1
+fi
+
+if [ ! -d "${TMPDIR}" ]; then
+    mkdir -p "${TMPDIR}"
 fi
 
 # pip alterrrr
