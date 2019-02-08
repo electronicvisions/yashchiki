@@ -6,7 +6,14 @@ export MY_SPACK_FOLDER=/opt/spack_${SPACK_BRANCH}
 export MY_SPACK_BIN=/opt/spack_${SPACK_BRANCH}/bin/spack
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
-LOCK_BUILD_CACHE=/opt/lock/build_cache
+LOCK_FOLDER_INSIDE=/opt/lock
+LOCK_FOLDER_OUTSIDE=/home/vis_jenkins/lock
+
+BUILD_CACHE_INSIDE="/opt/build_cache"
+BUILD_CACHE_LOCK="${LOCK_FOLDER_INSIDE}/build_cache"
+BUILD_CACHE_OUTSIDE="/home/vis_jenkins/build_cache"
+
+SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
 
 ############
 # PACKAGES #
@@ -155,8 +162,8 @@ compute_hashes_buildcache() {
 
 install_from_buildcache() {
     # obtain shared lock around buildcache
-    exec {lock_fd}>"${LOCK_BUILD_CACHE}"
-    flock -sn "${lock_fd}" || { echo "ERROR: flock() failed." >&2; exit 1; }
+    exec {lock_fd}>"${BUILD_CACHE_LOCK}"
+    flock -s "${lock_fd}"
     _install_from_buildcache "${@}"
     flock -u "${lock_fd}"
 }

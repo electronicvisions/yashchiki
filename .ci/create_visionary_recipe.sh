@@ -20,32 +20,32 @@ cat <<EOF >${RECIPE_FILENAME}
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
-Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, patch, procps, python, ssh, sudo, udev, unzip, xz-utils
+Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, patch, procps, python, rsync, ssh, sudo, udev, unzip, xz-utils
 
 %setup
-    mv ${WORKSPACE}/spack_${SPACK_BRANCH}/ \${SINGULARITY_ROOTFS}/opt/
+    mv "${WORKSPACE}/spack_${SPACK_BRANCH}/" "\${SINGULARITY_ROOTFS}/opt/"
     # bind-mount ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
-    mount --no-mtab --bind ${HOME}/spack_ccache \${SINGULARITY_ROOTFS}/opt/ccache
+    mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
     # bind-mount build_cache
-    mkdir \${SINGULARITY_ROOTFS}/opt/build_cache
-    mount --no-mtab --bind -o ro ${HOME}/build_cache \${SINGULARITY_ROOTFS}/opt/build_cache
+    mkdir "\${SINGULARITY_ROOTFS}/${BUILD_CACHE_INSIDE}"
+    mount --no-mtab --bind -o ro "${BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}/${BUILD_CACHE_INSIDE}"
     # bind-mount tmp-folder
     mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack"
     mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
     # lockfiles folder
-    mkdir \${SINGULARITY_ROOTFS}/opt/lock
-    mount --no-mtab --bind ${HOME}/lock \${SINGULARITY_ROOTFS}/opt/lock
+    mkdir "\${SINGULARITY_ROOTFS}/opt/lock"
+    mount --no-mtab --bind "${LOCK_FOLDER_OUTSIDE}" "\${SINGULARITY_ROOTFS}/${LOCK_FOLDER_INSIDE}"
     # copy install scripts
-    mkdir \${SINGULARITY_ROOTFS}/opt/spack_install_scripts
-    rsync -av ${SOURCE_DIR}/*.sh \${SINGULARITY_ROOTFS}/opt/spack_install_scripts/
+    mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
 
 %files
-    ${WORKSPACE}/${GITLOG} ${GITLOG}
+    "${WORKSPACE}/${GITLOG}" "${GITLOG}"
     # provide spack command to login shells
-    ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/
-    ${WORKSPACE}/misc-files/locale.gen /etc/
-    ${WORKSPACE}/misc-files/sudoers /etc
+    "${WORKSPACE}/misc-files/setup-spack.sh" /etc/profile.d/
+    "${WORKSPACE}/misc-files/locale.gen" /etc/
+    "${WORKSPACE}/misc-files/sudoers" /etc
 
 %post
     # cannot specify permissions in %files section
@@ -65,12 +65,12 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     # specified under "Inlucde:" above. install_system_dependencies.sh should
     # only install packages that are needed once the container finished
     # building!
-    /opt/spack_install_scripts/install_system_dependencies.sh &
-    /opt/spack_install_scripts/prepare_spack_as_root.sh
-    sudo -Eu spack /opt/spack_install_scripts/bootstrap_spack.sh
-    sudo -Eu spack /opt/spack_install_scripts/install_visionary_spack.sh
-    sudo -Eu spack /opt/spack_install_scripts/restore_spack_user_settings.sh
-    # system dependencies might not have installed now
+    "${SPACK_INSTALL_SCRIPTS}/install_system_dependencies.sh" &
+    "${SPACK_INSTALL_SCRIPTS}/prepare_spack_as_root.sh"
+    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/bootstrap_spack.sh"
+    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_visionary_spack.sh"
+    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings.sh"
+    # system dependencies might not have installed by now
     wait
 EOF
 
@@ -78,7 +78,7 @@ EOF
 for view in "${spack_views[@]}"; do
 
     # append apps for each spackview...
-cat <<EOF >>${RECIPE_FILENAME}
+cat <<EOF >>"${RECIPE_FILENAME}"
 
 %appenv ${view}
     # there can only be one app loaded at any time
