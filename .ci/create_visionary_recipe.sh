@@ -58,11 +58,20 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     export VISIONARY_GCC="${VISIONARY_GCC}"
     export VISIONARY_GCC_VERSION="${VISIONARY_GCC_VERSION}"
     export SPACK_BRANCH=${SPACK_BRANCH}
-    /opt/spack_install_scripts/install_system_dependencies.sh
+    # Improve efficiency by installing system packages in the background (even
+    # though we set the number of worker to \$(nproc), often times - e.g. when
+    # concretizing - only one process will be active.)
+    # NOTE: For this to work all spack-related dependencies need to be
+    # specified under "Inlucde:" above. install_system_dependencies.sh should
+    # only install packages that are needed once the container finished
+    # building!
+    /opt/spack_install_scripts/install_system_dependencies.sh &
     /opt/spack_install_scripts/prepare_spack_as_root.sh
     sudo -Eu spack /opt/spack_install_scripts/bootstrap_spack.sh
     sudo -Eu spack /opt/spack_install_scripts/install_visionary_spack.sh
     sudo -Eu spack /opt/spack_install_scripts/restore_spack_user_settings.sh
+    # system dependencies might not have installed now
+    wait
 EOF
 
 # create appenvs for all views...
