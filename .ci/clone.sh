@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+set -euo pipefail
+
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
@@ -108,19 +110,15 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
-${MY_SPACK_BIN} fetch --dependencies ${VISIONARY_GCC} || exit 1
-# FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
-${MY_SPACK_BIN} fetch --dependencies visionary-defaults+tensorflow+gccxml^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-analysis^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-dev-tools^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-dls+gccxml^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-simulation^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-spikey^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-wafer+gccxml^${DEPENDENCY_PYTHON} || exit 1
-${MY_SPACK_BIN} fetch --dependencies visionary-slurmviz^${DEPENDENCY_PYTHON} || exit 1
+${MY_SPACK_BIN} fetch --dependencies ${VISIONARY_GCC}
+
+for package in "${spack_packages[@]}"; do
+    # we need to strip the compiler spec from the package description
+    ${MY_SPACK_BIN} fetch --dependencies "${package//%*[![:space:]]/}"
+done
 
 # update download_cache
-rsync -av ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/ ${HOME}/download_cache/
+rsync -av "${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/" "${HOME}/download_cache/"
 
 # remove job_mirror again (re-added in container)
 ${MY_SPACK_BIN} mirror rm --scope site job_mirror
