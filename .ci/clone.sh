@@ -99,7 +99,7 @@ cp -vrl $HOME/download_cache/* ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
 export MY_SPACK_BIN=$PWD/spack_${SPACK_BRANCH}/bin/spack
 ${MY_SPACK_BIN} mirror rm --scope site global
 # TODO: delme (download cache is handled manually)
-${MY_SPACK_BIN} mirror add --scope site job_mirror file://${HOME}/download_cache
+${MY_SPACK_BIN} mirror add --scope site job_mirror "file://${HOME}/download_cache"
 
 # add system compiler (needed for fetching)
 ${MY_SPACK_BIN} compiler add --scope site /usr/bin
@@ -110,12 +110,73 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
-${MY_SPACK_BIN} fetch --dependencies ${VISIONARY_GCC}
 
-for package in "${spack_packages[@]}"; do
-    # we need to strip the compiler spec from the package description
-    ${MY_SPACK_BIN} fetch --dependencies "${package//%*[![:space:]]/}"
+tmpfiles_fetch=()
+tmpfiles_err=()
+rm_tmp_to_fetch() {
+    rm -v "${tmpfiles_fetch[@]}"
+    rm -v "${tmpfiles_err[@]}"
+}
+trap rm_tmp_to_fetch EXIT
+
+# concretize all spack packages in parallel -> fetch once!
+packages_to_concretize=( "${VISIONARY_GCC}" "${spack_packages[@]}" )
+for package in "${packages_to_concretize[@]}"; do
+    # pause if we have sufficient concretizing jobs
+    set +x # do not clobber build log so much
+    while (( $(jobs | wc -l) >= $(nproc) )); do
+        sleep 1
+    done
+    set -x
+    tmp="$(mktemp)"
+    tmp_err="$(mktemp)"
+    tmpfiles_fetch+=("${tmp}")
+    tmpfiles_err+=("${tmp_err}")
+    # we need to strip the compiler spec from the package description because
+    # the compiler is not yet known to spack
+    # awk transforms the list of dependencies to a list of specs, skipping the
+    # header in the beginning
+    (${MY_SPACK_BIN} spec "${package//%*[![:space:]]/}" \
+        | awk 'header_line >= 2 { gsub(/^\s*\^/, ""); print } /^-/ { header_line+=1 }' \
+        1>"${tmp}" 2>"${tmp_err}" ) &
 done
+# wait for all spawned jobs to complete
+wait
+
+# verify that all concretizations were successful
+if (($(cat "${tmpfiles_err[@]}" | wc -l) > 0)); then
+    echo "ERROR: Encountered the following during concretizations:" >&2
+    cat "${tmpfiles_err[@]}" >&2
+    exit 1
+fi
+
+# prevent readarray from being executed in pipe subshell
+reset_lastpipe=0
+if ! shopt -q lastpipe; then
+    shopt -s lastpipe
+    reset_lastpipe=1
+fi
+
+# make sure we fetch everything once and only take name and variants of each
+# package (everything up to compiler spec)
+sort "${tmpfiles_fetch[@]}" | uniq | awk -F '%' '{ print $1 }' | readarray -t packages_to_fetch
+
+if (( reset_lastpipe )); then
+    # restore defaults
+    shopt -u lastpipe
+fi
+
+for package in "${packages_to_fetch[@]}"; do
+    # pause if we have sufficient concretizing jobs
+    set +x # do not clobber build log so much
+    while (( $(jobs | wc -l) >= $(nproc) )); do
+        sleep 1
+    done
+    set -x
+    ${MY_SPACK_BIN} fetch "${package}" &
+done
+# wait for all spawned jobs to complete
+wait
 
 # update download_cache
 rsync -av "${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/" "${HOME}/download_cache/"
