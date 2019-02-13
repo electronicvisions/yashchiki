@@ -35,10 +35,6 @@ spack_packages=(
     "visionary-analysis~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-analysis^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
-    "visionary-dls~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-dls^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-dls+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-nux~dev %${VISIONARY_GCC}"
     "visionary-nux %${VISIONARY_GCC}"
     "visionary-simulation~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
@@ -54,7 +50,6 @@ spack_packages=(
     "visionary-wafer+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer-visu %${VISIONARY_GCC}"
-    "visionary-dls-demos^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "tensorflow@1.8.0^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     # START python 3 packages
@@ -92,8 +87,6 @@ spack_views=(\
         visionary-analysis-without-dev
         visionary-dls
         visionary-dls-without-dev
-        visionary-dls-py3
-        visionary-dls-py3-without-dev
         visionary-simulation
         visionary-simulation-without-dev
         visionary-spikey
