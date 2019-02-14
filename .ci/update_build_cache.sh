@@ -24,4 +24,4 @@ sudo -Eu spack singularity exec\
     -B "${BUILD_CACHE_OUTSIDE}:${BUILD_CACHE_INSIDE}:rw"\
     -B "${LOCK_FOLDER_OUTSIDE}:${LOCK_FOLDER_INSIDE}"\
     "${IMAGE_NAME}" \
-    /opt/slurm_install_scripts/update_build_cache_in_container.sh || exit 0
+    /opt/spack_install_scripts/update_build_cache_in_container.sh || exit 0
