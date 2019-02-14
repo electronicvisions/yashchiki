@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+set -euo pipefail
+
 echo "deploying container to /containers"
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
