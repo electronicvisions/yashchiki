@@ -3,12 +3,22 @@
 set -euo pipefail
 
 # set generic locale for building
-export LANG=C
-export LC_ALL=C
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+
+unset LC_CTYPE
+unset LC_COLLATE
+unset LC_MONETARY
+unset LC_NUMERIC
+unset LC_TIME
+unset LC_MESSAGES
 
 echo "creating visionary-recipe.def"
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 "${SOURCE_DIR}/create_visionary_recipe.sh"
+
+echo "created visionary-recipe.def"
+cat "${WORKSPACE}/visionary_recipe.def"
 
 # create some jenkins-owned temp folder for spack build
 if [ ! -d "${JOB_TMP_SPACK}" ]; then

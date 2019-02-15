@@ -16,7 +16,7 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 # * create "spack" user in the container and run spack installation script as spack user
 #   (-> installs to /opt/spack_SPACK_BRANCH, and creates views)
 # * provide "apps" which set environment variables to appropriate views
-cat <<EOF >${RECIPE_FILENAME}
+cat <<EOF >"${RECIPE_FILENAME}"
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
@@ -52,7 +52,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     ${WORKSPACE}/misc-files/sudoers /etc/sudoers
 
 %post
-    # cannot specify permissions in %files section
+    # cannot specify permissions in files-section
     chmod 440 /etc/sudoers
     chown root:root /etc/sudoers
     # install locales
