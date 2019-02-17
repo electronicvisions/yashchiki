@@ -41,11 +41,15 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
 
 %files
-    "${WORKSPACE}/${GITLOG}" "${GITLOG}"
+    # NOTE: Due to a bug in singularity 2.6 all paths in this section _cannot_
+    # be surrounded in quotes.. ergo there should be no spaces in filenames! If
+    # there are, I pray for your poor soul that escaping them works..
+    # --obreitwi, 17-02-19 # 23:45:51
+    ${WORKSPACE}/${GITLOG} ${GITLOG}
     # provide spack command to login shells
-    "${WORKSPACE}/misc-files/setup-spack.sh" /etc/profile.d/
-    "${WORKSPACE}/misc-files/locale.gen" /etc/
-    "${WORKSPACE}/misc-files/sudoers" /etc
+    ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
+    ${WORKSPACE}/misc-files/locale.gen /etc/locale.gen
+    ${WORKSPACE}/misc-files/sudoers /etc/sudoers
 
 %post
     # cannot specify permissions in %files section
