@@ -49,6 +49,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     # provide spack command to login shells
     ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
     ${WORKSPACE}/misc-files/locale.gen /etc/locale.gen
+    ${WORKSPACE}/misc-files/locale.alias /etc/locale.alias
     ${WORKSPACE}/misc-files/sudoers /etc/sudoers
 
 %post
