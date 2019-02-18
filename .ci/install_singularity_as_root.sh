@@ -67,7 +67,7 @@ pushd "${SINGULARITY_INSTALL_PATH}"
 ./mconfig -b "${SPACK_TMPDIR}/singularity-builddir" \
     --prefix=/usr/local \
     --localstatedir=/var/lib \
-    --sysconfdir=/etc/singularity
+    --sysconfdir=/etc
 
 pushd "${SPACK_TMPDIR}/singularity-builddir"
 make && make install
