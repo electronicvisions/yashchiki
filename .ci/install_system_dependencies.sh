@@ -3,6 +3,7 @@
 set -euo pipefail
 
 system_dependencies=(
+        "corkscrew"
         "cpio"
         "fxload"
         "iproute2"
@@ -16,6 +17,7 @@ system_dependencies=(
         "net-tools"
         "strace"
         "texlive-full"
+        "tsocks"
         "vim-nox"
         "xz-utils"
         "zsh"
