@@ -53,15 +53,19 @@ pipeline {
 				sh ".ci/build_container.sh"
 			}
 		}
-		stage('Update build cache') {
-			steps {
-				sh ".ci/update_build_cache.sh"
-			}
-		}
-		stage('Export') {
-			steps {
-				sh ".ci/deploy_container.sh"
-				echo "TODO skipping (due to disk usage problems on jenviz): archiveArtifacts artifacts: '*.img', onlyIfSuccessful: true"
+		stage('Update build cache and export container') {
+			parallel {
+				stage('Update build cache') {
+					steps {
+						sh ".ci/update_build_cache.sh"
+					}
+				}
+				stage('Export') {
+					steps {
+						sh ".ci/deploy_container.sh"
+						echo "TODO skipping (due to disk usage problems on jenviz): archiveArtifacts artifacts: '*.img', onlyIfSuccessful: true"
+					}
+				}
 			}
 		}
 	}
