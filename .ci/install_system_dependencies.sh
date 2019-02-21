@@ -27,6 +27,7 @@ system_dependencies=(
         "texlive"
         "texlive-lang-german"
         "texlive-latex-extra"
+        "tshark"
         "tsocks"
         "usbutils"
         "vim-nox"
@@ -35,6 +36,17 @@ system_dependencies=(
     )
 # for premium software (e.g. Xilinx impact)
 ln -s /lib/x86_64-linux-gnu/libusb-0.1.so.4 /lib/x86_64-linux-gnu/libusb.so
+
+# usually debconf poses questions regarding configuraiton for the user to
+# answer during install, but we install headless -> we need to tell debian to
+# look up our pre-determined answers via the noninteractive
+export DEBIAN_FRONTEND=noninteractive
+
+# Make the following selections for debconf:
+# * install tshark with setuid binaries (needed to capture raw network traffic)
+debconf-set-selections <<EOF
+wireshark-common wireshark-common/install-setuid boolean true
+EOF
 
 # install singularity
 # (temporarily disabled because we rely on unmerged features)
