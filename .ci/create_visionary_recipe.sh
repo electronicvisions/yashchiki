@@ -39,6 +39,9 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    # init scripts for user convenience
+    mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
+    rsync -av "${WORKSPACE}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
 
 %files
     # NOTE: Due to a bug in singularity 2.6 all paths in this section _cannot_
