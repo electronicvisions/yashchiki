@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# This file is to install all packages needed from apt that are not required by
+# spack in order to bootstrap itself.
+
 system_dependencies=(
         "corkscrew"
         "cpio"
@@ -13,6 +16,7 @@ system_dependencies=(
         "libcap2-bin"
         "libusb-1.0-0-dev"
         "libusb-dev"
+        "linux-perf"
         "man-db"
         "net-tools"
         "strace"
