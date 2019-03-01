@@ -83,7 +83,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     # currently, singularity needs some dependendencies from apt as well, so
     # wait till we are finished with system dependencies
     wait
-    /opt/spack_install_scripts/install_singularity_as_root.sh
+    "${SPACK_INSTALL_SCRIPTS}/install_singularity_as_root.sh"
 EOF
 
 # create appenvs for all views...

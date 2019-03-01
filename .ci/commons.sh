@@ -166,37 +166,41 @@ trap remove_tmp_files EXIT
 
 compute_hashes_buildcache() {
     # extract all available package hashes from buildcache
-    find ${BUILD_CACHE_DIR} -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > "${FILE_HASHES_BUILDCACHE}"
+    find "${BUILD_CACHE_DIR}" -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > "${FILE_HASHES_BUILDCACHE}"
 }
 
 install_from_buildcache() {
     # obtain shared lock around buildcache
     exec {lock_fd}>"${BUILD_CACHE_LOCK}"
+    echo "Locking buildcache (shared).." >&2
     flock -s "${lock_fd}"
+    echo "Locked buildcache (shared)." >&2
     _install_from_buildcache "${@}"
+    echo "Unlocking buildcache (shared).." >&2
     flock -u "${lock_fd}"
+    echo "Unlocked buildcache (shared)." >&2
 }
 
 _install_from_buildcache() {
     # only extract the hashes present in buildcache on first invocation
-    if [ "$(cat "${FILE_HASHES_BUILDCACHE}" | wc -l)" -eq 0 ]; then
+    if [ "$(wc -l < "${FILE_HASHES_BUILDCACHE}")" -eq 0 ]; then
         compute_hashes_buildcache
     fi
 
     # install packages from buildcache
     packages_to_install=("${@}")
 
-    echo "" > ${FILE_HASHES_SPACK_ALL}
+    echo "" > "${FILE_HASHES_SPACK_ALL}"
     for package in "${packages_to_install[@]}"; do
-        ${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> ${FILE_HASHES_SPACK_ALL}
+        ${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> "${FILE_HASHES_SPACK_ALL}"
     done
 
     # make each unique
     cat ${FILE_HASHES_SPACK_ALL} | sort | uniq > ${FILE_HASHES_SPACK}
 
     # install if available in buildcache
-    cat ${FILE_HASHES_SPACK} ${FILE_HASHES_BUILDCACHE} | sort | uniq -d > ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}
-    hashes_to_install=$(sed "s:^:/:g" < ${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE} | tr '\n' ' ')
+    cat "${FILE_HASHES_SPACK}" "${FILE_HASHES_BUILDCACHE}" | sort | uniq -d > "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
+    hashes_to_install=$(sed "s:^:/:g" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" | tr '\n' ' ')
     # TODO verify that -j reads from default config, if not -> add
     # HOTFIX: halve the number of buildcache worker to circumvent oom-killer
     # Problem (in odd cases round up!)
