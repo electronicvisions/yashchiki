@@ -11,7 +11,12 @@ chown spack:nogroup /opt
 mkdir /opt/spack_views
 chown spack:nogroup /opt/spack_views
 chmod go=rwx /opt
-chown -R spack:nogroup /opt/spack_${SPACK_BRANCH}
+# in the final image /opt/spack* should be owned by the spack user.
+# Therefore: chown everything to the spack user except for var/cache (contains
+# hardlinks to vis_jenkins-owned files)
+find "/opt/spack_${SPACK_BRANCH}" \
+    \( -type d -wholename "/opt/spack_${SPACK_BRANCH}/var/spack/cache" -prune \
+    \) -o -exec chown spack:nogroup '{}' \;
 chmod +x /opt/spack_install_scripts/*.sh
 # symbolic link for convenience
 ln -s "/opt/spack_${SPACK_BRANCH}" /opt/spack
