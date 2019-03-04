@@ -6,7 +6,7 @@ Closure cleanupSteps = {
 }
 
 pipeline {
-	agent { label 'conviz||conviz2' }
+	agent { label 'conviz1||conviz2' }
 	options { timestamps () }
 
 	environment {
@@ -14,7 +14,7 @@ pipeline {
 		DEPENDENCY_PYTHON="python@2.7.15"
 		VISIONARY_GCC_VERSION="8.2.0"
 		VISIONARY_GCC="gcc@${VISIONARY_GCC_VERSION}"
-		JOB_TMP_SPACK=sh(script: "mktemp -d /tmp/spack-XXXXXXXXXX",
+		JOB_TMP_SPACK=sh(script: "mkdir -p /tmp/${env.NODE_NAME} &>/dev/null; mktemp -d /tmp/${env.NODE_NAME}/spack-XXXXXXXXXX",
 				returnStdout: true).trim()
 	}
 	stages {
@@ -28,7 +28,7 @@ pipeline {
 				script {
 					cleanupSteps()
 				}
-				sh "mkdir \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
+				sh "mkdir -p \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
 			}
 		}
 		stage('Clone') {

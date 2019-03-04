@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
+# NOTE: Do not allow more than one build per executor!
 # Do not change: special sudo permit for jenkins user...
-if [ -d "${JOB_TMP_SPACK}" ]; then
-    sudo /bin/rm -rf "${JOB_TMP_SPACK}"
-fi
+sudo /bin/rm -rf "/tmp/${NODE_NAME}/"
