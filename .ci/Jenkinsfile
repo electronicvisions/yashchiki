@@ -14,7 +14,8 @@ pipeline {
 		DEPENDENCY_PYTHON="python@2.7.15"
 		VISIONARY_GCC_VERSION="8.2.0"
 		VISIONARY_GCC="gcc@${VISIONARY_GCC_VERSION}"
-		JOB_TMP_SPACK=sh(script: "mkdir -p /tmp/${env.NODE_NAME} &>/dev/null; mktemp -d /tmp/${env.NODE_NAME}/spack-XXXXXXXXXX",
+		TMPDIR="/tmp/${env.NODE_NAME}"
+		JOB_TMP_SPACK=sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
 				returnStdout: true).trim()
 	}
 	stages {

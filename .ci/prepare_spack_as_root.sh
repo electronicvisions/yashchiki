@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # prepare spack as root during container setup
 
