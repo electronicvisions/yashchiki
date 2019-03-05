@@ -54,6 +54,15 @@ spack_packages=(
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
 )
 
+# TODO: Keep in sync with <spack-repo>/lib/spack/spack/cmd/bootstrap.py since
+# there is no straight-forward way to extract bootstrap dependencies
+# automatically. If bootstrap dependencies should change we will notice because
+# they won't be able to be fetched inside the container because of missing
+# permissions.
+spack_bootstrap_dependencies=(
+    "environment-modules~X"
+)
+
 #########
 # VIEWS #
 #########

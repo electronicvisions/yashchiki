@@ -120,7 +120,11 @@ rm_tmp_to_fetch() {
 trap rm_tmp_to_fetch EXIT
 
 # concretize all spack packages in parallel -> fetch once!
-packages_to_concretize=( "${VISIONARY_GCC}" "${spack_packages[@]}" )
+packages_to_concretize=(
+    "${VISIONARY_GCC}"
+    "${spack_bootstrap_dependencies[@]}"
+    "${spack_packages[@]}"
+)
 for package in "${packages_to_concretize[@]}"; do
     # pause if we have sufficient concretizing jobs
     set +x # do not clobber build log so much
