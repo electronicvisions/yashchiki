@@ -190,10 +190,11 @@ _install_from_buildcache() {
     # install packages from buildcache
     packages_to_install=("${@}")
 
-    echo "" > "${FILE_HASHES_SPACK_ALL}"
+    (
     for package in "${packages_to_install[@]}"; do
-        ${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p' >> "${FILE_HASHES_SPACK_ALL}"
+        echo "${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p'"
     done
+    ) | parallel > "${FILE_HASHES_SPACK_ALL}"
 
     # make each unique
     cat ${FILE_HASHES_SPACK_ALL} | sort | uniq > ${FILE_HASHES_SPACK}
