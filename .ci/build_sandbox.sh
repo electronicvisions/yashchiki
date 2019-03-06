@@ -42,8 +42,3 @@ mkdir sandboxes
 
 # Do not change: special sudo permit for jenkins user...
 sudo -E singularity build --sandbox "${TARGET_FOLDER}" visionary_recipe.def
-
-# create image file
-IMAGE_NAME=singularity_spack_temp.img
-sudo singularity build ${IMAGE_NAME} "${TARGET_FOLDER}"
-sudo chown -R vis_jenkins singularity_spack_*.img

@@ -49,9 +49,14 @@ pipeline {
 				sh ".ci/create_visionary_recipe.sh"
 			}
 		}
-		stage('Build container') {
+		stage('Build sandbox') {
 			steps {
-				sh ".ci/build_container.sh"
+				sh ".ci/build_sandbox.sh"
+			}
+		}
+		stage('Build container image') {
+			steps {
+				sh ".ci/build_image.sh"
 			}
 		}
 		stage('Update build cache and export container') {
