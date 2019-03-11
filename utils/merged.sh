@@ -32,26 +32,20 @@ get_changesets()
     get_images | xargs -n 1 basename | sed "s/c\\(.*\\)p.*/\\1/g" | sort | uniq
 }
 
-get_merged_changesets()
+get_merged_or_abandoned_changesets()
 {
-    gerrit_query=$(mktemp)
-
     for cs in $(get_changesets); do
         ssh -p ${GERRIT_PORT} \
-            ${GERRIT_USERNAME}@${GERRIT_HOSTNAME} gerrit query \
-            --current-patch-set ${cs} > "${gerrit_query}"
-
-        awk "\$1 ~ \"status:\" && \$2 ~ \"MERGED\" { print ${cs} }" \
-            "${gerrit_query}"
+            "${GERRIT_USERNAME}@${GERRIT_HOSTNAME}" gerrit query \
+            --current-patch-set "${cs}" | \
+        awk "\$1 ~ \"status:\" && (\$2 ~ \"MERGED\" || \$2 ~ \"ABANDONED\") { print ${cs} }"
     done
-
-    rm "${gerrit_query}"
 }
 
-get_merged_images()
+get_merged_or_abandoned_images()
 {
     local pattern=""
-    for cs in $(get_merged_changesets); do
+    for cs in $(get_merged_or_abandoned_changesets); do
         if [ -z "${pattern}" ]; then
             pattern="\\(c${cs}p"
         else
@@ -70,22 +64,22 @@ get_merged_images()
 if [ "$1" = "clean" ]; then
     if [ "$UID" -eq 0 ] && [ "$(hostname)" = "${CONTAINER_HOST}" ]; then
         tmp=$(mktemp)
-        get_merged_images | xargs rm -v > "${tmp}"
+        get_merged_or_abandoned_images | xargs rm -v > "${tmp}"
         cat "${tmp}" >&2
-        echo "# Cleaned $(wc -l < ${tmp}) images belonging to merged changesets." >&2
+        echo "# Cleaned $(wc -l < ${tmp}) images belonging to merged (or abandoned) changesets." >&2
         rm "${tmp}"
     else
         echo -n "Must be root on ${CONTAINER_HOST} to clean images for " >&2
-        echo "merged changesets!" >&2
+        echo "merged (or abandoned) changesets!" >&2
         exit 1
     fi
 else
     echo "#" >&2
-    echo "# The following images correspond to merged changesets:" >&2
+    echo "# The following images correspond to merged (or abandoned) changesets:" >&2
     echo -n "# Run $0 with 'clean' argument as root on " >&2
     echo "${CONTAINER_HOST} to remove them." >&2
     echo "#" >&2
 
-    get_merged_images
+    get_merged_or_abandoned_images
 fi
 
