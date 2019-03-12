@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-export MY_SPACK_FOLDER=/opt/spack_${SPACK_BRANCH}
-export MY_SPACK_BIN=/opt/spack_${SPACK_BRANCH}/bin/spack
+export MY_SPACK_FOLDER=/opt/spack
+export MY_SPACK_BIN=/opt/spack/bin/spack
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 LOCK_FOLDER_INSIDE=/opt/lock

@@ -14,7 +14,7 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 # * bind mount spack's buildcache into the container -> speed up stuff
 # * copy spack installation script into container
 # * create "spack" user in the container and run spack installation script as spack user
-#   (-> installs to /opt/spack_SPACK_BRANCH, and creates views)
+#   (-> installs to /opt/spack, and creates views)
 # * provide "apps" which set environment variables to appropriate views
 cat <<EOF >"${RECIPE_FILENAME}"
 bootstrap: debootstrap
@@ -23,7 +23,7 @@ OSVersion: stretch
 Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, procps, python, rsync, ssh, sudo, udev, unzip, xz-utils
 
 %setup
-    mv "${WORKSPACE}/spack_${SPACK_BRANCH}/" "\${SINGULARITY_ROOTFS}/opt/"
+    mv "${WORKSPACE}/spack/" "\${SINGULARITY_ROOTFS}/opt/"
     # bind-mount ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
@@ -65,7 +65,6 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
     export VISIONARY_GCC="${VISIONARY_GCC}"
     export VISIONARY_GCC_VERSION="${VISIONARY_GCC_VERSION}"
-    export SPACK_BRANCH=${SPACK_BRANCH}
     # Improve efficiency by installing system packages in the background (even
     # though we set the number of worker to \$(nproc), often times - e.g. when
     # concretizing - only one process will be active.)

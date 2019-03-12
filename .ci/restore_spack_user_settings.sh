@@ -23,7 +23,7 @@ find "${MY_SPACK_FOLDER}" \
 
 # allow non-spack users to install new packages
 # Note: modified packages can be loaded by bind-mounting the /var-subdirectory
-# of a locally checked out spack-repo at /opt/spack_${SPACK_BRANCH} in the container
+# of a locally checked out spack-repo at /opt/spack in the container
 chmod 777 "${MY_SPACK_FOLDER}"/opt/spack/{*/*,*,}
 
 # shrink image: remove useless links in the stage area

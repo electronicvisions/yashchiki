@@ -23,8 +23,8 @@ fi
 
 # clone spack installation ouside and copy into the container
 MY_GERRIT_URL="${GERRIT_BASE_URL}/spack"
-rm -rf spack_${SPACK_BRANCH}
-git clone ${MY_GERRIT_URL} -b ${SPACK_BRANCH} spack_${SPACK_BRANCH}
+rm -rf spack
+git clone ${MY_GERRIT_URL} -b visionary spack
 
 
 # Checkout specific spack change in case we have a testing build.
@@ -52,7 +52,7 @@ fi
 # if there is a spack gerrit change specified and no refspec -> resolve!
 if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
     # convert spack change id to latest patchset
-    pushd "spack_${SPACK_BRANCH}"
+    pushd "spack"
 
     gerrit_query=$(mktemp)
 
@@ -86,17 +86,17 @@ fi
 
 if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC:-}" ]; then
     echo "SPACK_GERRIT_REFSPEC was specified: ${SPACK_GERRIT_REFSPEC} -> checking out"
-    pushd "spack_${SPACK_BRANCH}"
+    pushd "spack"
     git fetch  ${MY_GERRIT_URL} ${SPACK_GERRIT_REFSPEC} && git checkout FETCH_HEAD
     popd
 fi
 
 # hard-link download cache into spack folder to avoid duplication
-mkdir -p ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
-cp -vrl $HOME/download_cache/* ${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/
+mkdir -p ${PWD}/spack/var/spack/cache/
+cp -vrl $HOME/download_cache/* ${PWD}/spack/var/spack/cache/
 
 # set download mirror stuff to prefill outside of container
-export MY_SPACK_BIN=$PWD/spack_${SPACK_BRANCH}/bin/spack
+export MY_SPACK_BIN=$PWD/spack/bin/spack
 ${MY_SPACK_BIN} mirror rm --scope site global
 # TODO: delme (download cache is handled manually)
 ${MY_SPACK_BIN} mirror add --scope site job_mirror "file://${HOME}/download_cache"
@@ -186,10 +186,10 @@ done
 wait
 
 # update download_cache
-rsync -av "${PWD}/spack_${SPACK_BRANCH}/var/spack/cache/" "${HOME}/download_cache/"
+rsync -av "${PWD}/spack/var/spack/cache/" "${HOME}/download_cache/"
 
 # remove job_mirror again (re-added in container)
 ${MY_SPACK_BIN} mirror rm --scope site job_mirror
 
 # remove f***ing compiler config
-rm ${PWD}/spack_${SPACK_BRANCH}/etc/spack/compilers.yaml
+rm ${PWD}/spack/etc/spack/compilers.yaml

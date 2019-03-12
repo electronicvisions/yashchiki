@@ -33,7 +33,7 @@ chmod 777 "${JOB_TMP_SPACK}"
 export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
 export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
-TARGET_FOLDER="sandboxes/stretch_spack_${SPACK_BRANCH}"
+TARGET_FOLDER="sandboxes/stretch_spack"
 
 # Do not change: special sudo permit for jenkins user...
 sudo rm -rf sandboxes/

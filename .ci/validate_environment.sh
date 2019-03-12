@@ -4,11 +4,6 @@ set -euo pipefail
 #
 # Some early checks to make sure all needed environment variables are defined.
 #
-if [ -z "${SPACK_BRANCH}" ]; then
-    echo "SPACK_BRANCH not set!" >&2
-    exit 1
-fi
-
 if [ "${CONTAINER_BUILD_TYPE}" != "testing" ] && \
         [ "${CONTAINER_BUILD_TYPE}" != "stable" ]; then
     echo "CONTAINER_BUILD_TYPE needs to be 'testing' or 'stable'!" >&2
