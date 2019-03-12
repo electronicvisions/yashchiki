@@ -7,18 +7,20 @@
 #  clean        delete all images belonging to already merged changesets
 #
 
+set -euo pipefail
+
 CONTAINER_PATH="/containers/testing"
 CONTAINER_HOST="comicsans"
 
-if [ -z "${GERRIT_USERNAME}" ]; then
+if [ -z "${GERRIT_USERNAME:-}" ]; then
     GERRIT_USERNAME=$(git config gitreview.username || echo "$USER")
 fi
 
-if [ -z "${GERRIT_PORT}" ]; then
+if [ -z "${GERRIT_PORT:-}" ]; then
     GERRIT_PORT=29418
 fi
 
-if [ -z "${GERRIT_HOSTNAME}" ]; then
+if [ -z "${GERRIT_HOSTNAME:-}" ]; then
     GERRIT_HOSTNAME="brainscales-r.kip.uni-heidelberg.de"
 fi
 
@@ -61,12 +63,12 @@ get_merged_or_abandoned_images()
 }
 
 
-if [ "$1" = "clean" ]; then
+if (( $# > 0 )) && [ "$1" = "clean" ]; then
     if [ "$UID" -eq 0 ] && [ "$(hostname)" = "${CONTAINER_HOST}" ]; then
         tmp=$(mktemp)
         get_merged_or_abandoned_images | xargs rm -v > "${tmp}"
         cat "${tmp}" >&2
-        echo "# Cleaned $(wc -l < ${tmp}) images belonging to merged (or abandoned) changesets." >&2
+        echo "# Cleaned $(wc -l < "${tmp}") images belonging to merged (or abandoned) changesets." >&2
         rm "${tmp}"
     else
         echo -n "Must be root on ${CONTAINER_HOST} to clean images for " >&2
