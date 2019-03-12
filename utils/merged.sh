@@ -34,6 +34,16 @@ get_changesets()
     get_images | xargs -n 1 basename | sed "s/c\\(.*\\)p.*/\\1/g" | sort | uniq
 }
 
+get_changesets_with_status()
+{
+    for cs in $(get_changesets); do
+        ssh -p ${GERRIT_PORT} \
+            "${GERRIT_USERNAME}@${GERRIT_HOSTNAME}" gerrit query \
+            --current-patch-set "${cs}" | \
+        awk "\$1 ~ \"status:\" { print \"CS:\", \"${cs}\", \"status:\", \$2 }"
+    done
+}
+
 get_merged_or_abandoned_changesets()
 {
     for cs in $(get_changesets); do
@@ -75,11 +85,15 @@ if (( $# > 0 )) && [ "$1" = "clean" ]; then
         echo "merged (or abandoned) changesets!" >&2
         exit 1
     fi
+elif (( $# > 0 )) && [ "$1" = "status" ]; then
+    echo "# Displaying status of all CS for which there is at least one testing image present:" >&2
+    get_changesets_with_status
 else
     echo "#" >&2
     echo "# The following images correspond to merged (or abandoned) changesets:" >&2
     echo -n "# Run $0 with 'clean' argument as root on " >&2
     echo "${CONTAINER_HOST} to remove them." >&2
+    echo "# Run '$0 status' to see the status of all changesets." >&2
     echo "#" >&2
 
     get_merged_or_abandoned_images
