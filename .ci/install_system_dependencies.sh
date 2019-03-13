@@ -24,6 +24,7 @@ system_dependencies=(
         "texlive-lang-german"
         "texlive-latex-extra"
         "tsocks"
+        "usbutils"
         "vim-nox"
         "xz-utils"
         "zsh"
