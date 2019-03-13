@@ -140,17 +140,20 @@ for package in "${packages_to_concretize[@]}"; do
     # the compiler is not yet known to spack
     # awk transforms the list of dependencies to a list of specs, skipping the
     # header in the beginning
-    (${MY_SPACK_BIN} spec "${package//%*[![:space:]]/}" \
-        | awk 'header_line >= 2 { gsub(/^\s*\^/, ""); print } /^-/ { header_line+=1 }' \
+    ( set +x; \
+        ( ${MY_SPACK_BIN} spec "${package//%*[![:space:]]/}" \
+        | awk 'header_line >= 2 { gsub(/^\s*\^/, ""); print } /^-/ { header_line+=1 }' ) \
         1>"${tmp}" 2>"${tmp_err}" ) &
 done
 # wait for all spawned jobs to complete
 wait
 
 # verify that all concretizations were successful
-if (($(cat "${tmpfiles_err[@]}" | wc -l) > 0)); then
-    echo "ERROR: Encountered the following during concretizations:" >&2
-    cat "${tmpfiles_err[@]}" >&2
+if (( $(cat "${tmpfiles_err[@]}" | wc -l) > 0 )); then
+    {
+        echo "ERROR: Encountered the following errors during concretizations:"
+        cat "${tmpfiles_err[@]}"
+    } | tee errors_concretization.log
     exit 1
 fi
 

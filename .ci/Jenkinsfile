@@ -34,8 +34,16 @@ pipeline {
 		}
 		stage('Clone') {
 			steps {
-				checkout scm
-				sh ".ci/clone.sh"
+				script {
+					try {
+						checkout scm
+						sh ".ci/clone.sh"
+					}
+					catch (Throwable t) {
+						archiveArtifacts "errors_concretization.log"
+						throw t
+					}
+				}
 			}
 		}
 		stage('Deploy utilities')
