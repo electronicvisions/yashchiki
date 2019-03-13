@@ -52,6 +52,9 @@ spack_packages=(
     "visionary-wafer-visu %${VISIONARY_GCC}"
     "visionary-dls-demos^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "py-jupyterhub^python@3.6.8"
+    "py-jupyterhub-dummyauthenticator^python@3.6.8"
+    "py-jupyterhub-simplespawner^python@3.6.8"
 )
 
 # TODO: Keep in sync with <spack-repo>/lib/spack/spack/cmd/bootstrap.py since
