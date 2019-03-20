@@ -61,21 +61,38 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
                ${GERRIT_USERNAME}@${GERRIT_HOSTNAME} gerrit query \
                --current-patch-set ${change} > ${gerrit_query}
 
-        SPACK_GERRIT_REFSPEC=$(grep "^[[:space:]]*ref:" ${gerrit_query} \
-            | cut -d : -f 2 | tr -d \[:space:\])
+        # check that the change corresponds to a spack change and extract
+        # refspec
+        SPACK_GERRIT_REFSPEC="$(awk '
+            $1 ~ "project:" && $2 ~ "spack" { project_found=1 }
+            $1 ~ "ref:" && project_found { print $2 }' "${gerrit_query}" )"
 
         # break as soon as we have the change for the spack repo
         if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
+
+            change_status="$(awk '$1 ~ "status:" { print $2 }' "${gerrit_query}")"
             # in case we have a stable build, just make sure that the change we
             # depend on has been merged, if not -> fail early!
             if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-                if [ "$(awk '$1 ~ "status:" { print $2 }' "${gerrit_query}")" != "MERGED" ]; then
+                if [ "${change_status}" != "MERGED" ]; then
                     echo "This change depends on unmerged spack changeset! Aborting.." >&2
                     rm "${gerrit_query}"
                     exit 1
                 fi
+            else
+                # 
+                if [ "${change_status}" = "MERGED" ]; then
+                    echo "This change depends on an already merged spack changeset! Ignoring.." >&2
+                    unset SPACK_GERRIT_REFSPEC
+                fi
             fi
-            break
+
+            # if SPACK_GERRIT_REFSPEC is still set, then we found a valid
+            # changeset to checkout -> break
+            # else -> continue searching
+            if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
+                break
+            fi
         fi
     done
 
