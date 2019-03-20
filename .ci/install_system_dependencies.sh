@@ -15,6 +15,7 @@ system_dependencies=(
         "latex-make"
         "latexmk"
         "libcap2-bin"
+        "libpam0g-dev"
         "libusb-1.0-0-dev"
         "libusb-dev"
         "linux-perf"
