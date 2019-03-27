@@ -17,6 +17,7 @@ system_dependencies=(
         "libusb-1.0-0-dev"
         "libusb-dev"
         "linux-perf"
+        "lshw"
         "man-db"
         "net-tools"
         "strace"
