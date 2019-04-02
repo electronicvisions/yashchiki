@@ -210,7 +210,7 @@ _install_from_buildcache() {
     # TODO verify that -j reads from default config, if not -> add
     # HOTFIX: halve the number of buildcache worker to circumvent oom-killer
     # Problem (in odd cases round up!)
-    ${MY_SPACK_BIN} buildcache install -y -w -j$(( $(nproc) / 2 + $(nproc) % 2 )) ${hashes_to_install} || true
+    ${MY_SPACK_BIN} --verbose buildcache install -u -w -j$(( $(nproc) / 2 + $(nproc) % 2 )) ${hashes_to_install} || true
 }
 
 #############
