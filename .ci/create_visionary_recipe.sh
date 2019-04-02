@@ -23,7 +23,9 @@ OSVersion: stretch
 Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, procps, python, rsync, ssh, sudo, udev, unzip, xz-utils
 
 %setup
-    mv "${WORKSPACE}/spack/" "\${SINGULARITY_ROOTFS}/opt/"
+    # bind-mount spack-folder as moving involves copying the complete download cache
+    mkdir \${SINGULARITY_ROOTFS}/opt/spack
+    mount --no-mtab --bind "${WORKSPACE}/spack" "\${SINGULARITY_ROOTFS}/opt/spack"
     # bind-mount ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"

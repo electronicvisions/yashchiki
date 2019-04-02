@@ -4,6 +4,9 @@ Closure cleanupSteps = {
 	sh "sudo /bin/rm -rf \"${WORKSPACE}/sandboxes/\" || exit 0"
 	// remove tmp spack
 	sh "sudo /bin/rm -rf \"/tmp/${NODE_NAME}/\""
+	// the spack repository gets bind mounted into the sandbox and owned by
+	// spack user during build -> revert prior to cleaning worksapce
+	sh "[ -d \"$WORKSPACE/spack\" ] && sudo chown -R vis_jenkins \"$WORKSPACE/spack\" || true"
 	cleanWs(patterns: [[pattern: 'download_cache/', type: 'EXCLUDE']],
 	        deleteDirs: true)
 }
