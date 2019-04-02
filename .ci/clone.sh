@@ -96,10 +96,9 @@ mkdir -p ${PWD}/spack/var/spack/cache/
 cp -vrl $HOME/download_cache/* ${PWD}/spack/var/spack/cache/
 
 # set download mirror stuff to prefill outside of container
-export MY_SPACK_BIN=$PWD/spack/bin/spack
+export MY_SPACK_FOLDER="$PWD/spack"
+export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
 ${MY_SPACK_BIN} mirror rm --scope site global
-# TODO: delme (download cache is handled manually)
-${MY_SPACK_BIN} mirror add --scope site job_mirror "file://${HOME}/download_cache"
 
 # add system compiler (needed for fetching)
 ${MY_SPACK_BIN} compiler add --scope site /usr/bin
@@ -111,85 +110,93 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
 
-tmpfiles_fetch=()
-tmpfiles_err=()
-rm_tmp_to_fetch() {
-    rm -v "${tmpfiles_fetch[@]}"
-    rm -v "${tmpfiles_err[@]}"
-}
-trap rm_tmp_to_fetch EXIT
-
-# concretize all spack packages in parallel -> fetch once!
-packages_to_concretize=(
+# concretize all spack packages in parallel
+packages_to_fetch=(
     "${VISIONARY_GCC}"
     "${spack_bootstrap_dependencies[@]}"
     "${spack_packages[@]}"
 )
-for package in "${packages_to_concretize[@]}"; do
-    # pause if we have sufficient concretizing jobs
-    set +x # do not clobber build log so much
-    while (( $(jobs | wc -l) >= $(nproc) )); do
-        sleep 1
-    done
-    set -x
-    tmp="$(mktemp)"
-    tmp_err="$(mktemp)"
-    tmpfiles_fetch+=("${tmp}")
-    tmpfiles_err+=("${tmp_err}")
-    # we need to strip the compiler spec from the package description because
-    # the compiler is not yet known to spack
-    # awk transforms the list of dependencies to a list of specs, skipping the
-    # header in the beginning
-    ( set +x; \
-        ( ${MY_SPACK_BIN} spec "${package//%*[![:space:]]/}" \
-        | awk 'header_line >= 2 { gsub(/^\s*\^/, ""); print } /^-/ { header_line+=1 }' ) \
-        1>"${tmp}" 2>"${tmp_err}" ) &
-done
-# wait for all spawned jobs to complete
-wait
-
 # verify that all concretizations were successful
-if (( $(cat "${tmpfiles_err[@]}" | wc -l) > 0 )); then
-    {
-        echo "ERROR: Encountered the following errors during concretizations:"
-        cat "${tmpfiles_err[@]}"
-    } | tee errors_concretization.log
-    exit 1
-fi
 
-# prevent readarray from being executed in pipe subshell
-reset_lastpipe=0
-if ! shopt -q lastpipe; then
-    shopt -s lastpipe
-    reset_lastpipe=1
-fi
+# first entry is just a statefile to indicate fetching failed (as opposed to
+# some warnings that are also printed to stderr during fetching)
+tmpfiles_fetch_err=("$(mktemp)")
 
-# make sure we fetch everything once and only take name and variants of each
-# package (everything up to compiler spec)
-sort "${tmpfiles_fetch[@]}" | uniq | awk -F '%' '{ print $1 }' | readarray -t packages_to_fetch
+rm_tmp_fetch_err() {
+    rm -v "${tmpfiles_fetch_err[@]}"
+}
+trap rm_tmp_fetch_err EXIT
 
-if (( reset_lastpipe )); then
-    # restore defaults
-    shopt -u lastpipe
-fi
+num_jobs_fetch="$(nproc)"
+
+fetch_spack_package() {
+    set -euo pipefail
+
+    # fetch (and therefore concretize) the given spack packages in a temporary
+    # spack instance and hardlink download cache back to main spack
+    if (( $# == 0 )); then
+        echo "NO PACKAGE TO FETCH!" >&2
+        return 1
+    fi
+    local tmp_spack_folder
+    local tmp_spack_bin
+
+    tmp_spack_folder="$(mktemp -d)/spack"
+    tmp_spack_bin="${tmp_spack_folder}/bin/spack"
+
+    # hardlink whole spack folder (will also link cache)
+    cp -rl "${MY_SPACK_FOLDER}" "${tmp_spack_folder}" || return 1
+
+    # perfom the concretization and the fetching into the given subfolder
+    ${tmp_spack_bin} --verbose fetch -D "${@}" || return 1
+
+    # hardlink the locally downloaded cache back into the main spack folder
+    cp -ruln "${tmp_spack_folder}/var/spack/cache" "${MY_SPACK_FOLDER}/var/spack/" || return 1
+
+    rm -rf "${tmp_spack_folder}" || return 1
+}
 
 for package in "${packages_to_fetch[@]}"; do
+    echo "Fetching ${package}.."
     # pause if we have sufficient concretizing jobs
-    set +x # do not clobber build log so much
-    while (( $(jobs | wc -l) >= $(nproc) )); do
+    set +x  # do not clobber build log so much
+    while (( $(jobs | wc -l) >= num_jobs_fetch )); do
+        # call jobs because otherwise we will not exit the loop
+        jobs &>/dev/null
         sleep 1
     done
     set -x
-    ${MY_SPACK_BIN} fetch "${package}" &
+    tmp_err="$(mktemp)"
+    tmpfiles_fetch_err+=("${tmp_err}")
+    # we need to strip the compiler spec starting with '%' from the spec string
+    # because the compiler is not yet known
+    ( set -x; \
+        ( fetch_spack_package "${package%%%*}" ) 2>"${tmp_err}" \
+        || ( echo "FETCH FAILED" >> "${tmpfiles_fetch_err[0]}" )) &
 done
 # wait for all spawned jobs to complete
 wait
+
+# verify that all fetches were successful
+if (( $(cat "${tmpfiles_fetch_err[@]}" | wc -l) > 0 )); then
+    {
+        if (( $(wc -l <"${tmpfiles_fetch_err[0]}") > 0)); then
+            echo -n "ERROR: "
+        else
+            echo -n "WARN: "
+        fi
+        echo "Encountered the following during concretizations prior to fetching:"
+        cat "${tmpfiles_fetch_err[@]}"
+    } | tee errors_concretization.log
+    if (( $(wc -l <"${tmpfiles_fetch_err[0]}") > 0)); then
+        exit 1
+    fi
+fi
+
 
 # update download_cache
 rsync -av "${PWD}/spack/var/spack/cache/" "${HOME}/download_cache/"
 
-# remove job_mirror again (re-added in container)
-${MY_SPACK_BIN} mirror rm --scope site job_mirror
 
 # remove f***ing compiler config
 rm ${PWD}/spack/etc/spack/compilers.yaml
