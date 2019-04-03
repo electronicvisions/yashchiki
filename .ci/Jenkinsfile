@@ -1,6 +1,9 @@
 Closure cleanupSteps = {
-	sh ".ci/remove_sandboxes.sh"
-	sh ".ci/remove_tmp_spack.sh"
+	// NOTE: sudo commands have been manually permitted
+	// remove sandboxes
+	sh "sudo /bin/rm -rf \"${WORKSPACE}/sandboxes/\" || exit 0"
+	// remove tmp spack
+	sh "sudo /bin/rm -rf \"/tmp/${NODE_NAME}/\""
 	cleanWs(patterns: [[pattern: 'download_cache/', type: 'EXCLUDE']],
 	        deleteDirs: true)
 }
@@ -22,11 +25,6 @@ pipeline {
 				returnStdout: true).trim()
 	}
 	stages {
-		stage('Validate environment') {
-			steps {
-				sh ".ci/validate_environment.sh"
-			}
-		}
 		stage('Pre-build Cleanup') {
 			steps {
 				script {
@@ -35,11 +33,20 @@ pipeline {
 				sh "mkdir -p \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
 			}
 		}
-		stage('Clone') {
+		stage('yashchiki Checkout') {
+			steps {
+				checkout scm
+			}
+		}
+		stage('Validate environment') {
+			steps {
+				sh ".ci/validate_environment.sh"
+			}
+		}
+		stage('Spack Clone') {
 			steps {
 				script {
 					try {
-						checkout scm
 						sh ".ci/clone.sh"
 					}
 					catch (Throwable t) {
