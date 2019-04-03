@@ -44,7 +44,7 @@ install_from_buildcache "${VISIONARY_GCC}"
 
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
-${MY_SPACK_BIN} install --show-log-on-error "${VISIONARY_GCC}"
+${MY_SPACK_BIN} --debug install --no-cache --show-log-on-error "${VISIONARY_GCC}"
 
 # add fresh compiler to spack
 ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*

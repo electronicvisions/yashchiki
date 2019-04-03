@@ -15,7 +15,11 @@ install_from_buildcache "${spack_packages[@]}"
 
 echo "INSTALLING PACKAGES"
 for package in "${spack_packages[@]}"; do
-    ${MY_SPACK_BIN} install --show-log-on-error ${package}
+    # Disable cache because we already installed from build cache.
+    # Also there is a bug that when `--no-cache` is not specified, install will
+    # fail because spack checks for signed buildcache packages only.
+    # PR pending: https://github.com/spack/spack/pull/11107
+    ${MY_SPACK_BIN} install --no-cache --show-log-on-error ${package}
 done
 
 # create the filesystem views (exposed via singularity --app option)
