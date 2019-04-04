@@ -55,6 +55,7 @@ spack_packages=(
     "py-jupyterhub^python@3.6.8"
     "py-jupyterhub-dummyauthenticator^python@3.6.8"
     "py-jupyterhub-simplespawner^python@3.6.8"
+    "tensorflow@1.8.0^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
 )
 
 # TODO: Keep in sync with <spack-repo>/lib/spack/spack/cmd/bootstrap.py since
@@ -83,6 +84,7 @@ spack_views=(\
         visionary-spikey-without-dev
         visionary-wafer
         visionary-wafer-without-dev
+        visionary-nn-conv
     )
 
 spack_views_no_default_gcc=(

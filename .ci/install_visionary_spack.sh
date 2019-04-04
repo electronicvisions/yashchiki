@@ -58,6 +58,13 @@ ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simula
 # slurvmiz needs no dev-tools because it is not for end-users
 ${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %${VISIONARY_GCC}"
 
+################################################
+# nn-conv needs a different tensorflow version #
+################################################
+
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-nn-conv visionary-wafer+dev~tensorflow~gccxml
+${MY_SPACK_BIN} view -d yes hardlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-nn-conv tensorflow@1.8.0
+
 # Ensure that only one version of visionary-dev-tools is installed as view even
 # if several are installed due to different constraints in other packages
 hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L ${SPEC_VIEW_VISIONARY_DEV_TOOLS} | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
