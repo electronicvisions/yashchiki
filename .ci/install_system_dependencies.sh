@@ -13,6 +13,7 @@ system_dependencies=(
         "iptables"
         "iputils-ping"
         "latex-make"
+        "latexmk"
         "libcap2-bin"
         "libusb-1.0-0-dev"
         "libusb-dev"
