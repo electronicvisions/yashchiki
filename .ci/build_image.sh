@@ -22,3 +22,8 @@ sudo singularity build ${IMAGE_NAME} "${TARGET_FOLDER}"
 sudo umount "${TARGET_FOLDER}/opt/spack"
 
 sudo chown -R vis_jenkins singularity_spack_*.img
+
+if [[ "${CONTAINER_BUILD_TYPE}" =~ "^stable$" ]]; then
+    # allow spack user to execute image
+    chmod +rx singularity_spack_*.img
+fi
