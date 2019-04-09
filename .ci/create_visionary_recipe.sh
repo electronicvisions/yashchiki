@@ -20,7 +20,7 @@ cat <<EOF >"${RECIPE_FILENAME}"
 bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
-Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, procps, python, rsync, ssh, sudo, udev, unzip, xz-utils
+Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, procps, python, python-yaml, rsync, ssh, sudo, udev, unzip, xz-utils
 
 %setup
     # bind-mount spack-folder as moving involves copying the complete download cache
