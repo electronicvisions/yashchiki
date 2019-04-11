@@ -9,9 +9,11 @@ export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 LOCK_FOLDER_INSIDE=/opt/lock
 LOCK_FOLDER_OUTSIDE=/home/vis_jenkins/lock
 
+BUILD_CACHE_NAME=${BUILD_CACHE_NAME:-visionary}
+
 BUILD_CACHE_INSIDE="/opt/build_cache"
-BUILD_CACHE_LOCK="${LOCK_FOLDER_INSIDE}/build_cache"
-BUILD_CACHE_OUTSIDE="/home/vis_jenkins/build_cache"
+BUILD_CACHE_LOCK="${LOCK_FOLDER_INSIDE}/build_cache_${BUILD_CACHE_NAME}"
+BUILD_CACHE_OUTSIDE="/home/vis_jenkins/build_caches/${BUILD_CACHE_NAME}"
 
 SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
 
