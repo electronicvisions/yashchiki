@@ -60,6 +60,9 @@ spack_packages=(
     "tensorflow@1.8.0^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
 )
 
+# control view creation with verbosity for more debuggability
+SPACK_VIEW_ARGS="--verbose"
+
 # TODO: Keep in sync with <spack-repo>/lib/spack/spack/cmd/bootstrap.py since
 # there is no straight-forward way to extract bootstrap dependencies
 # automatically. If bootstrap dependencies should change we will notice because
@@ -147,7 +150,7 @@ populate_views() {
     for addition in "${!spack_add_to_view[@]}"; do
         local dependencies="${spack_add_to_view_with_dependencies["${addition}"]}"
         for viewname in ${spack_add_to_view["${addition}"]}; do
-            ${MY_SPACK_BIN} view -d ${dependencies} hardlink -i "${MY_SPACK_VIEW_PREFIX}/${viewname}" "${addition}"
+            ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d ${dependencies} hardlink -i "${MY_SPACK_VIEW_PREFIX}/${viewname}" "${addition}"
         done
     done
 }
