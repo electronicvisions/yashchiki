@@ -150,7 +150,7 @@ populate_views() {
     for addition in "${!spack_add_to_view[@]}"; do
         local dependencies="${spack_add_to_view_with_dependencies["${addition}"]}"
         for viewname in ${spack_add_to_view["${addition}"]}; do
-            ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d ${dependencies} hardlink -i "${MY_SPACK_VIEW_PREFIX}/${viewname}" "${addition}"
+            ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d ${dependencies} symlink -i "${MY_SPACK_VIEW_PREFIX}/${viewname}" "${addition}"
         done
     done
 }
