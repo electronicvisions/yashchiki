@@ -9,95 +9,128 @@ Closure cleanupSteps = {
 }
 
 pipeline {
-	agent { label 'conviz1||conviz2' }
+	agent none
 	options {
-		timestamps ()
+		timestamps()
 		skipDefaultCheckout()
 	}
 
-	environment {
-		/* FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization */
-		DEPENDENCY_PYTHON="python@2.7.15"
-		VISIONARY_GCC_VERSION="8.2.0"
-		VISIONARY_GCC="gcc@${VISIONARY_GCC_VERSION}"
-		TMPDIR="/tmp/${env.NODE_NAME}"
-		JOB_TMP_SPACK=sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
-				returnStdout: true).trim()
-	}
 	stages {
-		stage('Pre-build Cleanup') {
-			steps {
-				script {
-					cleanupSteps()
-				}
-				sh "mkdir -p \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
+		stage('Container Build') {
+			agent { label 'conviz1||conviz2' }
+			environment {
+				// FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
+				DEPENDENCY_PYTHON = "python@2.7.15"
+				VISIONARY_GCC_VERSION = "8.2.0"
+				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
+				TMPDIR = "/tmp/${env.NODE_NAME}"
+				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
+				                   returnStdout: true).trim()
 			}
-		}
-		stage('yashchiki Checkout') {
-			steps {
-				checkout scm
-			}
-		}
-		stage('Validate environment') {
-			steps {
-				sh ".ci/validate_environment.sh"
-			}
-		}
-		stage('Spack Clone') {
-			steps {
-				script {
-					try {
-						sh ".ci/clone.sh"
-					}
-					catch (Throwable t) {
-						archiveArtifacts "errors_concretization.log"
-						throw t
-					}
-				}
-			}
-		}
-		stage('Deploy utilities')
-		{
-			steps {
-				sh ".ci/deploy_utilities.sh"
-			}
-		}
-		stage('Create visionary recipe') {
-			steps {
-				sh ".ci/create_visionary_recipe.sh"
-			}
-		}
-		stage('Build sandbox') {
-			steps {
-				sh ".ci/build_sandbox.sh"
-			}
-		}
-		stage('Build container image') {
-			steps {
-				sh ".ci/build_image.sh"
-			}
-		}
-		stage('Update build cache and export container') {
-			parallel {
-				stage('Update build cache') {
+			stages {
+				stage('Pre-build Cleanup') {
 					steps {
-						sh ".ci/update_build_cache.sh"
+						script {
+							cleanupSteps()
+						}
+						sh "mkdir -p \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
 					}
 				}
-				stage('Export') {
+				stage('yashchiki Checkout') {
 					steps {
-						sh ".ci/deploy_container.sh"
-						echo "TODO skipping (due to disk usage problems on jenviz): archiveArtifacts artifacts: '*.img', onlyIfSuccessful: true"
+						checkout scm
+					}
+				}
+				stage('Validate environment') {
+					steps {
+						sh ".ci/validate_environment.sh"
+					}
+				}
+				stage('Spack Clone') {
+					steps {
+						script {
+							try {
+								sh ".ci/clone.sh"
+							}
+							catch (Throwable t) {
+								archiveArtifacts "errors_concretization.log"
+								throw t
+							}
+						}
+					}
+				}
+				stage('Deploy utilities') {
+					steps {
+						sh ".ci/deploy_utilities.sh"
+					}
+				}
+				stage('Create visionary recipe') {
+					steps {
+						sh ".ci/create_visionary_recipe.sh"
+					}
+				}
+				stage('Build sandbox') {
+					steps {
+						sh ".ci/build_sandbox.sh"
+					}
+				}
+				stage('Build container image') {
+					steps {
+						sh ".ci/build_image.sh"
+					}
+				}
+				stage('Update build cache and export container') {
+					parallel {
+						stage('Update build cache') {
+							steps {
+								sh ".ci/update_build_cache.sh"
+							}
+						}
+						stage('Export') {
+							steps {
+								script {
+									CONTAINER_NAME = sh(script: ".ci/deploy_container.sh", returnStdout: true).trim()
+								}
+								echo "TODO skipping (due to disk usage problems on jenviz): archiveArtifacts artifacts: '*.img', onlyIfSuccessful: true"
+							}
+						}
+					}
+				}
+			}
+			post {
+				cleanup {
+					script {
+						cleanupSteps()
 					}
 				}
 			}
 		}
-	}
 
-	post {
-		cleanup {
-			script {
-				cleanupSteps()
+		// Container verification stage: Build visionary metaprojects
+		stage('Container Verification') {
+			parallel {
+
+				// BSS1
+				stage('NMPM Software') {
+					steps {
+						build(job: 'bld_gerrit-meta-nmpm-software',
+						      parameters: [string(name: 'CONTAINER_IMAGE', value: CONTAINER_NAME)])
+					}
+				}
+
+				// BSS2
+				stage('PPU Toolchain') {
+					steps {
+						build(job: 'bld_gerrit-ppu-toolchain-dependencies',
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+					}
+				}
+				stage('haldls') {
+					steps {
+						build(job: 'bld_gerrit-haldls-dependencies',
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+					}
+				}
 			}
 		}
 	}

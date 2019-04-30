@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-echo "deploying container to /containers"
+# NOTE: stdout of this script is parsed within the Jenkinsfile.
+#       Think twice before adding any output!
+
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
 IMAGE_NAME="singularity_spack_temp.img"
@@ -37,11 +39,13 @@ while [[ -e "$(get_container_name ${num})" ]] ; do
 done
 
 CONTAINER_NAME="$(get_container_name ${num})"
+# this must be the only output for Jenkins to pick up the container path
+# in order to trigger the downstream software builds in the correct container
+echo $CONTAINER_NAME
 
 # copy to target
-cp -v "${IMAGE_NAME}" ${CONTAINER_NAME}
+cp "${IMAGE_NAME}" ${CONTAINER_NAME}
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-    echo "Linking latest.."
     ln -sfv "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
 fi
