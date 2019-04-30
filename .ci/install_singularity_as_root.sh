@@ -25,7 +25,7 @@ rm_tmp_modules() {
 }
 trap rm_tmp_modules EXIT
 {
-    spack module loads -r "$(get_latest_version "${VISIONARY_GCC}")"
+    spack module tcl loads -r "$(get_latest_version "${VISIONARY_GCC}")"
 } | tee "${TMP_MODULES}"
 source "${TMP_MODULES}"
 # --------- 8< ---------- 8< -------- 8< ---------
