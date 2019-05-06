@@ -47,5 +47,5 @@ echo $CONTAINER_NAME
 cp "${IMAGE_NAME}" ${CONTAINER_NAME}
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-    ln -sfv "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
+    ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
 fi
