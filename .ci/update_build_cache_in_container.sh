@@ -35,7 +35,7 @@ fi
 # we store all hashes currently installed
 hashes_to_store="$(spack find -L | awk '/^[a-z0-9]/ { print "/"$1; }' | tr '\n' ' ')"
 # TODO: verify that buildcache -j reads from default config, if not -> add
-spack buildcache create -w -y -d "${BUILD_CACHE_TEMP}" -j$(nproc) ${hashes_to_store}
+spack --verbose buildcache create --only package -d "${BUILD_CACHE_TEMP}" -j$(nproc) ${hashes_to_store}
 
 echo "Obtaining build_cache lock."
 flock ${lock_fd}

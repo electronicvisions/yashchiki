@@ -213,9 +213,7 @@ _install_from_buildcache() {
     cat "${FILE_HASHES_SPACK}" "${FILE_HASHES_BUILDCACHE}" | sort | uniq -d > "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
     hashes_to_install=$(sed "s:^:/:g" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" | tr '\n' ' ')
     # TODO verify that -j reads from default config, if not -> add
-    # HOTFIX: halve the number of buildcache worker to circumvent oom-killer
-    # Problem (in odd cases round up!)
-    ${MY_SPACK_BIN} --verbose buildcache install -u -w -j$(( $(nproc) / 2 + $(nproc) % 2 )) ${hashes_to_install} || true
+    ${MY_SPACK_BIN} --verbose buildcache install -u --only package -j$(nproc) ${hashes_to_install}
 }
 
 #############
