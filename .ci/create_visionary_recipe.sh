@@ -17,7 +17,7 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 #   (-> installs to /opt/spack, and creates views)
 # * provide "apps" which set environment variables to appropriate views
 cat <<EOF >"${RECIPE_FILENAME}"
-bootstrap: debootstrap
+Bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
 OSVersion: stretch
 Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, patchelf, procps, python, python-yaml, rsync, ssh, sudo, udev, unzip, xz-utils
