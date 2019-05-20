@@ -37,7 +37,8 @@ echo "BOOTSTRAPPING"
 ${MY_SPACK_BIN} mirror add --scope site build_mirror file://${BUILD_CACHE_DIR}
 
 install_from_buildcache "${spack_bootstrap_dependencies[@]}"
-${MY_SPACK_BIN} bootstrap -v
+
+${MY_SPACK_BIN} bootstrap -v --no-cache
 
 # check if it can be specialized
 install_from_buildcache "${VISIONARY_GCC}"
