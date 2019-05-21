@@ -21,6 +21,7 @@ system_dependencies=(
         "lshw"
         "man-db"
         "net-tools"
+        "psmisc"
         "strace"
         "texlive"
         "texlive-lang-german"
