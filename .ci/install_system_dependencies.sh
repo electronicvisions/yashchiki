@@ -48,12 +48,16 @@ debconf-set-selections <<EOF
 wireshark-common wireshark-common/install-setuid boolean true
 EOF
 
+apply_prefix() {
+    sed -e "s:^:[SYSTEM-APT] :g"
+}
+
 # install singularity
 # (temporarily disabled because we rely on unmerged features)
 if /bin/false; then
     echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
-    apt-get update
-    apt-get install -y singularity-container/stretch-backports
+    apt-get update | apply_prefix
+    apt-get install -y singularity-container/stretch-backports | apply_prefix
 fi
 
-apt-get install -y "${system_dependencies[@]}"
+apt-get install -y "${system_dependencies[@]}" | apply_prefix
