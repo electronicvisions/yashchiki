@@ -35,7 +35,9 @@ fi
 # we store all hashes currently installed
 hashes_to_store="$(spack find -L | awk '/^[a-z0-9]/ { print "/"$1; }' | tr '\n' ' ')"
 # TODO: verify that buildcache -j reads from default config, if not -> add
-spack --verbose buildcache create --only package -d "${BUILD_CACHE_TEMP}" -j$(nproc) ${hashes_to_store}
+# -a: allows root string to still be present in RPATH - this is okay since we
+# always install from/to /opt/spack in the container.
+spack --verbose buildcache create -a --only package -d "${BUILD_CACHE_TEMP}" -j$(nproc) ${hashes_to_store}
 
 echo "Obtaining build_cache lock."
 flock ${lock_fd}
