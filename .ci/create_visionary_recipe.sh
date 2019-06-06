@@ -80,6 +80,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_visionary_spack.sh"
     sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings.sh"
     "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings_as_root.sh"
+    "${SPACK_INSTALL_SCRIPTS}/generate_modules.sh"
     # system dependencies might not have installed by now
     # currently, singularity needs some dependendencies from apt as well, so
     # wait till we are finished with system dependencies
