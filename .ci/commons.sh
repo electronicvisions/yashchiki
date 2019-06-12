@@ -9,7 +9,9 @@ export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 LOCK_FOLDER_INSIDE=/opt/lock
 LOCK_FOLDER_OUTSIDE=/home/vis_jenkins/lock
 
-BUILD_CACHE_NAME=${BUILD_CACHE_NAME:-visionary}
+if [ -z "${BUILD_CACHE_NAME:-}" ]; then
+    BUILD_CACHE_NAME=visionary_manual
+fi
 
 BUILD_CACHE_INSIDE="/opt/build_cache"
 BUILD_CACHE_LOCK="${LOCK_FOLDER_INSIDE}/build_cache_${BUILD_CACHE_NAME}"
@@ -174,10 +176,29 @@ remove_tmp_files() {
 }
 trap remove_tmp_files EXIT
 
+
+# get hashes in buildcache
+get_hashes_in_buildcache() {
+    if [ -d "${BUILD_CACHE_INSIDE}" ]; then
+        # Naming scheme in the build_cache is <checksum>.tar.gz -> extract from full path
+        ( find "${BUILD_CACHE_INSIDE}" -name "*.tar.gz" -print0 \
+            | xargs -0 -n 1 basename \
+            | sed -e "s:\.tar\.gz$::g" \
+	    | sort ) || /bin/true
+    fi
+}
+
+
+get_hashes_in_spack() {
+    ${MY_SPACK_BIN} find -L | awk '/^[a-z0-9]/ { print $1 }' | sort
+}
+
+
 compute_hashes_buildcache() {
     # extract all available package hashes from buildcache
-    find "${BUILD_CACHE_DIR}" -name "*.spec.yaml" | sed 's/.*-\([^-]*\)\.spec\.yaml$/\1/' | sort | uniq > "${FILE_HASHES_BUILDCACHE}"
+    get_hashes_in_buildcache > "${FILE_HASHES_BUILDCACHE}"
 }
+
 
 install_from_buildcache() {
     # obtain shared lock around buildcache
@@ -190,6 +211,7 @@ install_from_buildcache() {
     flock -u "${lock_fd}"
     echo "Unlocked buildcache (shared)." >&2
 }
+
 
 _install_from_buildcache() {
     # only extract the hashes present in buildcache on first invocation
@@ -204,18 +226,19 @@ _install_from_buildcache() {
     for package in "${packages_to_install[@]}"; do
         echo "${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p'"
     done
-    ) | parallel > "${FILE_HASHES_SPACK_ALL}"
+    ) | parallel -j$(nproc) > "${FILE_HASHES_SPACK_ALL}"
 
     # make each unique
     cat ${FILE_HASHES_SPACK_ALL} | sort | uniq > ${FILE_HASHES_SPACK}
 
     # install if available in buildcache
     cat "${FILE_HASHES_SPACK}" "${FILE_HASHES_BUILDCACHE}" | sort | uniq -d > "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
-    hashes_to_install=$(sed "s:^:/:g" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" | tr '\n' ' ')
-    if [ -n "${hashes_to_install/ /}" ]; then
-        # TODO verify that -j reads from default config, if not -> add
-        ${MY_SPACK_BIN} --verbose buildcache install -u --only package -j$(nproc) ${hashes_to_install}
-    fi
+
+    parallel -v -j $(nproc) tar Pxf "${BUILD_CACHE_INSIDE}/{}.tar.gz" \
+        < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
+
+    # have spack reindex its install contents to find the new packages
+    ${MY_SPACK_BIN} --verbose reindex
 }
 
 #############
