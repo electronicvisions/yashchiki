@@ -22,6 +22,7 @@ system_dependencies=(
         "linux-perf"
         "lshw"
         "man-db"
+        "ncurses-term"
         "net-tools"
         "psmisc"
         "strace"
