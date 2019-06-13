@@ -74,7 +74,11 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     # specified under "Inlucde:" above. install_system_dependencies.sh should
     # only install packages that are needed once the container finished
     # building!
-    "${SPACK_INSTALL_SCRIPTS}/install_system_dependencies.sh" &
+    # We kill the main process in case of errors in order to have no silent
+    # fails!
+    PID_MAIN="\$\$"
+    ( "${SPACK_INSTALL_SCRIPTS}/install_system_dependencies.sh" \
+        || kill \${PID_MAIN} ) &
     "${SPACK_INSTALL_SCRIPTS}/prepare_spack_as_root.sh"
     sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/bootstrap_spack.sh"
     sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_visionary_spack.sh"
