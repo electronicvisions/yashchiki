@@ -212,8 +212,10 @@ _install_from_buildcache() {
     # install if available in buildcache
     cat "${FILE_HASHES_SPACK}" "${FILE_HASHES_BUILDCACHE}" | sort | uniq -d > "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
     hashes_to_install=$(sed "s:^:/:g" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" | tr '\n' ' ')
-    # TODO verify that -j reads from default config, if not -> add
-    ${MY_SPACK_BIN} --verbose buildcache install -u --only package -j$(nproc) ${hashes_to_install}
+    if [ -n "${hashes_to_install/ /}" ]; then
+        # TODO verify that -j reads from default config, if not -> add
+        ${MY_SPACK_BIN} --verbose buildcache install -u --only package -j$(nproc) ${hashes_to_install}
+    fi
 }
 
 #############
