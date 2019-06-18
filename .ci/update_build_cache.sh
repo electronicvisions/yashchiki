@@ -8,11 +8,25 @@ if [ "${CONTAINER_BUILD_TYPE}" != "stable" ]; then
     exit 0
 fi
 
+usage() { echo "Usage: ${0} -c <container>" 1>&2; exit 1; }
+
+while getopts ":c:" opts; do
+    case "${opts}" in
+        c)
+            IMAGE_NAME="${OPTARG}"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+if [ -z "${IMAGE_NAME:-}" ]; then
+    usage
+fi
+
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
-
-# taken from ./deploy_container.sh -> TODO: move all variables to single file!
-IMAGE_NAME=singularity_spack_temp.img
 
 # do not fail the build if some updates in the build-cache fail
 #

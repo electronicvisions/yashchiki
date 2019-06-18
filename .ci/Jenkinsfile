@@ -85,20 +85,11 @@ pipeline {
 					}
 				}
 				stage('Update build cache and export container') {
-					parallel {
-						stage('Update build cache') {
-							steps {
-								sh ".ci/update_build_cache.sh"
-							}
+					steps {
+						script {
+							CONTAINER_NAME = sh(script: ".ci/deploy_container.sh", returnStdout: true).trim()
 						}
-						stage('Export') {
-							steps {
-								script {
-									CONTAINER_NAME = sh(script: ".ci/deploy_container.sh", returnStdout: true).trim()
-								}
-								echo "TODO skipping (due to disk usage problems on jenviz): archiveArtifacts artifacts: '*.img', onlyIfSuccessful: true"
-							}
-						}
+						sh ".ci/update_build_cache.sh -c \"$CONTAINER_NAME\""
 					}
 				}
 			}

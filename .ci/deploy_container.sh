@@ -49,3 +49,6 @@ cp "${IMAGE_NAME}" ${CONTAINER_NAME}
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
 fi
+
+# delete temporary image
+rm "${IMAGE_NAME}"
