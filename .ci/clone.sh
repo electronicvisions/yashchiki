@@ -161,7 +161,10 @@ fetch_spack_package() {
     tmp_spack_bin="${tmp_spack_folder}/bin/spack"
 
     # hardlink whole spack folder (will also link cache)
-    cp -rl "${MY_SPACK_FOLDER}" "${tmp_spack_folder}" || return 1
+    # as of now spack folder contains symlinks of the form:
+    # _spack_root -> ../../..
+    # -> they have to be preserved
+    cp -rlH "${MY_SPACK_FOLDER}" "${tmp_spack_folder}" || return 1
 
     # perfom the concretization and the fetching into the given subfolder
     ${tmp_spack_bin} --verbose fetch -D "${@}" || return 1
