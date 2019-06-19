@@ -9,6 +9,7 @@ system_dependencies=(
         "corkscrew"
         "cpio"
         "fxload"
+        "htop"
         "iproute2"
         "iptables"
         "iputils-ping"
