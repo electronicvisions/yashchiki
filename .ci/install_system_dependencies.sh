@@ -15,6 +15,7 @@ system_dependencies=(
         "iputils-ping"
         "latex-make"
         "latexmk"
+        "libc6-dbg"
         "libcap2-bin"
         "libpam0g-dev"
         "libusb-1.0-0-dev"
