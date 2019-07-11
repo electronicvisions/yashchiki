@@ -6,6 +6,7 @@ set -euo pipefail
 # spack in order to bootstrap itself.
 
 system_dependencies=(
+        "arping"
         "corkscrew"
         "cpio"
         "fxload"
