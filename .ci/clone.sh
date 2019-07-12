@@ -80,7 +80,6 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
                     exit 1
                 fi
             else
-                # 
                 if [ "${change_status}" = "MERGED" ]; then
                     echo "This change depends on an already merged spack changeset! Ignoring.." >&2
                     unset SPACK_GERRIT_REFSPEC
