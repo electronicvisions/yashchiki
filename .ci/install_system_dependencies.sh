@@ -19,6 +19,7 @@ system_dependencies=(
         "libc6-dbg"
         "libcap2-bin"
         "libpam0g-dev"
+        "libudev-dev"
         "libusb-1.0-0-dev"
         "libusb-dev"
         "linux-perf"
