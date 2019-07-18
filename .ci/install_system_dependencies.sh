@@ -36,6 +36,7 @@ system_dependencies=(
         "tsocks"
         "usbutils"
         "vim-nox"
+        "xauth"
         "xz-utils"
         "zsh"
     )
