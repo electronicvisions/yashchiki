@@ -24,7 +24,7 @@ SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
 ############
 
 # the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
 
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
@@ -56,10 +56,17 @@ spack_packages=(
     "visionary-wafer-visu %${VISIONARY_GCC}"
     "visionary-dls-demos^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "py-jupyterhub^python@3.6.8"
-    "py-jupyterhub-dummyauthenticator^python@3.6.8"
-    "py-jupyterhub-simplespawner^python@3.6.8"
     "tensorflow@1.8.0^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    # START python 3 packages
+    "visionary-dls~dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls-demos^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub-dummyauthenticator^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub-simplespawner^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    # END python 3 packages
 )
 
 # control view creation with verbosity for more debuggability
@@ -85,6 +92,8 @@ spack_views=(\
         visionary-analysis-without-dev
         visionary-dls
         visionary-dls-without-dev
+        visionary-dls-py3
+        visionary-dls-py3-without-dev
         visionary-simulation
         visionary-simulation-without-dev
         visionary-spikey
@@ -107,7 +116,7 @@ declare -A spack_add_to_view_with_dependencies
 # Add gccxml to those views that still depend on it
 spack_add_to_view_with_dependencies["gccxml"]="no"
 spack_add_to_view["gccxml"]="$(
-for view in visionary-{defaults,dls,dls-demos,wafer}{,-without-dev}; do
+for view in visionary-{defaults,dls,dls-py3,wafer}{,-without-dev}; do
     echo ${view}
 done | tr '\n' ' '
 )"

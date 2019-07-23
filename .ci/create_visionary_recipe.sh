@@ -65,6 +65,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     locale-gen
     # propagate environment variables to container recipe
     export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
+    export DEPENDENCY_PYTHON3="${DEPENDENCY_PYTHON3}"
     export VISIONARY_GCC="${VISIONARY_GCC}"
     export VISIONARY_GCC_VERSION="${VISIONARY_GCC_VERSION}"
     # Improve efficiency by installing system packages in the background (even
