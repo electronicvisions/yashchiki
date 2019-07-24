@@ -9,7 +9,7 @@ GITLOG="git_log_yashchiki.txt"
 RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
 # create container description file
-# * based on Debian stretch (minimal) + a few extra packages (e.g. git, python, ...)
+# * based on Debian buster (minimal) + a few extra packages (e.g. git, python, ...)
 # * bind mount spack's fetch-cache and ccache into the container -> speed up stuff
 # * bind mount spack's buildcache into the container -> speed up stuff
 # * copy spack installation script into container
@@ -19,8 +19,8 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 cat <<EOF >"${RECIPE_FILENAME}"
 Bootstrap: debootstrap
 MirrorURL: http://httpredir.debian.org/debian
-OSVersion: stretch
-Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, patchelf, procps, python, python-yaml, python3, python3-yaml, rsync, ssh, sudo, udev, unzip, xz-utils
+OSVersion: buster
+Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, patchelf, procps, python, python-yaml, python3, python3-yaml, rsync, ssh, sudo, udev, unzip, xz-utils
 
 %setup
     # bind-mount spack-folder as moving involves copying the complete download cache

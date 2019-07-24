@@ -56,10 +56,11 @@ apply_prefix() {
 
 # install singularity
 # (temporarily disabled because we rely on unmerged features)
+# (also disabled due to missing package in buster)
 if /bin/false; then
-    echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
+    echo "deb http://ftp.debian.org/debian buster-backports main" >> /etc/apt/sources.list
     apt-get update | apply_prefix
-    apt-get install -y singularity-container/stretch-backports | apply_prefix
+    apt-get install -y singularity-container/buster-backports | apply_prefix
 fi
 
 apt-get install -y "${system_dependencies[@]}" | apply_prefix

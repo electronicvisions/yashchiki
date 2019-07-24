@@ -62,9 +62,17 @@ fi
 spec_compiler="${VISIONARY_GCC} target=${PINNED_TARGET}"
 install_from_buildcache "${spec_compiler}"
 
+# remember system compiler versions (to be removed later)
+system_compilers="$(${MY_SPACK_BIN} compiler list --scope site | grep \@)"
+
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
 ${MY_SPACK_BIN} --verbose install --no-cache --show-log-on-error "${spec_compiler}"
 
 # add fresh compiler to spack
 ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
+
+# remove system compilers from spack (just testing! FIXME!)
+for system_compiler in ${system_compilers}; do
+    ${MY_SPACK_BIN} compiler rm --scope site "${system_compiler}"
+done
