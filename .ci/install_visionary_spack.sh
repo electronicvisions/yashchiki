@@ -19,7 +19,13 @@ for package in "${spack_packages[@]}"; do
     # Also there is a bug that when `--no-cache` is not specified, install will
     # fail because spack checks for signed buildcache packages only.
     # PR pending: https://github.com/spack/spack/pull/11107
-    ${MY_SPACK_BIN} install --no-cache --show-log-on-error ${package}
+    specfile="$(get_specfiles "${package}")"
+    if (( $(wc -l <"${specfile}") == 0 )); then
+        echo "ERROR: Failed to concretize ${package} for install." >&2
+        exit 1
+    fi
+    echo "Installing: ${package}" >&2
+    ${MY_SPACK_BIN} install --no-cache --show-log-on-error --file "${specfile}"
 done
 
 # create the filesystem views (exposed via singularity --app option)

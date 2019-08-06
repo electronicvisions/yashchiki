@@ -15,9 +15,12 @@ fi
 
 BUILD_CACHE_INSIDE="/opt/build_cache"
 BUILD_CACHE_LOCK="${LOCK_FOLDER_INSIDE}/build_cache_${BUILD_CACHE_NAME}"
-BUILD_CACHE_OUTSIDE="/home/vis_jenkins/build_caches/${BUILD_CACHE_NAME}"
+BUILD_CACHE_OUTSIDE="${HOME}/build_caches/${BUILD_CACHE_NAME}"
 
 SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
+
+# only valid in container
+SPEC_FOLDER="/opt/spack_specs"
 
 ############
 # PACKAGES #
@@ -199,6 +202,53 @@ compute_hashes_buildcache() {
     get_hashes_in_buildcache > "${FILE_HASHES_BUILDCACHE}"
 }
 
+# Compute the concrete specfile for the given packages.
+#
+# Spec files are only computed once and afterwards their names are emitted via
+# stdout, one per line.
+#
+# We want to achieve the following:
+# * Compute the specfiles once and then - for the same input-spec, i.e., the
+#   string that gets fed to `spack spec` - get the name of the already computed
+#   specfile.
+# * Do not deal with all the funny characters that appear and might appear in
+#   spec-formats in the future.
+# Instead of turning the intput-spec into a filename by replacing all spaces,
+# slashes, tildes etc, we just take the sha256 of the input-spec. This is
+# achieved via taking the sha256sum. This is NOT the hash of the spec (because
+# this can only be computed once the spec is fully concretized)! It is merely a
+# way to reliably know where the fully-contretized spec is stored for a given
+# user-supplied input-spec.
+#
+# The spec files are put under ${SPEC_FOLDER}.
+#
+get_specfiles() {
+    local specfiles=()
+
+    if [ ! -d "${SPEC_FOLDER}" ]; then
+        mkdir ${SPEC_FOLDER}
+    fi
+
+    for package in "${@}"; do
+        # compute spec and put into temporary file derived from package name
+        specfiles+=("${SPEC_FOLDER}/$(echo ${package} | sha256sum |
+                                      awk '{ print "spec_" $1 ".yaml" }')")
+    done
+
+    (
+    local idx=0
+    for package in "${@}"; do
+        if [ ! -f "${specfiles[${idx}]}" ]; then
+            echo "${MY_SPACK_BIN} spec -y \"${package}\" > ${specfiles[${idx}]}"
+        fi
+        idx=$((idx + 1))
+    done
+    ) | parallel -j$(nproc) 1>/dev/null
+
+    for f in "${specfiles[@]}"; do
+        echo "${f}"
+    done
+}
 
 install_from_buildcache() {
     # obtain shared lock around buildcache
@@ -212,21 +262,18 @@ install_from_buildcache() {
     echo "Unlocked buildcache (shared)." >&2
 }
 
-
 _install_from_buildcache() {
     # only extract the hashes present in buildcache on first invocation
     if [ "$(wc -l < "${FILE_HASHES_BUILDCACHE}")" -eq 0 ]; then
         compute_hashes_buildcache
     fi
 
-    # install packages from buildcache
-    packages_to_install=("${@}")
+    local specfiles=()
+    local packages_to_install=("${@}")
+    readarray -t specfiles < <(get_specfiles "${packages_to_install[@]}")
 
-    (
-    for package in "${packages_to_install[@]}"; do
-        echo "${MY_SPACK_BIN} spec -y ${package} | sed -n 's/.*hash:\s*\(.*\)/\1/p'"
-    done
-    ) | parallel -j$(nproc) > "${FILE_HASHES_SPACK_ALL}"
+    # install packages from buildcache
+    cat "${specfiles[@]}" | sed -n 's/.*hash:\s*\(.*\)/\1/p' > "${FILE_HASHES_SPACK_ALL}"
 
     # make each unique
     cat ${FILE_HASHES_SPACK_ALL} | sort | uniq > ${FILE_HASHES_SPACK}
