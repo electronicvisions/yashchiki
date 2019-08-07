@@ -46,13 +46,16 @@ if [ -z "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
         | awk '$1 ~ "Depends-On:" { $1 = ""; print $0 }' | tr '\n' ',' | tr -d \[:space:\])
 else
     echo "SPACK_GERRIT_CHANGE or SPACK_GERRIT_REFSPEC specified, ignoring "\
-         "possible 'Depends-On'-line in commit message!"
+         "possible 'Depends-On'-line in commit message!" >&2
 fi
+
 
 # if there is a spack gerrit change specified and no refspec -> resolve!
 if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
     # convert spack change id to latest patchset
     pushd "spack"
+
+    ref_stable="$(git rev-parse HEAD)"
 
     gerrit_query=$(mktemp)
 
@@ -89,21 +92,38 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
             # if SPACK_GERRIT_REFSPEC is still set, then we found a valid
             # changeset to checkout -> break
             # else -> continue searching
+            #
+            # We want to support two workflows:
+            # * specify one changeset that represents a stack of changes in the
+            #   spack repo to be checked out
+            # * specify several independent spack changesets that are to be
+            #   cherry-picked on top of each other
+            #
+            # Therefore, we check out the first unmerged refspec we encounter
+            # and cherry pick all further changes.
             if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
-                break
+
+                git fetch ${MY_GERRIT_URL} "${SPACK_GERRIT_REFSPEC}"
+
+                if [[ "${ref_stable}" == "$(git rev-parse HEAD)" ]]; then
+                    echo "SPACK_GERRIT_REFSPEC was specified for the first"\
+                        "time: ${SPACK_GERRIT_REFSPEC} -> check out" >&2
+
+                    git checkout FETCH_HEAD
+                else
+                    echo "SPACK_GERRIT_REFSPEC was specified again:"\
+                        "${SPACK_GERRIT_REFSPEC} -> cherry-pick" >&2
+
+                    git cherry-pick FETCH_HEAD
+                fi
+
+                unset SPACK_GERRIT_REFSPEC
             fi
         fi
     done
 
     rm "${gerrit_query}"
 
-    popd
-fi
-
-if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC:-}" ]; then
-    echo "SPACK_GERRIT_REFSPEC was specified: ${SPACK_GERRIT_REFSPEC} -> checking out"
-    pushd "spack"
-    git fetch  ${MY_GERRIT_URL} ${SPACK_GERRIT_REFSPEC} && git checkout FETCH_HEAD
     popd
 fi
 
