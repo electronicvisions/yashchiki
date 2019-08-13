@@ -128,6 +128,13 @@ pipeline {
 						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
 					}
 				}
+				// neuromorphic sampling library
+				stage('model-nmsampling-sbs') {
+					steps {
+						build(job: 'bld_gerrit-model-nmsampling-sbs',
+							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+					}
+				}
 			}
 		}
 	}
