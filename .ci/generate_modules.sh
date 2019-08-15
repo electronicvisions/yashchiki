@@ -27,5 +27,5 @@ EOF
 (echo; echo) >> "${TARGET}"
 
 cat <<EOF >> "${TARGET}"
-source "${PATH_MODULES}/\$(basename "\${SHELL}")"
+source "${PATH_MODULES}/\$(readlink -f /proc/\$\$/exe | xargs basename)"
 EOF
