@@ -7,6 +7,7 @@ set -euo pipefail
 
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
+FALLBACK_DIR="${HOME}/container_mount_full"
 IMAGE_NAME="singularity_spack_temp.img"
 DATE=$(date --iso)
 
@@ -44,7 +45,11 @@ CONTAINER_NAME="$(get_container_name ${num})"
 echo $CONTAINER_NAME
 
 # copy to target
-cp "${IMAGE_NAME}" ${CONTAINER_NAME}
+cp "${IMAGE_NAME}" "${CONTAINER_NAME}" || (
+    echo "Error: Copy failed because the mount point is full, saving container image to fallback location.." >&2
+    cp -v "${IMAGE_NAME}" "${FALLBACK_DIR}/$(basename "${CONTAINER_NAME}")" >&2
+    exit 1
+)
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
