@@ -17,7 +17,7 @@ get_container_name()
 {
     local local_num="$1"
     if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
-        echo -n "${INSTALL_DIR}/$(get_change_name)_${local_num}.img"
+        echo -n "${INSTALL_DIR}/$(get_change_name)_${DATE}_${local_num}.img"
     else
         echo -n "${INSTALL_DIR}/${DATE}_${local_num}.img"
     fi
