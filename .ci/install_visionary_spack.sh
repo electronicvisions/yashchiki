@@ -36,8 +36,6 @@ umask 000
 # Packages still plagued by gccxml #
 ####################################
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-defaults visionary-defaults+tensorflow~gccxml
-
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls visionary-dls+dev~gccxml "^${DEPENDENCY_PYTHON3}"
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev visionary-dls~dev~gccxml "^${DEPENDENCY_PYTHON3}"
 

@@ -28,10 +28,6 @@ SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON3} %${VISI
 
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
-    "visionary-defaults^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-defaults+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-defaults+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-defaults+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-analysis~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-analysis^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
@@ -81,7 +77,6 @@ spack_bootstrap_dependencies=(
 #########
 
 spack_views=(\
-        visionary-defaults
         visionary-dev-tools
         visionary-analysis
         visionary-analysis-without-dev
@@ -109,7 +104,7 @@ declare -A spack_add_to_view_with_dependencies
 # Add gccxml to those views that still depend on it
 spack_add_to_view_with_dependencies["gccxml"]="no"
 spack_add_to_view["gccxml"]="$(
-for view in visionary-{defaults,dls,dls-py3,wafer}{,-without-dev}; do
+for view in visionary-{dls,dls-py3,wafer}{,-without-dev}; do
     echo ${view}
 done | tr '\n' ' '
 )"
