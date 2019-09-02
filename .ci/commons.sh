@@ -28,8 +28,6 @@ SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON3} %${VISI
 
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
-    "visionary-analysis~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-analysis^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
     "visionary-nux~dev %${VISIONARY_GCC}"
     "visionary-nux %${VISIONARY_GCC}"
@@ -78,8 +76,6 @@ spack_bootstrap_dependencies=(
 
 spack_views=(\
         visionary-dev-tools
-        visionary-analysis
-        visionary-analysis-without-dev
         visionary-dls
         visionary-dls-without-dev
         visionary-simulation
