@@ -115,4 +115,9 @@ cat <<EOF >>"${RECIPE_FILENAME}"
     export PKG_CONFIG_PATH=\${SVF}/lib/pkgconfig:\${SVF}/lib64/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig\${PKG_CONFIG_PATH:+:}\${PKG_CONFIG_PATH}
     export CMAKE_PREFIX_PATH=\${SVF}\${CMAKE_PREFIX_PATH:+:}\${CMAKE_PREFIX_PATH}
 EOF
+if [ "${view}" = "visionary-simulation" ];then
+cat <<EOF >>"${RECIPE_FILENAME}"
+    export NEST_MODULES=visionarymodule
+EOF
+fi
 done
