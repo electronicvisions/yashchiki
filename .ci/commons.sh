@@ -52,6 +52,8 @@ spack_packages=(
     "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls-demos^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-exa^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-exa~dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub-dummyauthenticator^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub-simplespawner^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
@@ -88,6 +90,8 @@ spack_views=(\
         visionary-wafer
         visionary-wafer-without-dev
         visionary-nn-conv
+        visionary-exa
+        visionary-exa-without-dev
     )
 
 spack_views_no_default_gcc=(

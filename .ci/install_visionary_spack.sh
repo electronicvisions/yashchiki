@@ -55,6 +55,13 @@ ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX
 # slurvmiz needs no dev-tools because it is not for end-users
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %${VISIONARY_GCC}"
 
+############
+# exa-mode #
+############
+
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa "visionary-exa+dev %${VISIONARY_GCC}"
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa-without-dev "visionary-exa~dev %${VISIONARY_GCC}"
+
 ################################################
 # nn-conv needs a different tensorflow version #
 ################################################
