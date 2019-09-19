@@ -94,14 +94,14 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
 EOF
 
 # create appenvs for all views...
-for view in "${spack_views[@]}"; do
-
-    # append apps for each spackview...
-cat <<EOF >>"${RECIPE_FILENAME}"
-
-%appenv ${view}
+# append apps for each spackview...
+generate_appenv() {
+local name_app="$1"
+local name_view="$2"
+cat <<EOF
+%appenv ${name_app}
     # there can only be one app loaded at any time
-    export VISIONARY_ENV=${view}
+    export VISIONARY_ENV=${name_view}
     SVF=/opt/spack_views/\${VISIONARY_ENV}
     export PATH=\${SVF}/bin\${PATH:+:}\${PATH}
     export PYTHONHOME=\${SVF}
@@ -115,9 +115,18 @@ cat <<EOF >>"${RECIPE_FILENAME}"
     export PKG_CONFIG_PATH=\${SVF}/lib/pkgconfig:\${SVF}/lib64/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig\${PKG_CONFIG_PATH:+:}\${PKG_CONFIG_PATH}
     export CMAKE_PREFIX_PATH=\${SVF}\${CMAKE_PREFIX_PATH:+:}\${CMAKE_PREFIX_PATH}
 EOF
-if [ "${view}" = "visionary-simulation" ];then
+}
+for view in "${spack_views[@]}"; do
+    # generate two apps, one with visionary- prefix for compatability with old
+    # scripts and one with stripped visionary- prefix
+    (
+        generate_appenv "${view}" "${view}"
+        [[ "${view}" =~ ^visionary- ]] && generate_appenv "${view#visionary-}" "${view}"
+    ) >> "${RECIPE_FILENAME}"
+
+    if [ "${view}" = "visionary-simulation" ];then
 cat <<EOF >>"${RECIPE_FILENAME}"
     export NEST_MODULES=visionarymodule
 EOF
-fi
+    fi
 done

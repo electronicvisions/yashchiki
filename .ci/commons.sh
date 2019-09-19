@@ -74,6 +74,9 @@ spack_bootstrap_dependencies=(
 # VIEWS #
 #########
 
+# Views are put under /opt/spack_views/visionary-xy
+# The app names are then just xy for smaller terminal lines.
+
 spack_views=(\
         visionary-dev-tools
         visionary-dls
