@@ -40,6 +40,8 @@ BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches/${BUILD_CACHE_NAME}"
 PRESERVED_PACKAGES_INSIDE="${BUILD_CACHE_INSIDE}/../preserved_packages"
 PRESERVED_PACKAGES_OUTSIDE="${BUILD_CACHE_OUTSIDE}/../preserved_packages"
 
+COMMONS_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
+
 SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
 
 SPEC_FOLDER_IN_CONTAINER="/opt/spack_specs"
@@ -75,6 +77,30 @@ add_cleanup_step() {
 # PACKAGES #
 ############
 
+# Usage: get_pinned_deps <name>
+#
+# Arguments:
+#   <name> has to correspond to a list of pinned dependencies residing under
+#   <yashchiki-root>/container-build-files/pinned/<name>.list
+#   The file should contain a list of spec constraints (one spec per line).
+#   Lines starting with and everything followed by # will be considered
+#   comments and removed.
+get_pinned_deps() {
+    local depsname="${1}"
+    local filename="${COMMONS_DIR}/pinned/${depsname}.list"
+
+    if [ ! -f "${filename}" ]; then
+        echo "ERROR: No dependencies for ${depsname} found at ${filename}!" >&2
+        exit 1
+    fi
+    # The grep call removes lines starting with # as well as blank lines. sed
+    # then removes trailing comments. Afterwards we insert a tilde (^) in front
+    # of every line (i.e., dependency) and join all lines by replacing the
+    # newline character with spaces.
+    grep -v "\(^#\|^\s*$\)" "${filename}" | sed -e "s:#.*$::" \
+        | sed -e "s:^:\^:" | tr '\n' ' '
+}
+
 # the version of dev tools we want in our view
 SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
 
@@ -82,22 +108,22 @@ SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON3} %${VISI
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
     "visionary-nux~dev %${VISIONARY_GCC}"
-    "visionary-nux %${VISIONARY_GCC}"
-    "visionary-simulation~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-simulation^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-spikey~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-spikey^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer~dev^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer~dev+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer~dev+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "visionary-wafer-visu %${VISIONARY_GCC}"
-    "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
+    "visionary-simulation~dev^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
+    "visionary-simulation^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
+    "visionary-spikey~dev^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_wout_dev) %${VISIONARY_GCC}"
+    "visionary-spikey^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_w_dev) %${VISIONARY_GCC}"
+    "visionary-wafer~dev^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer~dev+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer~dev+gccxml+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer+gccxml+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer-visu^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
+    "visionary-nux+dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"  # python dependency because of +dev
+    "visionary-slurmviz^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls~dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"

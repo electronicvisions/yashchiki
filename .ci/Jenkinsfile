@@ -36,6 +36,8 @@ pipeline {
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
 				                   returnStdout: true).trim()
+				BUILD_CACHE_NAME = "spack_merge_7"  // take a different build cache to not disturb stable container builds
+				                                    // TODO: DELME
 			}
 			stages {
 				stage('Pre-build Cleanup') {
