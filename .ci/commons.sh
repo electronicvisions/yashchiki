@@ -48,7 +48,6 @@ spack_packages=(
     "visionary-wafer+gccxml+tensorflow^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     "visionary-wafer-visu %${VISIONARY_GCC}"
     "visionary-slurmviz^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
-    "tensorflow@1.8.0^${DEPENDENCY_PYTHON} %${VISIONARY_GCC}"
     # START python 3 packages
     "visionary-dls~dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
@@ -92,7 +91,6 @@ spack_views=(\
         visionary-spikey-without-dev
         visionary-wafer
         visionary-wafer-without-dev
-        visionary-nn-conv
         visionary-exa
         visionary-exa-without-dev
     )
