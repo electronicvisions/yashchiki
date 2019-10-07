@@ -19,8 +19,14 @@ BUILD_CACHE_OUTSIDE="${HOME}/build_caches/${BUILD_CACHE_NAME}"
 
 SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
 
-# only valid in container
-SPEC_FOLDER="/opt/spack_specs"
+SPEC_FOLDER_IN_CONTAINER="/opt/spack_specs"
+
+if [ -d "${SPEC_FOLDER_IN_CONTAINER}" ]; then
+    # only valid in container
+    SPEC_FOLDER="${SPEC_FOLDER_IN_CONTAINER}"
+else
+    SPEC_FOLDER="$(mktemp -d)"
+fi
 
 ############
 # PACKAGES #
@@ -200,6 +206,15 @@ compute_hashes_buildcache() {
     get_hashes_in_buildcache > "${FILE_HASHES_BUILDCACHE}"
 }
 
+
+# Get the name of given package name, should only be called if one does not
+# depend on the specfile existing or having correct content, see
+# get_specfiles().
+get_specfile_name() {
+    echo -n "${SPEC_FOLDER}/$(echo "$1" | sha256sum |
+                              awk '{ print "spec_" $1 ".yaml" }')"
+}
+
 # Compute the concrete specfile for the given packages.
 #
 # Spec files are only computed once and afterwards their names are emitted via
@@ -223,14 +238,9 @@ compute_hashes_buildcache() {
 get_specfiles() {
     local specfiles=()
 
-    if [ ! -d "${SPEC_FOLDER}" ]; then
-        mkdir ${SPEC_FOLDER}
-    fi
-
     for package in "${@}"; do
         # compute spec and put into temporary file derived from package name
-        specfiles+=("${SPEC_FOLDER}/$(echo ${package} | sha256sum |
-                                      awk '{ print "spec_" $1 ".yaml" }')")
+        specfiles+=("$(get_specfile_name "${package}")")
     done
 
     (

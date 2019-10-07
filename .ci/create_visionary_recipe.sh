@@ -43,6 +43,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
+    mkdir -p "\${SINGULARITY_ROOTFS}${SPEC_FOLDER_IN_CONTAINER}"
     rsync -av "${WORKSPACE}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
 
 %files

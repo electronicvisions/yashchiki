@@ -156,86 +156,67 @@ packages_to_fetch=(
 
 # first entry is just a statefile to indicate fetching failed (as opposed to
 # some warnings that are also printed to stderr during fetching)
-tmpfiles_fetch_err=("$(mktemp)")
+tmpfiles_concretize_err=("$(mktemp)")
 
 rm_tmp_fetch_err() {
-    rm -v "${tmpfiles_fetch_err[@]}"
+    rm -v "${tmpfiles_concretize_err[@]}"
 }
 trap rm_tmp_fetch_err EXIT
 
-num_jobs_fetch="$(nproc)"
-
-fetch_spack_package() {
-    set -euo pipefail
-
-    # fetch (and therefore concretize) the given spack packages in a temporary
-    # spack instance and hardlink download cache back to main spack
-    if (( $# == 0 )); then
-        echo "NO PACKAGE TO FETCH!" >&2
-        return 1
-    fi
-    local tmp_spack_folder
-    local tmp_spack_bin
-
-    tmp_spack_folder="$(mktemp -d)/spack"
-    tmp_spack_bin="${tmp_spack_folder}/bin/spack"
-
-    # hardlink whole spack folder (will also link cache)
-    # as of now spack folder contains symlinks of the form:
-    # _spack_root -> ../../..
-    # -> they have to be preserved
-    cp -rlH "${MY_SPACK_FOLDER}" "${tmp_spack_folder}" || return 1
-
-    # perfom the concretization and the fetching into the given subfolder
-    ${tmp_spack_bin} --verbose fetch -D "${@}" || return 1
-
-    # hardlink the locally downloaded cache back into the main spack folder
-    cp -ruln "${tmp_spack_folder}/var/spack/cache" "${MY_SPACK_FOLDER}/var/spack/" || return 1
-
-    rm -rf "${tmp_spack_folder}" || return 1
-}
-
 for package in "${packages_to_fetch[@]}"; do
-    echo "Fetching ${package}.."
+    echo "Concretizing ${package} for fetching.."
     # pause if we have sufficient concretizing jobs
     set +x  # do not clobber build log so much
-    while (( $(jobs | wc -l) >= num_jobs_fetch )); do
+    while (( $(jobs | wc -l) >= $(nproc) )); do
         # call jobs because otherwise we will not exit the loop
         jobs &>/dev/null
         sleep 1
     done
     set -x
     tmp_err="$(mktemp)"
-    tmpfiles_fetch_err+=("${tmp_err}")
+    tmpfiles_concretize_err+=("${tmp_err}")
     # we need to strip the compiler spec starting with '%' from the spec string
     # because the compiler is not yet known
-    ( set -x; \
-        ( fetch_spack_package "${package%%%*}" ) 2>"${tmp_err}" \
-        || ( echo "FETCH FAILED" >> "${tmpfiles_fetch_err[0]}" )) &
+    ( set -x;
+        ( specfile=$(get_specfile_name "${package%%%*}");
+        ("${MY_SPACK_BIN}" spec -y "${package}" > "${specfile}")
+        ) 2>"${tmp_err}" \
+        || ( echo "CONCRETIZING FAILED" >> "${tmpfiles_concretize_err[0]}" );
+    ) &
 done
 # wait for all spawned jobs to complete
 wait
 
 # verify that all fetches were successful
-if (( $(cat "${tmpfiles_fetch_err[@]}" | wc -l) > 0 )); then
+if (( $(cat "${tmpfiles_concretize_err[@]}" | wc -l) > 0 )); then
     {
-        if (( $(wc -l <"${tmpfiles_fetch_err[0]}") > 0)); then
+        if (( $(wc -l <"${tmpfiles_concretize_err[0]}") > 0)); then
             echo -n "ERROR: "
         else
             echo -n "WARN: "
         fi
         echo "Encountered the following during concretizations prior to fetching:"
-        cat "${tmpfiles_fetch_err[@]}"
+        cat "${tmpfiles_concretize_err[@]}"
     } | tee errors_concretization.log
-    if (( $(wc -l <"${tmpfiles_fetch_err[0]}") > 0)); then
+    if (( $(wc -l <"${tmpfiles_concretize_err[0]}") > 0)); then
         exit 1
     fi
 fi
 
+# now fetch everything that is needed in order
+fetch_specfiles=()
+for package in "${packages_to_fetch[@]}"; do
+    specfile="$(get_specfile_name "${package%%%*}")"
+    if (( $(wc -l <"${specfile}") == 0 )); then
+        echo "${package} failed to concretize!" >&2
+        exit 1
+    fi
+    fetch_specfiles+=( "${specfile}" )
+done
+${MY_SPACK_BIN} fetch -D "${fetch_specfiles[@]/^/-f }"
 
 # update download_cache
 rsync -av "${PWD}/spack/var/spack/cache/" "${HOME}/download_cache/"
-
 
 # remove f***ing compiler config
 rm ${PWD}/spack/etc/spack/compilers.yaml
