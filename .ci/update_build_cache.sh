@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # only update build cache for stable builds
-if [ "${CONTAINER_BUILD_TYPE}" != "stable" ]; then
+if [ "${CONTAINER_BUILD_TYPE:-}" != "stable" ]; then
     echo "Not updating build cache for testing builds." 1>&2
     exit 0
 fi
@@ -36,6 +36,5 @@ set +e
 # Arugments needed once we switch to singularity3: --writable-tmpfs
 sudo -Eu spack singularity exec\
     -B "${BUILD_CACHE_OUTSIDE}:${BUILD_CACHE_INSIDE}:rw"\
-    -B "${LOCK_FOLDER_OUTSIDE}:${LOCK_FOLDER_INSIDE}"\
     "${IMAGE_NAME}" \
-    /opt/spack_install_scripts/update_build_cache_in_container.sh || exit 0
+    /opt/spack_install_scripts/update_build_cache_in_container.sh -q || exit 0

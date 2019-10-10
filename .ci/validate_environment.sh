@@ -33,3 +33,6 @@ fi
 # source file for early validation
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
+
+# store environment for usage within container
+env > "${JENKINS_ENV_FILE}"

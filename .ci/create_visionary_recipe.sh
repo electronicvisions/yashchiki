@@ -30,20 +30,19 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
     # bind-mount build_cache
-    mkdir "\${SINGULARITY_ROOTFS}/${BUILD_CACHE_INSIDE}"
-    mount --no-mtab --bind -o ro "${BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}/${BUILD_CACHE_INSIDE}"
+    mkdir "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
+    mount --no-mtab --bind "${BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
+    # bind-mount preserved packages in case the build fails
+    mkdir "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
+    mount --no-mtab --bind "${PRESERVED_PACKAGES_OUTSIDE}" "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
     # bind-mount tmp-folder
     mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack"
     mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
-    # lockfiles folder
-    mkdir "\${SINGULARITY_ROOTFS}/opt/lock"
-    mount --no-mtab --bind "${LOCK_FOLDER_OUTSIDE}" "\${SINGULARITY_ROOTFS}/${LOCK_FOLDER_INSIDE}"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
-    mkdir -p "\${SINGULARITY_ROOTFS}${SPEC_FOLDER_IN_CONTAINER}"
     rsync -av "${WORKSPACE}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
 
 %files
@@ -57,6 +56,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     ${WORKSPACE}/misc-files/locale.gen /etc/locale.gen
     ${WORKSPACE}/misc-files/locale.alias /etc/locale.alias
     ${WORKSPACE}/misc-files/sudoers /etc/sudoers
+    ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
 
 %post
     # cannot specify permissions in files-section
@@ -81,17 +81,16 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     PID_MAIN="\$\$"
     ( "${SPACK_INSTALL_SCRIPTS}/install_system_dependencies.sh" \
         || kill \${PID_MAIN} ) &
-    "${SPACK_INSTALL_SCRIPTS}/prepare_spack_as_root.sh"
-    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/bootstrap_spack.sh"
-    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_visionary_spack.sh"
-    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings.sh"
-    "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings_as_root.sh"
-    "${SPACK_INSTALL_SCRIPTS}/generate_modules.sh"
+    "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post_as_root.sh"
     # system dependencies might not have installed by now
     # currently, singularity needs some dependendencies from apt as well, so
     # wait till we are finished with system dependencies
     wait
-    "${SPACK_INSTALL_SCRIPTS}/install_singularity_as_root.sh"
+    "${SPACK_INSTALL_SCRIPTS}/install_singularity_as_root.sh" || \
+    (
+    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&
+        exit 1  # propagate the error
+    )
 EOF
 
 # create appenvs for all views...

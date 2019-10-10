@@ -92,7 +92,8 @@ pipeline {
 				stage('Update build cache and export container') {
 					steps {
 						script {
-							CONTAINER_NAME = sh(script: ".ci/deploy_container.sh", returnStdout: true).trim()
+							// we only want the container name, tail everything else
+							CONTAINER_NAME = sh(script: ".ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
 						sh ".ci/update_build_cache.sh -c \"$CONTAINER_NAME\""
 					}

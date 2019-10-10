@@ -2,20 +2,43 @@
 
 set -euo pipefail
 
+JENKINS_ENV_FILE_INSIDE="/tmp/spack/jenkins.env"
+if [ -n "${WORKSPACE:-}" ]; then
+    # we are not in container
+    JENKINS_ENV_FILE="${WORKSPACE}/jenkins.env"
+else
+    JENKINS_ENV_FILE="${JENKINS_ENV_FILE_INSIDE}"
+fi
+
+get_jenkins_env() {
+    # match on variable name at the beginning of line and then delete everyting
+    # up to and including the first equal sign
+    {
+        if [ -f "${JENKINS_ENV_FILE}" ]; then
+            cat ${JENKINS_ENV_FILE}
+        else
+            env
+        fi
+    } | grep "^$*=" | sed -e "s:[^=]*=::"
+}
+
 export MY_SPACK_FOLDER=/opt/spack
 export MY_SPACK_BIN=/opt/spack/bin/spack
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
-LOCK_FOLDER_INSIDE=/opt/lock
-LOCK_FOLDER_OUTSIDE=/home/vis_jenkins/lock
+LOCK_FILENAME=lock
 
-if [ -z "${BUILD_CACHE_NAME:-}" ]; then
+BUILD_CACHE_NAME="$(get_jenkins_env BUILD_CACHE_NAME)"
+if [ -z "${BUILD_CACHE_NAME}" ]; then
     BUILD_CACHE_NAME=visionary_manual
 fi
 
 BUILD_CACHE_INSIDE="/opt/build_cache"
-BUILD_CACHE_LOCK="${LOCK_FOLDER_INSIDE}/build_cache_${BUILD_CACHE_NAME}"
-BUILD_CACHE_OUTSIDE="${HOME}/build_caches/${BUILD_CACHE_NAME}"
+BUILD_CACHE_LOCK="${BUILD_CACHE_INSIDE}/${LOCK_FILENAME}"
+BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches/${BUILD_CACHE_NAME}"
+
+PRESERVED_PACKAGES_INSIDE="${BUILD_CACHE_INSIDE}/../preserved_packages"
+PRESERVED_PACKAGES_OUTSIDE="${BUILD_CACHE_OUTSIDE}/../preserved_packages"
 
 SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
 
@@ -184,6 +207,57 @@ populate_views() {
     done
 }
 
+#################################
+# HELPER FUNCTIONS NEEDED BELOW #
+#################################
+
+# Usage:
+#       lock_file [-e] [-w <sec>] <file>
+#
+# Lock the given file, the file will be unlocked once the process exits. Make
+# sure to only use it in subshells to automatically unlock afterwards.
+#
+# Args:
+#   -e          Lock exculsively (otherwise shared)
+#   -w <secs>   How long to wait for lock until retrying. [default: 10]
+#
+lock_file() {
+    local OPTIND
+    local opt
+    local args_flock=()
+    local exclusive=0
+    local info_exclusive=""
+    local wait_secs=10
+
+    while getopts ":ew:" opt
+    do
+        case $opt in
+            e) exclusive=1 ;;
+            w) wait_secs="${OPTARG}" ;;
+            *) echo -e "Invalid option to lock_file(): $OPTARG\n" >&2; exit 1 ;;
+        esac
+    done
+    shift $(( OPTIND - 1 ))
+
+    local fd_lock
+    local filename_lock="$1"
+    exec {fd_lock}>"${filename_lock}"
+
+    if (( exclusive == 1 )); then
+        args_flock+=( "-e" )
+        info_exclusive="(exclusively) "
+    else
+        args_flock+=( "-s" )
+        info_exclusive="(shared) "
+    fi
+
+    while /bin/true; do
+        echo "Obtaining build_cache lock ${info_exclusive}from ${filename_lock}." 1>&2
+        flock ${args_flock[*]} -w "${wait_secs}" ${fd_lock} && break \
+            || echo "Could not lock ${filename_lock}, retrying in ${wait_secs} seconds.." 1>&2
+    done
+}
+
 ###################################
 # HELPER FUNCTIONS FOR BUILDCACHE #
 ###################################
@@ -204,15 +278,25 @@ remove_tmp_files() {
 add_cleanup_step remove_tmp_files EXIT
 
 
-# get hashes in buildcache
+# get hashes in buildcache [<build_cache-directory>]
+# <buildcache-directory> defaults to ${BUILD_CACHE_INSIDE} if not supplied.
 get_hashes_in_buildcache() {
-    if [ -d "${BUILD_CACHE_INSIDE}" ]; then
+    local buildcache_dir
+    buildcache_dir="${1:-${BUILD_CACHE_INSIDE}}"
+
+    local resultsfile
+    resultsfile=$(mktemp)
+
+    if [ -d "${buildcache_dir}" ]; then
         # Naming scheme in the build_cache is <checksum>.tar.gz -> extract from full path
-        ( find "${BUILD_CACHE_INSIDE}" -name "*.tar.gz" -print0 \
+        ( find "${buildcache_dir}" -name "*.tar.gz" -mindepth 1 -maxdepth 1 -print0 \
             | xargs -0 -n 1 basename \
             | sed -e "s:\.tar\.gz$::g" \
-	    | sort ) || /bin/true
+	    | sort >"${resultsfile}") || /bin/true
     fi
+    echo "DEBUG: Found $(wc -l <"${resultsfile}") hashes in buildcache: ${buildcache_dir}" >&2
+    cat "${resultsfile}"
+    rm "${resultsfile}"
 }
 
 
@@ -223,7 +307,7 @@ get_hashes_in_spack() {
 
 compute_hashes_buildcache() {
     # extract all available package hashes from buildcache
-    get_hashes_in_buildcache > "${FILE_HASHES_BUILDCACHE}"
+    get_hashes_in_buildcache >"${FILE_HASHES_BUILDCACHE}"
 }
 
 
@@ -279,20 +363,22 @@ get_specfiles() {
 }
 
 install_from_buildcache() {
-    # obtain shared lock around buildcache
-    exec {lock_fd}>"${BUILD_CACHE_LOCK}"
-    echo "Locking buildcache (shared).." >&2
-    flock -s "${lock_fd}"
-    echo "Locked buildcache (shared)." >&2
-    _install_from_buildcache "${@}"
-    echo "Unlocking buildcache (shared).." >&2
-    flock -u "${lock_fd}"
-    echo "Unlocked buildcache (shared)." >&2
+    local install_failed=0
+    # don't forget to unlock builcache in case of error, but then propagate
+    (
+        lock_file "${BUILD_CACHE_LOCK}"
+        _install_from_buildcache "${@}"
+    ) || install_failed=1
+
+    if (( install_failed == 1 )); then
+        echo "Error during builcache install!" >&2
+        exit 1
+    fi
 }
 
 _install_from_buildcache() {
     # only extract the hashes present in buildcache on first invocation
-    if [ "$(wc -l < "${FILE_HASHES_BUILDCACHE}")" -eq 0 ]; then
+    if (( "$(wc -l <"${FILE_HASHES_BUILDCACHE}")" == 0 )); then
         compute_hashes_buildcache
     fi
 
@@ -300,11 +386,21 @@ _install_from_buildcache() {
     local packages_to_install=("${@}")
     readarray -t specfiles < <(get_specfiles "${packages_to_install[@]}")
 
+    # check again that specfiles are not empty - otherwise a concretization failed
+    echo "DEBUG: Checking specfiles for ${packages_to_install[*]}" >&2
+    for spec in "${specfiles[@]}"; do
+        if (( $(wc -l <"${spec}") == 0 )); then
+            echo "One of the following specs failed to concretize: " \
+                 "${packages_to_install[@]}" >&2
+            exit 1
+        fi
+    done
+
     # install packages from buildcache
     cat "${specfiles[@]}" | sed -n 's/.*hash:\s*\(.*\)/\1/p' > "${FILE_HASHES_SPACK_ALL}"
 
     # make each unique
-    cat ${FILE_HASHES_SPACK_ALL} | sort | uniq > ${FILE_HASHES_SPACK}
+    cat "${FILE_HASHES_SPACK_ALL}" | sort | uniq > "${FILE_HASHES_SPACK}"
 
     # install if available in buildcache
     cat "${FILE_HASHES_SPACK}" "${FILE_HASHES_BUILDCACHE}" | sort | uniq -d > "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
@@ -319,6 +415,31 @@ _install_from_buildcache() {
 #############
 # UTILITIES #
 #############
+
+get_compact_name() {
+    local change_num
+    local patch_level
+
+    local gerrit_change_number
+    local gerrit_patchset_number
+    local gerrit_refspec
+
+    gerrit_change_number="$(get_jenkins_env GERRIT_CHANGE_NUMBER)"
+    gerrit_patchset_number="$(get_jenkins_env GERRIT_PATCHSET_NUMBER)"
+    gerrit_refspec="$(get_jenkins_env GERRIT_REFSPEC)"
+
+    if [ -z "${gerrit_change_number:-}" ]; then
+        if [ -n "${gerrit_refspec:-}" ]; then
+            # extract gerrit change number from refspec
+            change_num="$(echo "${gerrit_refspec}" | cut -f 4 -d / )"
+            patch_level="$(echo "${gerrit_refspec}" | cut -f 5 -d / )"
+        fi
+    else
+        change_num="${gerrit_change_number}"
+        patch_level="${gerrit_patchset_number}"
+    fi
+    echo -n "c${change_num}p${patch_level}"
+}
 
 # copied from slurmviz-commons.sh
 get_latest_version() {
