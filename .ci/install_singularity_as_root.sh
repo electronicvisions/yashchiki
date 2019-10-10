@@ -23,7 +23,7 @@ TMP_MODULES=$(mktemp)
 rm_tmp_modules() {
     rm -v "${TMP_MODULES}"
 }
-trap rm_tmp_modules EXIT
+add_cleanup_step rm_tmp_modules
 {
     spack module tcl loads -r "$(get_latest_version "${VISIONARY_GCC}")"
 } | tee "${TMP_MODULES}"
@@ -44,7 +44,7 @@ curl -OLJ "https://dl.google.com/go/${GO_TAR}"
 remove_tar() {
     rm -v "${SPACK_TMPDIR}/${GO_TAR}"
 }
-trap remove_tar EXIT
+add_cleanup_step remove_tar
 tar -C "${GO_INSTALL_PATH}" -xzf "${GO_TAR}"
 popd
 

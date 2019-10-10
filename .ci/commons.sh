@@ -28,6 +28,26 @@ else
     SPEC_FOLDER="$(mktemp -d)"
 fi
 
+###############
+# BOOKKEEPING #
+###############
+
+# bash only supports a single function for the exit trap, so we store all functions to execute in an array an iterate over it
+_yashchiki_exit_fns=()
+
+_yashchiki_exit_trap() {
+    for fn in "${_yashchiki_exit_fns[@]}"; do
+        eval "${fn}"
+    done
+}
+trap _yashchiki_exit_trap EXIT
+
+add_cleanup_step() {
+    for fn in "$@"; do
+        yashchiki_exit_fns+=("${fn}")
+    done
+}
+
 ############
 # PACKAGES #
 ############
@@ -181,7 +201,7 @@ remove_tmp_files() {
     rm "${FILE_HASHES_SPACK}"
     rm "${FILE_HASHES_SPACK_ALL}"
 }
-trap remove_tmp_files EXIT
+add_cleanup_step remove_tmp_files EXIT
 
 
 # get hashes in buildcache
