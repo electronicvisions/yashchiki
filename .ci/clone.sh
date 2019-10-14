@@ -163,6 +163,17 @@ rm_tmp_fetch_err() {
 }
 trap rm_tmp_fetch_err EXIT
 
+
+# Concretize a trivial spec to regenerate
+# SPACK_ROOT/.spack/cache/{patches,providers,tags}/builtin-index.json
+# This should prevent lockfile timeout issues as parallel spack calls can rely
+# on the pregenerated index..
+# Unfortunately, right now reindexing spack does not cause the index file to be
+# generated.
+echo "Regenerating database index." >&2
+${MY_SPACK_BIN} spec aida >/dev/null
+
+
 for package in "${packages_to_fetch[@]}"; do
     echo "Concretizing ${package} for fetching.."
     # pause if we have sufficient concretizing jobs
