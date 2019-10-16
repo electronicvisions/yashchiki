@@ -26,15 +26,6 @@ find "${MY_SPACK_FOLDER}" \
 # of a locally checked out spack-repo at /opt/spack in the container
 chmod 777 "${MY_SPACK_FOLDER}"/opt/spack/{*/*,*,}
 
-# shrink image: remove useless links in the stage area
-rm -rf "${MY_SPACK_FOLDER}"/var/spack/stage/*
-
-# set permissions for local users to install files
-# this includes any lockfiles that might have been left over
-# TODO: revisit this strategy again once
-# https://github.com/spack/spack/pull/8014 is implemented! the user could
-# simply stack the container-repo ontop of a locally mounted one
-chmod -R 777 ${MY_SPACK_FOLDER}/var/spack/stage
 # locks and indices have to be writable for local user when trying to install
 chmod -R 777 ${MY_SPACK_FOLDER}/opt/spack/.spack-db
 # same goes for local caches
