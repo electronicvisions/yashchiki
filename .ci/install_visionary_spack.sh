@@ -36,8 +36,19 @@ cd ${MY_SPACK_FOLDER}
 OLD_UMASK=$(umask)
 umask 000
 
-# Perform custom view settings
+################################
+# Perform custom view settings #
+################################
 
+# NOTE: Please note that these lines cannot share state because each is
+# executed essentially in parallel in its own subshell.
+#
+# For reproducibility reasons, each view should only appear once per call to
+# parallel_cmds! Due to the fact that we simply ignore file duplicates if
+# several spack packages get linked into the same view and the random order of
+# execution in a parallel context, builds might become unstable otherwise.
+{
+cat <<EOF
 ####################################
 # Packages still plagued by gccxml #
 ####################################
@@ -67,11 +78,15 @@ ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX
 
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa "visionary-exa+dev %${VISIONARY_GCC}"
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa-without-dev "visionary-exa~dev %${VISIONARY_GCC}"
+EOF
 
 # Ensure that only one version of visionary-dev-tools is installed as ${SPACK_VIEW_ARGS} view even
 # if several are installed due to different constraints in other packages
 hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L ${SPEC_VIEW_VISIONARY_DEV_TOOLS} | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
+cat <<EOF
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "/${hash_visionary_dev_tools}"
+EOF
+} | parallel_cmds
 
 # Perform the remaining additions to the views defined in commons.
 populate_views

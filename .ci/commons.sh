@@ -224,14 +224,51 @@ fi
 # HELPER FUNCTIONS FOR VIEWS #
 ##############################
 
+# Execute commands in given FILEs in parallel subshells.
+#
+# Usage:
+#   parallel_cmds [options] [FILE..]
+#
+# Please note that these lines cannot share state because each is executed
+# essentially in parallel in its own subshell.
+#
+# If FILE is omitted, commands are read from stdin.
+#
+# Options:
+#   -j <num>    Number of parallel jobs [default: all available]
+#
+parallel_cmds() {
+    local num_jobs
+    num_jobs="$(nproc)"
+    while getopts ":j:" opt
+    do
+        case $opt in
+            j) num_jobs="${OPTARG}" ;;
+            *) echo -e "Invalid option to lock_file(): $OPTARG\n" >&2; exit 1 ;;
+        esac
+    done
+    shift $(( OPTIND - 1 ))
+
+    grep -v "^\(#\|[[:space:]]*$\)" "${@}" | parallel -j "${num_jobs}"
+}
+
 populate_views() {
+    # Since each package may add to overlapping sets of views, we perform each
+    # addition on its own to be on the safe side.
+    # Due to the fact that we simply ignore file duplicates if several spack
+    # packages get linked into the same view and the random order of execution
+    # in a parallel context, builds might become unstable otherwise.
     for addition in "${!spack_add_to_view[@]}"; do
         local dependencies="${spack_add_to_view_with_dependencies["${addition}"]}"
-        for viewname in ${spack_add_to_view["${addition}"]}; do
-            ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d ${dependencies} symlink -i "${MY_SPACK_VIEW_PREFIX}/${viewname}" "${addition}"
-        done
+        {
+            for viewname in ${spack_add_to_view["${addition}"]}; do
+                echo "${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
+            done
+        } | parallel_cmds
     done
 }
+
+
 
 #################################
 # HELPER FUNCTIONS NEEDED BELOW #
