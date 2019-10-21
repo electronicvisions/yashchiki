@@ -211,10 +211,6 @@ if ! shopt -q lastpipe; then
     reset_lastpipe=1
 fi
 
-# get spack_package_names from spack_packages
-printf "%s\n" "${spack_packages[@]}" | awk -F '~|+| |\\^|%' '{ print $1 }' \
-    | sort | uniq | readarray -t spack_package_names
-
 if (( reset_lastpipe )); then
     # restore defaults
     shopt -u lastpipe
