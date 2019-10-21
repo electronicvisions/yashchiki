@@ -81,7 +81,7 @@ EOF
 
 # Ensure that only one version of visionary-dev-tools is installed as ${SPACK_VIEW_ARGS} view even
 # if several are installed due to different constraints in other packages
-hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L ${SPEC_VIEW_VISIONARY_DEV_TOOLS} | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
+hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L "${SPEC_VIEW_VISIONARY_DEV_TOOLS/ / target=${PINNED_TARGET} }" | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
 cat <<EOF
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "/${hash_visionary_dev_tools}"
 EOF

@@ -186,11 +186,13 @@ for package in "${packages_to_fetch[@]}"; do
     set -x
     tmp_err="$(mktemp)"
     tmpfiles_concretize_err+=("${tmp_err}")
-    # we need to strip the compiler spec starting with '%' from the spec string
-    # because the compiler is not yet known
+    # We need to strip the compiler spec starting with '%' from the spec string
+    # because the compiler is not yet known.
+    # Note that this will also delete target information right now!
+    package_wo_compiler="${package%%%*}"
     ( set -x;
-        ( specfile=$(get_specfile_name "${package%%%*}");
-        ("${MY_SPACK_BIN}" spec -y "${package}" > "${specfile}")
+        ( specfile=$(get_specfile_name "${package_wo_compiler}");
+        ("${MY_SPACK_BIN}" spec -y "${package_wo_compiler}" > "${specfile}")
         ) 2>"${tmp_err}" \
         || ( echo "CONCRETIZING FAILED" >> "${tmpfiles_concretize_err[0]}" );
     ) &
@@ -217,7 +219,8 @@ fi
 # now fetch everything that is needed in order
 fetch_specfiles=()
 for package in "${packages_to_fetch[@]}"; do
-    specfile="$(get_specfile_name "${package%%%*}")"
+    package_wo_compiler="${package%%%*}"
+    specfile="$(get_specfile_name "${package_wo_compiler}")"
     if (( $(wc -l <"${specfile}") == 0 )); then
         echo "${package} failed to concretize!" >&2
         exit 1

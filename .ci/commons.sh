@@ -102,40 +102,49 @@ get_pinned_deps() {
 }
 
 # the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
 
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
     "visionary-nux~dev %${VISIONARY_GCC}"
-    "visionary-simulation~dev^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
-    "visionary-simulation^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
-    "visionary-spikey~dev^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_wout_dev) %${VISIONARY_GCC}"
-    "visionary-spikey^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_w_dev) %${VISIONARY_GCC}"
-    "visionary-wafer~dev^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer~dev+gccxml^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer~dev+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer~dev+gccxml+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer+gccxml^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer+gccxml+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer-visu^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
+    "visionary-simulation~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
+    "visionary-simulation ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
+    "visionary-spikey~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_wout_dev) %${VISIONARY_GCC}"
+    "visionary-spikey ^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_w_dev) %${VISIONARY_GCC}"
+    "visionary-wafer~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer ~dev+gccxml^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer ~dev+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer ~dev+gccxml+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer+tensorflow ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer+gccxml +tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
+    "visionary-wafer-visu ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
-    "visionary-nux+dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"  # python dependency because of +dev
-    "visionary-slurmviz^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls+gccxml^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls-demos^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-exa^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-exa~dev^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub-dummyauthenticator^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub-simplespawner^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-nux+dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"  # python dependency because of +dev
+    "visionary-slurmviz ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~dev+gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls+gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls-demos ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-exa ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-exa~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     # END python 3 packages
 )
+
+# WIP fix to allow all software to run on AMTHosts, more permanent solution is
+# forthcoming.
+# Note: We insert target directly after the package name and variants (i.e.,
+# the first space) in order to deal with concretization errors that sometimes
+# occur if target is specified too far back in the string.
+# --obreitwi, 21-10-19 14:33:45
+PINNED_TARGET="sandybridge"
+spack_packages=( "${spack_packages[@]/ / target=${PINNED_TARGET} }" )
 
 # control view creation with verbosity for more debuggability
 SPACK_VIEW_ARGS="--verbose"
@@ -146,8 +155,9 @@ SPACK_VIEW_ARGS="--verbose"
 # they won't be able to be fetched inside the container because of missing
 # permissions.
 spack_bootstrap_dependencies=(
-    "environment-modules~X"
+    "environment-modules~X " # space needs to be there for replacement below to work
 )
+spack_bootstrap_dependencies=( "${spack_bootstrap_dependencies[@]/ / target=${PINNED_TARGET} } " )
 
 #########
 # VIEWS #
@@ -415,6 +425,17 @@ get_specfiles() {
         idx=$((idx + 1))
     done
     ) | parallel -j$(nproc) 1>/dev/null
+
+    # TODO: DELME
+    for sf in "${specfiles[@]}"; do
+        if grep broadwell "${sf}" >/dev/null; then
+            {
+                echo "Found target broadwell in specfile, aborting:"
+                head -n 10 "${sf}"
+            } >&2
+            exit 1
+        fi
+    done
 
     for f in "${specfiles[@]}"; do
         echo "${f}"

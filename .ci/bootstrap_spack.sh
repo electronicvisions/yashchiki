@@ -38,14 +38,33 @@ ${MY_SPACK_BIN} mirror add --scope site build_mirror file://${BUILD_CACHE_DIR}
 
 install_from_buildcache "${spack_bootstrap_dependencies[@]}"
 
+# We install all packages needed by boostrap here
+for bootstrap_spec in "${spack_bootstrap_dependencies[@]}"; do
+    ${MY_SPACK_BIN} --verbose install --no-cache --show-log-on-error "${bootstrap_spec}"
+done
+
+num_packages_pre_boostrap="$(${MY_SPACK_BIN} find 2>&1 | head -n 1 | awk '/installed packages/ { print $2 }')"
+
 ${MY_SPACK_BIN} bootstrap -v --no-cache
 
+num_packages_post_boostrap="$(${MY_SPACK_BIN} find 2>&1 | head -n 1 | awk '/installed packages/ { print $2 }')"
+
+if (( num_packages_pre_boostrap < num_packages_post_boostrap )); then
+cat <<EOF | tr '\n' ' ' >&2
+ERROR: spack bootstrap command did install some packages on its own, this
+should not happen, aborting..!
+EOF
+echo ""
+    exit 1
+fi
+
 # check if it can be specialized
-install_from_buildcache "${VISIONARY_GCC}"
+spec_compiler="${VISIONARY_GCC} target=${PINNED_TARGET}"
+install_from_buildcache "${spec_compiler}"
 
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
-${MY_SPACK_BIN} --verbose install --no-cache --show-log-on-error "${VISIONARY_GCC}"
+${MY_SPACK_BIN} --verbose install --no-cache --show-log-on-error "${spec_compiler}"
 
 # add fresh compiler to spack
 ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
