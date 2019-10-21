@@ -10,7 +10,6 @@ source "${sourcedir}/setup_env_spack.sh"
 
 cd "$HOME"
 
-# tensorflow fails
 install_from_buildcache "${spack_packages[@]}"
 
 echo "INSTALLING PACKAGES"
