@@ -31,4 +31,7 @@ done
 
 mkdir -p "${target_folder}"
 
-"${sourcedir}/update_build_cache_in_container.sh" -d "${target_folder}" -q
+"${sourcedir}/update_build_cache_in_container.sh" -d "${target_folder}" -q || /bin/true  # do not fail!
+
+# dump the temp folder to the preserved packages folder to help diagnostics
+XZ_DEFAULTS="-T0" tar cfJ "${target_folder}/tmp_spack.tar.xz" "${SPACK_TMPDIR}"
