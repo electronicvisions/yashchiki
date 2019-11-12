@@ -107,7 +107,6 @@ SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} %${VIS
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
-    "visionary-nux~dev %${VISIONARY_GCC}"
     "visionary-simulation~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
     "visionary-simulation ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
     "visionary-spikey~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_wout_dev) %${VISIONARY_GCC}"
@@ -122,7 +121,6 @@ spack_packages=(
     "visionary-wafer+gccxml +tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
     "visionary-wafer-visu ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
-    "visionary-nux+dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"  # python dependency because of +dev
     "visionary-slurmviz ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
