@@ -496,7 +496,7 @@ _install_from_buildcache() {
 # UTILITIES #
 #############
 
-get_compact_name() {
+get_change_name() {
     local change_num
     local patch_level
 

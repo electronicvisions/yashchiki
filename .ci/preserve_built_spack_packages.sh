@@ -17,10 +17,16 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/commons.sh"
 source "${sourcedir}/setup_env_spack.sh"
 
+build_type=$(get_jenkins_env CONTAINER_BUILD_TYPE)
+
 # find empty directory to dump into
 build_num=1
 while /bin/true; do
-    target_folder="${PRESERVED_PACKAGES_INSIDE}/$(get_compact_name)_${build_num}"
+    if [ "${build_type}" = "testing" ]; then
+        target_folder="${PRESERVED_PACKAGES_INSIDE}/$(get_change_name)_${build_num}"
+    else
+        target_folder="${PRESERVED_PACKAGES_INSIDE}/${build_type}_$(date --iso)_${build_num}"
+    fi
 
     if [ ! -d "${target_folder}" ]; then
         break
