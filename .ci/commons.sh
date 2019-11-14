@@ -122,8 +122,8 @@ spack_packages=(
     "visionary-wafer-visu ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
     "visionary-slurmviz ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~dev~gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls~dev+gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls+gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls-demos ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"

@@ -18,7 +18,7 @@ py-ipython@5.8.0
 py-jsonrpc-server@0.1.2
 py-junit-xml@1.7
 py-jupyter-console@5.2.0
-py-jupyter-notebook@5.7.0
+py-notebook@5.7.0
 py-language-server@0.22.0
 py-llvmlite@0.27.1
 py-lmfit@0.9.5
@@ -37,20 +37,24 @@ py-pandas@0.24.1
 py-pandocfilters@1.4.2
 py-partd@0.3.8
 py-pexpect@4.6.0
+py-protobuf@3.6.1  # needed by tensorflow 1.13.1
+protobuf@3.6.1  # needs to be in sync with py-protobuf
 py-ptyprocess@0.5.1
 py-pybind11@2.3.0
 py-pydocstyle@3.0.0
-py-pytest@4.3.0
+py-pytest@4.4.0
 py-pywavelets@0.5.2
 py-quantities@0.12.1
 py-scikit-image@0.14.2
 py-scikit-learn@0.20.2
 py-scipy@1.2.1
 py-send2trash@1.5.0
+py-setuptools@41.3.0  # blocked by py-astor 
 py-slurm-pipeline@3.0.2
 py-sphinx-rtd-theme@0.4.3
 py-sphinx@1.8.4
 py-subprocess32@3.2.7
+py-tables@3.3.0
 py-tornado@5.1.1
 py-traitlets@4.3.2
 py-typing@3.6.4
@@ -59,5 +63,6 @@ py-uuid@1.30
 py-wcwidth@0.1.7
 py-yccp@0.5.0
 py-yq@2.7.2
-py-zmq@18.0.1
+py-pyzmq@18.1.0
 openmpi  # needed because otherwise there will be an error regarding spectrum-mpi
+tensorflow@1.13.1

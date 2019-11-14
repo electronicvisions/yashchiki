@@ -16,7 +16,7 @@ py-chardet@3.0.2
 py-click@6.6
 py-configargparse@0.14.0
 py-configparser@3.5.1
-py-coverage@4.5.2
+py-coverage@4.5.4
 py-cycler@0.10.0
 py-cython@0.29.7
 py-decorator@4.3.0
@@ -48,7 +48,7 @@ py-ipython-genutils@0.2.0
 py-ipython@5.8.0
 py-itsdangerous@0.24
 py-jedi@0.13.2
-py-jinja2@2.10
+py-jinja2@2.10.3
 py-jsonrpc-server@0.1.2
 py-junit-xml@1.7
 py-keras-applications@1.0.7
@@ -77,9 +77,10 @@ py-pbr@3.1.1
 py-pexpect@4.6.0
 py-pickleshare@0.7.4
 py-pillow@5.4.1
-py-pluggy@0.8.1
+py-pluggy@0.9.0
 py-prompt-toolkit@1.0.9
-py-protobuf@3.7.1
+py-protobuf@3.6.1
+protobuf@3.6.1  # keep in sync with py-protobuf because concretizer is stupid
 py-psutil@5.5.1
 py-ptyprocess@0.5.1
 py-pudb@2017.1.1
@@ -93,7 +94,7 @@ py-pygments@2.3.1
 py-pynn@0.9.1
 py-pyparsing@2.3.1
 py-pytest-xdist@1.16.0
-py-pytest@4.3.0
+py-pytest@4.4.0
 py-python-dateutil@2.8.0
 py-python-engineio@3.3.0
 py-python-socketio@1.8.4
@@ -114,7 +115,7 @@ py-snowballstemmer@1.2.1
 py-sphinx-rtd-theme@0.4.3
 py-sphinx@1.8.4
 py-sphinxcontrib-websupport@1.1.0
-py-sqlalchemy@1.3.1
+py-sqlalchemy@1.3.9
 py-subprocess32@3.2.7
 py-termcolor@1.1.0
 py-traceback2@1.4.0
@@ -125,10 +126,12 @@ py-urllib3@1.21.1
 py-urwid@1.3.0
 py-virtualenv@16.4.1
 py-wcwidth@0.1.7
-py-werkzeug@0.11.15
+py-werkzeug@0.15.6
 py-wheel@0.33.1
 py-xmlrunner@1.7.7
 py-xmltodict@0.12.0
 py-yapf@0.2.1
 py-yccp@0.5.0
 py-yq@2.7.2
+# fixed tensorflow
+tensorflow@1.13.1
