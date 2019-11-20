@@ -31,6 +31,8 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git-core, lbzip2, 
     mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
     # bind-mount build_cache
     mkdir "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
+    # create buildcache directory if it does not exist
+    [ ! -d "${BUILD_CACHE_OUTSIDE}" ] && mkdir -p "${BUILD_CACHE_OUTSIDE}"
     mount --no-mtab --bind "${BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
     # bind-mount preserved packages in case the build fails
     mkdir "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"

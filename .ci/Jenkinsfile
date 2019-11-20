@@ -15,9 +15,16 @@ Closure cleanupSteps = {
 
 pipeline {
 	agent none
+
 	options {
 		timestamps()
 		skipDefaultCheckout()
+	}
+
+	parameters {
+		string(name: 'BUILD_CACHE_NAME',
+			   defaultValue: 'spack_merge_7',
+			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
 	}
 
 	stages {
@@ -36,8 +43,7 @@ pipeline {
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
 				                   returnStdout: true).trim()
-				BUILD_CACHE_NAME = "spack_merge_7"  // take a different build cache to not disturb stable container builds
-				                                    // TODO: DELME
+				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
 				stage('Pre-build Cleanup') {
@@ -103,6 +109,7 @@ pipeline {
 			}
 			post {
 				cleanup {
+					archiveArtifacts "jenkins.env"
 					script {
 						cleanupSteps()
 					}

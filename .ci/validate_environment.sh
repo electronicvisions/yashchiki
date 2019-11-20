@@ -20,9 +20,9 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
     # * a refspec from which we extract changeset number and patchset
     # therefore we have to fail both cases fail.
     #
-    if [[ ! (( -n "${GERRIT_CHANGE_NUMBER}"
-              && -n "${GERRIT_PATCHSET_NUMBER}" )
-             || -n "${GERRIT_REFSPEC}" ) ]]; then
+    if [[ ! (( -n "${GERRIT_CHANGE_NUMBER:-}"
+              && -n "${GERRIT_PATCHSET_NUMBER:-}" )
+             || -n "${GERRIT_REFSPEC:-}" ) ]]; then
         echo -n "Neither GERRIT_REFSPEC nor GERRIT_CHANGE_NUMBER/" >&2
         echo -n "GERRIT_PATCHSET_NUMBER specified " >&2
         echo    "for testing build." >&2

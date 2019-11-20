@@ -15,6 +15,7 @@ mkdir /opt/spack_views
 chown spack:nogroup /opt/spack_views
 mkdir -p "${SPEC_FOLDER_IN_CONTAINER}"
 chown spack:nogroup "${SPEC_FOLDER_IN_CONTAINER}"
+chown spack:nogroup "${BUILD_CACHE_INSIDE}"
 chmod go=rwx /opt
 # in the final image /opt/spack* should be owned by the spack user.
 # Therefore: chown everything to the spack user except for var/cache (contains
