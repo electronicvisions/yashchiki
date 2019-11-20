@@ -219,6 +219,30 @@ if (( $(cat "${tmpfiles_concretize_err[@]}" | wc -l) > 0 )); then
     fi
 fi
 
+# --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< ---
+####################
+# WORKAROUND START #
+####################
+# Switch to http for ftpmirror.gnu.org
+
+# The https-version of ftpmirror.gnu.org sometimes redirects to old
+# servers that have no secure (according to curl) SSL versions available,
+# leading to the following error:
+
+# ```
+# curl: (35) error:1425F102:SSL routines:ssl_choose_client_version:unsupported protocol
+# ```
+
+# Since we are downloading public software and can verify its contents via
+# hashes, there is no benefit of using https -> fall back to http.
+
+find "${MY_SPACK_FOLDER}/var/spack/repos" -type f -print0 \
+    | xargs -0 sed -i "s|https://ftpmirror.gnu.org|http://ftpmirror.gnu.org|g"
+##################
+# WORKAROUND END #
+##################
+# --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< ---
+
 # now fetch everything that is needed in order
 fetch_specfiles=()
 for package in "${packages_to_fetch[@]}"; do
