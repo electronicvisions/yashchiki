@@ -37,6 +37,8 @@ BUILD_CACHE_INSIDE="/opt/build_cache"
 BUILD_CACHE_LOCK="${BUILD_CACHE_INSIDE}/${LOCK_FILENAME}"
 BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches/${BUILD_CACHE_NAME}"
 
+SOURCE_CACHE_DIR="$(get_jenkins_env HOME)/download_cache"
+
 PRESERVED_PACKAGES_INSIDE="${BUILD_CACHE_INSIDE}/../preserved_packages"
 PRESERVED_PACKAGES_OUTSIDE="${BUILD_CACHE_OUTSIDE}/../preserved_packages"
 

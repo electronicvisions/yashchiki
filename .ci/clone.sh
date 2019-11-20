@@ -127,9 +127,12 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
     popd
 fi
 
-# hard-link download cache into spack folder to avoid duplication
-mkdir -p ${PWD}/spack/var/spack/cache/
-cp -vrl $HOME/download_cache/* ${PWD}/spack/var/spack/cache/
+# hard-link source cache into spack folder to avoid duplication.
+# https://github.com/spack/spack/pull/12940 introduced a new format for the
+# cache, so we switch from $HOME/download_cache to $HOME/source_cache
+mkdir -p "${PWD}/spack/var/spack/cache/"
+find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
+    | xargs -n 1 "-I{}" -0 cp -vrl '{}' "${PWD}/spack/var/spack/cache/"
 
 # set download mirror stuff to prefill outside of container
 export MY_SPACK_FOLDER="$PWD/spack"
@@ -200,7 +203,7 @@ done
 # wait for all spawned jobs to complete
 wait
 
-# verify that all fetches were successful
+# verify that all concretizations were successful
 if (( $(cat "${tmpfiles_concretize_err[@]}" | wc -l) > 0 )); then
     {
         if (( $(wc -l <"${tmpfiles_concretize_err[0]}") > 0)); then
@@ -227,10 +230,19 @@ for package in "${packages_to_fetch[@]}"; do
     fi
     fetch_specfiles+=( "${specfile}" )
 done
-${MY_SPACK_BIN} fetch -D "${fetch_specfiles[@]/^/-f }"
+if ! ${MY_SPACK_BIN} fetch -D "${fetch_specfiles[@]/^/-f }"; then
+    fetch_failed=1
+else
+    fetch_failed=0
+fi
 
-# update download_cache
-rsync -av "${PWD}/spack/var/spack/cache/" "${HOME}/download_cache/"
+# update cache in any case to store successfully loaded files
+rsync -av "${PWD}/spack/var/spack/cache/" "${SOURCE_CACHE_DIR}/"
+
+if (( fetch_failed != 0 )); then
+    # propagate error
+    exit 1
+fi
 
 # remove f***ing compiler config
 rm ${PWD}/spack/etc/spack/compilers.yaml
