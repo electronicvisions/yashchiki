@@ -39,5 +39,10 @@ mkdir -p "${target_folder}"
 
 "${sourcedir}/update_build_cache_in_container.sh" -d "${target_folder}" -q || /bin/true  # do not fail!
 
+# preserve the specs that were concretized
+pushd "${SPEC_FOLDER_IN_CONTAINER}"
+XZ_DEFAULTS="-T0" tar cfJ "${target_folder}/spack_specs.tar.xz" . || /bin/true
+popd
+
 # dump the temp folder to the preserved packages folder to help diagnostics
-XZ_DEFAULTS="-T0" tar cfJ "${target_folder}/tmp_spack.tar.xz" "${SPACK_TMPDIR}"
+XZ_DEFAULTS="-T0" tar cfJ "${target_folder}/tmp_spack.tar.xz" "${SPACK_TMPDIR}" || /bin/true
