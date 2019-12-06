@@ -24,14 +24,10 @@ find "${MY_SPACK_FOLDER}" \
 # allow non-spack users to install new packages
 # Note: modified packages can be loaded by bind-mounting the /var-subdirectory
 # of a locally checked out spack-repo at /opt/spack in the container
-chmod 777 "${MY_SPACK_FOLDER}"/opt/spack/{*/*,*,}
+find "${MY_SPACK_FOLDER}" -mindepth 0 -maxdepth 2 -type d -print0 | xargs -0 chmod 777
 
-# locks and indices have to be writable for local user when trying to install
-chmod -R 777 ${MY_SPACK_FOLDER}/opt/spack/.spack-db
-# same goes for local caches
-chmod -R 777 ${MY_SPACK_FOLDER}/.spack
-# module files also need to be updated if the user installs packages
-chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules
+# module files need to be updated if the user installs packages (if they exist)
+chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules || /bin/true
 
 # remove build_cache again
 ${MY_SPACK_BIN} mirror rm --scope site build_mirror
