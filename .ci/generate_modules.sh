@@ -29,3 +29,14 @@ EOF
 cat <<EOF >> "${TARGET}"
 source "${PATH_MODULES}/\$(readlink -f /proc/\$\$/exe | xargs basename)"
 EOF
+
+# ensure that the directories with spack-generated module files are available
+# to use after sourcing /opt/init/modules.sh
+(
+IFS=$'\n'
+for moduledir in $(find /opt/spack/share/spack/modules -mindepth 1 -maxdepth 1 -type d); do
+cat <<EOF >> "${TARGET}"
+export MODULEPATH="${moduledir}\${MODULEPATH:+:\${MODULEPATH}}"
+EOF
+done
+)
