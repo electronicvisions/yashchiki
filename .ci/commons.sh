@@ -155,9 +155,8 @@ SPACK_VIEW_ARGS="--verbose"
 # they won't be able to be fetched inside the container because of missing
 # permissions.
 spack_bootstrap_dependencies=(
-    "environment-modules~X " # space needs to be there for replacement below to work
+    "environment-modules~X target=x86_64"
 )
-spack_bootstrap_dependencies=( "${spack_bootstrap_dependencies[@]/ / target=${PINNED_TARGET} } " )
 
 #########
 # VIEWS #
