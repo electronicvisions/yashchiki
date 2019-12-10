@@ -81,6 +81,13 @@ add_cleanup_step() {
 
 # Usage: get_pinned_deps <name>
 #
+# Note: This pinning is used only to help the concretizer make suitable picks.
+# The actual incompatabilities should still be expressed in the spack packages.
+#
+# The real reason for this machinery is the fact that the concretizer, despite
+# specifying which version of the package is compatible with python 2 and 3, is
+# unable to determine the last version still compatible with python 2
+#
 # Arguments:
 #   <name> has to correspond to a list of pinned dependencies residing under
 #   <yashchiki-root>/container-build-files/pinned/<name>.list
