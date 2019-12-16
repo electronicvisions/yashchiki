@@ -26,7 +26,7 @@ rm_tmp_modules() {
 add_cleanup_step rm_tmp_modules
 {
     echo "source /opt/init/modules.sh"
-    spack module tcl loads -r "$(get_latest_version "${VISIONARY_GCC}")"
+    spack module tcl loads -r "$(get_latest_hash "${VISIONARY_GCC}")"
 } | tee "${TMP_MODULES}"
 source "${TMP_MODULES}"
 # --------- 8< ---------- 8< -------- 8< ---------

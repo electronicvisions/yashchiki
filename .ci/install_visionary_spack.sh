@@ -52,38 +52,37 @@ cat <<EOF
 # Packages still plagued by gccxml #
 ####################################
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls visionary-dls+dev~gccxml "^${DEPENDENCY_PYTHON3}"
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev visionary-dls~dev~gccxml "^${DEPENDENCY_PYTHON3}"
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls $(get_latest_hash visionary-dls+dev~gccxml "^${DEPENDENCY_PYTHON3}")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev $(get_latest_hash visionary-dls~dev~gccxml "^${DEPENDENCY_PYTHON3}")
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey visionary-spikey+dev
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev visionary-spikey~dev
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey $(get_latest_hash visionary-spikey+dev)
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev $(get_latest_hash visionary-spikey~dev)
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer visionary-wafer+dev+tensorflow~gccxml
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev visionary-wafer~dev+tensorflow~gccxml
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer $(get_latest_hash visionary-wafer+dev+tensorflow~gccxml)
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev $(get_latest_hash visionary-wafer~dev+tensorflow~gccxml)
 
 ##################################################
 # Strong independent packages who need no gccxml #
 ##################################################
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation "visionary-simulation+dev %${VISIONARY_GCC}"
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev "visionary-simulation~dev %${VISIONARY_GCC}"
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation $(get_latest_hash "visionary-simulation+dev %${VISIONARY_GCC}")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev $(get_latest_hash "visionary-simulation~dev %${VISIONARY_GCC}")
 
 # slurvmiz needs no dev-tools because it is not for end-users
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz "visionary-slurmviz %${VISIONARY_GCC}"
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz $(get_latest_hash "visionary-slurmviz %${VISIONARY_GCC}")
 
 ############
 # exa-mode #
 ############
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa "visionary-exa+dev %${VISIONARY_GCC}"
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa-without-dev "visionary-exa~dev %${VISIONARY_GCC}"
-EOF
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa $(get_latest_hash "visionary-exa+dev %${VISIONARY_GCC}")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa-without-dev $(get_latest_hash "visionary-exa~dev %${VISIONARY_GCC}")
 
-# Ensure that only one version of visionary-dev-tools is installed as ${SPACK_VIEW_ARGS} view even
-# if several are installed due to different constraints in other packages
-hash_visionary_dev_tools="$(${MY_SPACK_BIN} spec -L "${SPEC_VIEW_VISIONARY_DEV_TOOLS/ / target=${PINNED_TARGET} }" | awk ' $2 ~ /^visionary-dev-tools/ { print $1 }')"
-cat <<EOF
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools "/${hash_visionary_dev_tools}"
+#############
+# dev tools #
+#############
+
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools $(get_latest_hash "${SPEC_VIEW_VISIONARY_DEV_TOOLS}")
 EOF
 } | parallel_cmds
 

@@ -38,7 +38,7 @@ export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 LOCK_FILENAME=lock
 
 BUILD_CACHE_NAME="$(get_jenkins_env BUILD_CACHE_NAME)"
-if [ -z "${BUILD_CACHE_NAME}" ]; then
+if [ -z "${BUILD_CACHE_NAME:-}" ]; then
     BUILD_CACHE_NAME=visionary_manual
 fi
 
@@ -537,10 +537,10 @@ get_change_name() {
 }
 
 # copied from slurmviz-commons.sh
-get_latest_version() {
-  # Usage: get_latest_version <pkg-name>
+get_latest_hash() {
+  # Usage: get_latest_hash <pkg-name>
   #
-  # Get the latest version of a given package in the spack installation. This
+  # Get the latest hash of a given package in the spack installation. This
   # takes into account compiler version, so if a package is available by two
   # compiler versions, the newer one is taken.
   FILE_AWK=$(mktemp)
@@ -551,14 +551,14 @@ get_latest_version() {
   compiler=\$4
 }
 
-/^[a-zA-Z]/ {
+/^[a-z0-9]/ {
   # insert compiler name into spec name at appropriate position (i.e., prior to
   # specifying any variants)
-  idx = match(\$1, /(\\+|\\~|$)/);
-  printf("%s%%%s%s\\n", substr(\$1, 0, idx-1), compiler, substr(\$1, idx))
+  # \$1 is the hash, \$2 is the spec
+  idx = match(\$2, /(\\+|\\~|$)/);
+  printf("%s%%%s%s /%s\\n", substr(\$2, 0, idx-1), compiler, substr(\$2, idx), \$1)
 }
 EOF
-
-  ${MY_SPACK_BIN} find -v "$1" | awk -f "${FILE_AWK}"| sort -V | tail -n 1
+  ${MY_SPACK_BIN} find -vL "$@" | awk -f "${FILE_AWK}"| sort -V | cut -d ' ' -f 2 | tail -n 1
   rm "${FILE_AWK}"
 }
