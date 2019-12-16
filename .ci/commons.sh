@@ -140,13 +140,8 @@ spack_packages=(
     "visionary-wafer-visu ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
     "visionary-slurmviz ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev~gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev+gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls+gccxml ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls-demos ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-exa ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-exa~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
@@ -183,6 +178,7 @@ spack_bootstrap_dependencies=(
 
 spack_views=(\
         visionary-dev-tools
+        visionary-dls-core
         visionary-dls
         visionary-dls-without-dev
         visionary-simulation
@@ -191,8 +187,6 @@ spack_views=(\
         visionary-spikey-without-dev
         visionary-wafer
         visionary-wafer-without-dev
-        visionary-exa
-        visionary-exa-without-dev
     )
 
 spack_views_no_default_gcc=(
@@ -208,7 +202,7 @@ declare -A spack_add_to_view_with_dependencies
 # Add gccxml to those views that still depend on it
 spack_add_to_view_with_dependencies["gccxml"]="no"
 spack_add_to_view["gccxml"]="$(
-for view in visionary-{dls,dls-py3,wafer}{,-without-dev}; do
+for view in visionary-wafer{,-without-dev}; do
     echo ${view}
 done | tr '\n' ' '
 )"

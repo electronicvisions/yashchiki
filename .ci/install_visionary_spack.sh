@@ -52,9 +52,6 @@ cat <<EOF
 # Packages still plagued by gccxml #
 ####################################
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls $(get_latest_hash visionary-dls+dev~gccxml "^${DEPENDENCY_PYTHON3}")
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev $(get_latest_hash visionary-dls~dev~gccxml "^${DEPENDENCY_PYTHON3}")
-
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey $(get_latest_hash visionary-spikey+dev)
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev $(get_latest_hash visionary-spikey~dev)
 
@@ -65,18 +62,16 @@ ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX
 # Strong independent packages who need no gccxml #
 ##################################################
 
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation $(get_latest_hash "visionary-simulation+dev %${VISIONARY_GCC}")
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev $(get_latest_hash "visionary-simulation~dev %${VISIONARY_GCC}")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation $(get_latest_hash "visionary-simulation+dev")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev $(get_latest_hash "visionary-simulation~dev")
+
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-core $(get_latest_hash visionary-dls-core "^${DEPENDENCY_PYTHON3}")
+
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls $(get_latest_hash visionary-dls+dev "^${DEPENDENCY_PYTHON3}")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev $(get_latest_hash visionary-dls~dev "^${DEPENDENCY_PYTHON3}")
 
 # slurvmiz needs no dev-tools because it is not for end-users
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz $(get_latest_hash "visionary-slurmviz %${VISIONARY_GCC}")
-
-############
-# exa-mode #
-############
-
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa $(get_latest_hash "visionary-exa+dev %${VISIONARY_GCC}")
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-exa-without-dev $(get_latest_hash "visionary-exa~dev %${VISIONARY_GCC}")
 
 #############
 # dev tools #
