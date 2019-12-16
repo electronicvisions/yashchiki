@@ -117,6 +117,7 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
                     git cherry-pick FETCH_HEAD
                 fi
 
+                # prevent SPACK_GERRIT_REFSPEC from getting checked out again below
                 unset SPACK_GERRIT_REFSPEC
             fi
         fi
@@ -124,6 +125,14 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
 
     rm "${gerrit_query}"
 
+    popd
+fi
+
+# if SPACK_GERRIT_REFSPEC was specified on its own (i.e., in bld_gerrit-yashchiki-spack-manual), check it out now!
+if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC:-}" ]; then
+    echo "SPACK_GERRIT_REFSPEC was specified: ${SPACK_GERRIT_REFSPEC} -> checking out"
+    pushd "spack"
+    git fetch  ${MY_GERRIT_URL} "${SPACK_GERRIT_REFSPEC}" && git checkout FETCH_HEAD
     popd
 fi
 
