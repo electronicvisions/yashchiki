@@ -10,6 +10,14 @@ else
     JENKINS_ENV_FILE="${JENKINS_ENV_FILE_INSIDE}"
 fi
 
+# Usage:
+#   get_jenkins_env <variable-name>
+#
+# Get <variable-name> from the jenkins environment dumped at the start of the
+# jenkins job.  If the jenkins environment was not dumped at the beginning of
+# the jenkins job, the regular environment is taken.
+#
+# If the variable is not found, return 1.
 get_jenkins_env() {
     # match on variable name at the beginning of line and then delete everyting
     # up to and including the first equal sign
@@ -19,7 +27,8 @@ get_jenkins_env() {
         else
             env
         fi
-    } | grep "^$*=" | sed -e "s:[^=]*=::"
+    } | grep "^$*=" | sed -e "s:[^=]*=::" \
+    || ( echo "Variable not found in environment: $*" >&2; return 1 )
 }
 
 export MY_SPACK_FOLDER=/opt/spack
