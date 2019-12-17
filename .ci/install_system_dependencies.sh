@@ -7,6 +7,7 @@ set -euo pipefail
 
 system_dependencies=(
         "arping"
+        "bash-completion"
         "corkscrew"
         "cpio"
         "fxload"
