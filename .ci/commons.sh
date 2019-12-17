@@ -256,7 +256,7 @@ parallel_cmds() {
     do
         case $opt in
             j) num_jobs="${OPTARG}" ;;
-            *) echo -e "Invalid option to lock_file(): $OPTARG\n" >&2; exit 1 ;;
+            *) echo -e "Invalid option to parallel_cmds(): $OPTARG\n" >&2; exit 1 ;;
         esac
     done
     shift $(( OPTIND - 1 ))
