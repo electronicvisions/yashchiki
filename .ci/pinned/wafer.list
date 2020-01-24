@@ -54,7 +54,7 @@ py-slurm-pipeline@3.0.2
 py-sphinx-rtd-theme@0.4.3
 py-sphinx@1.8.4
 py-subprocess32@3.2.7
-py-tables@3.3.0
+py-tables@3.5.2    # newer needs py3
 py-tornado@5.1.1
 py-traitlets@4.3.2
 py-typing@3.6.4
