@@ -69,20 +69,23 @@ fi
 ###############
 
 # bash only supports a single function for the exit trap, so we store all functions to execute in an array an iterate over it
-_yashchiki_exit_fns=()
+if [[ ! -v _yashchiki_exit_fns[@] ]]; then
+    _yashchiki_exit_fns=()
 
-_yashchiki_exit_trap() {
-    for fn in "${_yashchiki_exit_fns[@]}"; do
-        eval "${fn}"
-    done
-}
-trap _yashchiki_exit_trap EXIT
+    _yashchiki_exit_trap() {
+        for fn in "${_yashchiki_exit_fns[@]}"; do
+            eval "${fn}"
+        done
+    }
 
-add_cleanup_step() {
-    for fn in "$@"; do
-        yashchiki_exit_fns+=("${fn}")
-    done
-}
+    trap _yashchiki_exit_trap EXIT
+
+    add_cleanup_step() {
+        for fn in "$@"; do
+            _yashchiki_exit_fns+=("${fn}")
+        done
+    }
+fi
 
 ############
 # PACKAGES #
@@ -353,7 +356,7 @@ remove_tmp_files() {
     rm "${FILE_HASHES_SPACK}"
     rm "${FILE_HASHES_SPACK_ALL}"
 }
-add_cleanup_step remove_tmp_files EXIT
+add_cleanup_step remove_tmp_files
 
 
 # get hashes in buildcache [<build_cache-directory>]
