@@ -50,7 +50,7 @@ else
 fi
 
 
-# if there is a spack gerrit change specified and no refspec -> resolve!
+# If there is a spack gerrit change specified and no refspec -> resolve!
 if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
     # convert spack change id to latest patchset
     pushd "spack"
@@ -103,18 +103,22 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
             # and cherry pick all further changes.
             if [ -n "${SPACK_GERRIT_REFSPEC}" ]; then
 
-                git fetch ${MY_GERRIT_URL} "${SPACK_GERRIT_REFSPEC}"
+                if [ "${CONTAINER_BUILD_TYPE}" != "stable" ]; then
+                    git fetch ${MY_GERRIT_URL} "${SPACK_GERRIT_REFSPEC}"
 
-                if [[ "${ref_stable}" == "$(git rev-parse HEAD)" ]]; then
-                    echo "SPACK_GERRIT_REFSPEC was specified for the first"\
-                        "time: ${SPACK_GERRIT_REFSPEC} -> check out" >&2
+                    if [[ "${ref_stable}" == "$(git rev-parse HEAD)" ]]; then
+                        echo "SPACK_GERRIT_REFSPEC was specified for the first"\
+                            "time: ${SPACK_GERRIT_REFSPEC} -> check out" >&2
 
-                    git checkout FETCH_HEAD
+                        git checkout FETCH_HEAD
+                    else
+                        echo "SPACK_GERRIT_REFSPEC was specified again:"\
+                            "${SPACK_GERRIT_REFSPEC} -> cherry-pick" >&2
+
+                        git cherry-pick FETCH_HEAD
+                    fi
                 else
-                    echo "SPACK_GERRIT_REFSPEC was specified again:"\
-                        "${SPACK_GERRIT_REFSPEC} -> cherry-pick" >&2
-
-                    git cherry-pick FETCH_HEAD
+                    echo "yashchiki HEAD contains 'Depends-On:' but we are building stable -> ignoring!" >&2
                 fi
 
                 # prevent SPACK_GERRIT_REFSPEC from getting checked out again below
@@ -129,7 +133,7 @@ if [ -n "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
 fi
 
 # if SPACK_GERRIT_REFSPEC was specified on its own (i.e., in bld_gerrit-yashchiki-spack-manual), check it out now!
-if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] && [ -n "${SPACK_GERRIT_REFSPEC:-}" ]; then
+if [ "${CONTAINER_BUILD_TYPE}" != "stable" ] && [ -n "${SPACK_GERRIT_REFSPEC:-}" ]; then
     echo "SPACK_GERRIT_REFSPEC was specified: ${SPACK_GERRIT_REFSPEC} -> checking out"
     pushd "spack"
     git fetch  ${MY_GERRIT_URL} "${SPACK_GERRIT_REFSPEC}" && git checkout FETCH_HEAD
