@@ -10,6 +10,7 @@ system_dependencies=(
         "bash-completion"
         "corkscrew"
         "cpio"
+        "fish"
         "fxload"
         "htop"
         "iproute2"
