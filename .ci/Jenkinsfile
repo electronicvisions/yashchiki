@@ -23,7 +23,7 @@ pipeline {
 
 	parameters {
 		string(name: 'BUILD_CACHE_NAME',
-			   defaultValue: 'gcc_9-2',
+			   defaultValue: 'gcc_9-3',
 			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
 	}
 
@@ -38,7 +38,7 @@ pipeline {
 				// can be removed as soon as the explicit preferred version
 				// is dropped
 				DEPENDENCY_PYTHON3 = "python@3.7.5"
-				VISIONARY_GCC_VERSION = "9.2.0"
+				VISIONARY_GCC_VERSION = "9.3.0"
 				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
