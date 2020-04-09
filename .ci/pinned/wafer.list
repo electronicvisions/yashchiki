@@ -20,7 +20,7 @@ py-junit-xml@1.7
 py-jupyter-console@5.2.0
 py-notebook@5.7.0
 py-language-server@0.22.0
-py-llvmlite@0.27.1
+py-llvmlite@0.31.0
 py-lmfit@0.9.5
 py-matplotlib@2.2.3
 py-more-itertools@4.3.0
