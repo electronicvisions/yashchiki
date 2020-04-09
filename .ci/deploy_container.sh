@@ -43,6 +43,15 @@ cp "${IMAGE_NAME}" "${CONTAINER_NAME}" || (
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
+
+    # Announce new container in "Building & Deployment" channel
+    # Since the output of this script is used in other parts, we have to hide curl's output
+    export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
+    export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
+
+    curl -i -X POST -H 'Content-Type: application/json' \
+        -d "{\"text\": \"@channel New stable container built: ${CONTAINER_NAME}\"}" \
+        https://chat.bioai.eu/hooks/iuhwp9k3h38c3d98uhwh5fxe9h &>/dev/null
 fi
 
 # delete temporary image
