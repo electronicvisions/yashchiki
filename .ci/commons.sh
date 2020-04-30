@@ -183,13 +183,13 @@ spack_views=(\
         visionary-dev-tools
         visionary-dls-core
         visionary-dls
-        visionary-dls-without-dev
+        visionary-dls-nodev
         visionary-simulation
-        visionary-simulation-without-dev
+        visionary-simulation-nodev
         visionary-spikey
-        visionary-spikey-without-dev
+        visionary-spikey-nodev
         visionary-wafer
-        visionary-wafer-without-dev
+        visionary-wafer-nodev
     )
 
 spack_views_no_default_gcc=(
@@ -205,7 +205,7 @@ declare -A spack_add_to_view_with_dependencies
 # Add gccxml to those views that still depend on it
 spack_add_to_view_with_dependencies["gccxml"]="no"
 spack_add_to_view["gccxml"]="$(
-for view in visionary-wafer{,-without-dev}; do
+for view in visionary-wafer{,-nodev}; do
     echo ${view}
 done | tr '\n' ' '
 )"

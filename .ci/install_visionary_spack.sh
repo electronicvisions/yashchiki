@@ -53,22 +53,22 @@ cat <<EOF
 ####################################
 
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey $(get_latest_hash visionary-spikey+dev)
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-without-dev $(get_latest_hash visionary-spikey~dev)
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-nodev $(get_latest_hash visionary-spikey~dev)
 
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer $(get_latest_hash visionary-wafer+dev+tensorflow~gccxml)
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-without-dev $(get_latest_hash visionary-wafer~dev+tensorflow~gccxml)
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-nodev $(get_latest_hash visionary-wafer~dev+tensorflow~gccxml)
 
 ##################################################
 # Strong independent packages who need no gccxml #
 ##################################################
 
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation $(get_latest_hash "visionary-simulation+dev")
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-without-dev $(get_latest_hash "visionary-simulation~dev")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-simulation-nodev $(get_latest_hash "visionary-simulation~dev")
 
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-core $(get_latest_hash visionary-dls-core "^${DEPENDENCY_PYTHON3}")
 
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls $(get_latest_hash visionary-dls+dev "^${DEPENDENCY_PYTHON3}")
-${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-without-dev $(get_latest_hash visionary-dls~dev "^${DEPENDENCY_PYTHON3}")
+${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-nodev $(get_latest_hash visionary-dls~dev "^${DEPENDENCY_PYTHON3}")
 
 # slurvmiz needs no dev-tools because it is not for end-users
 ${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz $(get_latest_hash "visionary-slurmviz %${VISIONARY_GCC}")
