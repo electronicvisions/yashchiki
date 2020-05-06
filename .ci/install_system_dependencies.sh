@@ -22,6 +22,7 @@ system_dependencies=(
         "libudev-dev"
         "libusb-1.0-0-dev"
         "libusb-dev"
+        "linux-perf-4.19"
         "lshw"
         "man-db"
         "ncurses-term"
