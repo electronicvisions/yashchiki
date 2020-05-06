@@ -84,6 +84,14 @@ EOF
 # Perform the remaining additions to the views defined in commons.
 populate_views
 
+# Hide python3 in ancient (python2-based) views:
+# The host system provides a python3 binary which spack prefers over the
+# view-provided python2 binary. Since we set PYTHONHOME this leads to
+# incompatible python libraries search paths.
+for pyf in ${MY_SPACK_VIEW_PREFIX}/visionary-*/bin/python2; do
+    ln -fs ${pyf} $(dirname ${pyf})/python3
+done
+
 umask ${OLD_UMASK}
 
 # Have convience symlinks for shells for user sessions so that they can be
