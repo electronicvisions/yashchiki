@@ -32,13 +32,13 @@ pipeline {
 			agent { label 'conviz1||conviz2' }
 			environment {
 				// FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
-				DEPENDENCY_PYTHON = "python@2.7.16"
+				DEPENDENCY_PYTHON = "python@2.7.18"
 				// This needs to be here because otherwise the default python
-				// (2.7.16) will pollute the spec and lead to a conflict
+				// (2.7.18) will pollute the spec and lead to a conflict
 				// can be removed as soon as the explicit preferred version
 				// is dropped
 				DEPENDENCY_PYTHON3 = "python@3.8.2"
-				VISIONARY_GCC_VERSION = "9.3.0"
+				VISIONARY_GCC_VERSION = "10.1.0"
 				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",

@@ -4,12 +4,12 @@ py-kiwisolver@1.0.1
 py-lxml@4.2.5
 py-matplotlib@2.2.3
 py-nose@1.3.7
-py-numpy@1.16.4
+py-numpy@1.16.6
 py-pillow@5.4.1
 py-pyparsing@2.3.1
 py-python-dateutil@2.8.0
 py-pytz@2018.4
-py-scipy@1.2.1
+py-scipy@1.2.2
 py-setuptools@41.0.1
 py-six@1.12.0
 py-subprocess32@3.2.7
