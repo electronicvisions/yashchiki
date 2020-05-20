@@ -45,6 +45,7 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git, lbzip2, less,
     rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/pinned "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${SOURCE_DIR}"/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
     rsync -av "${WORKSPACE}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
@@ -95,6 +96,8 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git, lbzip2, less,
     sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&
         exit 1  # propagate the error
     )
+    # apply some system-level patching (TODO: remove this as soon as gccxml dependency is gone)
+    "${SPACK_INSTALL_SCRIPTS}/manual_system_level_patching_routine_called_in_post_as_root.sh"
 EOF
 
 # create appenvs for all views...

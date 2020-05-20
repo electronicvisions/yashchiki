@@ -1,0 +1,35 @@
+diff --git a/usr/include/math.h b/usr/include/math.h
+index ddee4e4..9a6acfd 100644
+--- a/usr/include/math.h
++++ b/usr/include/math.h
+@@ -1536,6 +1536,7 @@ template<> struct __iseqsig_type<_Float128>
+ template<typename _T1, typename _T2>
+ inline int
+ iseqsig (_T1 __x, _T2 __y) throw ()
++#ifndef PYPLUSPLUS
+ {
+ #  if __cplusplus >= 201103L
+   typedef decltype (__MATH_EVAL_FMT2 (__x, __y)) _T3;
+@@ -1544,6 +1545,9 @@ iseqsig (_T1 __x, _T2 __y) throw ()
+ #  endif
+   return __iseqsig_type<_T3>::__call (__x, __y);
+ }
++#else
++;
++#endif
+ 
+ } /* extern "C++" */
+ # endif /* __cplusplus */
+diff --git a/usr/include/x86_64-linux-gnu/bits/floatn.h b/usr/include/x86_64-linux-gnu/bits/floatn.h
+index 58ce5fe..c931e32 100644
+--- a/usr/include/x86_64-linux-gnu/bits/floatn.h
++++ b/usr/include/x86_64-linux-gnu/bits/floatn.h
+@@ -29,7 +29,7 @@
+ #if (defined __x86_64__							\
+      ? __GNUC_PREREQ (4, 3)						\
+      : (defined __GNU__ ? __GNUC_PREREQ (4, 5) : __GNUC_PREREQ (4, 4))) \
+-     &&  !defined(__CUDACC__) && !defined(__ICC)
++     &&  !defined(__CUDACC__) && !defined(__ICC) && !defined(__GCCXML__)
+ # define __HAVE_FLOAT128 1
+ #else
+ # define __HAVE_FLOAT128 0
