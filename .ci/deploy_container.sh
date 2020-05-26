@@ -52,6 +52,12 @@ if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     curl -i -X POST -H 'Content-Type: application/json' \
         -d "{\"text\": \"@channel New stable container built: \`${CONTAINER_NAME}\`\"}" \
         https://chat.bioai.eu/hooks/iuhwp9k3h38c3d98uhwh5fxe9h &>/dev/null
+
+    # extract dna
+    container_basename="$(basename ${CONTAINER_NAME})"
+    container_basename="${container_basename%%.*}"
+
+    /container/utils/extract_dna.sh -c "${CONTAINER_NAME}" -d "/containers/dna/${container_basename}"
 fi
 
 # delete temporary image
