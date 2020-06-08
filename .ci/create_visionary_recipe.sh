@@ -28,7 +28,7 @@ From: ${DOCKER_BASE_IMAGE}
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
     # bind-mount build_cache
-    mkdir "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
+    mkdir -p "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
     # create buildcache directory if it does not exist
     [ ! -d "${BUILD_CACHE_OUTSIDE}" ] && mkdir -p "${BUILD_CACHE_OUTSIDE}"
     mount --no-mtab --bind "${BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"

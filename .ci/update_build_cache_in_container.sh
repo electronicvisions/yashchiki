@@ -85,6 +85,6 @@ get_hashes_to_store \
     | parallel ${args_progress} -j$(nproc) \
         tar Pcfz "${destination_folder}/{}.tar.gz" \"\$\(spack location -i /{}\)\"
 
-# verify integrity
-find "${destination_folder}" -name "*.tar.gz" -print0 \
+# verify integrity (of actual files, not possible symlinks)
+find "${destination_folder}" -type f -name "*.tar.gz" -print0 \
     | parallel -0 -j$(nproc) "tar Ptf '{}' 1>/dev/null"

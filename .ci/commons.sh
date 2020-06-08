@@ -42,14 +42,23 @@ if [ -z "${BUILD_CACHE_NAME:-}" ]; then
     BUILD_CACHE_NAME=visionary_manual
 fi
 
-BUILD_CACHE_INSIDE="/opt/build_cache"
+# NOTE: build caches contain relavite symlinks to preserved_packages, so the
+# relation that build_caches and preserved_packages are in the same folder
+# should be maintained inside the container!
+# --obreitwi, 17-06-20 12:53:20
+
+BASE_BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches"
+BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_jenkins_env HOME)/build_caches/failed"
+BUILD_CACHE_OUTSIDE="${BASE_BUILD_CACHE_OUTSIDE}/${BUILD_CACHE_NAME}"
+
+BASE_BUILD_CACHE_INSIDE="/opt/build_cache"
+BUILD_CACHE_INSIDE="${BASE_BUILD_CACHE_INSIDE}/${BUILD_CACHE_NAME}"
 BUILD_CACHE_LOCK="${BUILD_CACHE_INSIDE}/${LOCK_FILENAME}"
-BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches/${BUILD_CACHE_NAME}"
 
 SOURCE_CACHE_DIR="$(get_jenkins_env HOME)/download_cache"
 
-PRESERVED_PACKAGES_INSIDE="${BUILD_CACHE_INSIDE}/../preserved_packages"
-PRESERVED_PACKAGES_OUTSIDE="${BUILD_CACHE_OUTSIDE}/../preserved_packages"
+PRESERVED_PACKAGES_INSIDE="/opt/preserved_packages"
+PRESERVED_PACKAGES_OUTSIDE="$(get_jenkins_env HOME)/preserved_packages"
 
 COMMONS_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 
@@ -322,6 +331,11 @@ lock_file() {
 
     local fd_lock
     local filename_lock="$1"
+    # ensure that we can always access lockfile 
+    if [ ! -f "${filename_lock}" ]; then
+        touch "${filename_lock}"
+        chmod 777 "${filename_lock}"
+    fi
     exec {fd_lock}>"${filename_lock}"
 
     if (( exclusive == 1 )); then
@@ -503,6 +517,35 @@ _install_from_buildcache() {
     # have spack reindex its install contents to find the new packages
     ${MY_SPACK_BIN} --verbose reindex
 }
+
+get_latest_failed_build_cache_name() {
+    local full_change_num
+    local possible_build_caches
+    local latest_patch_level
+    local latest_build_num
+
+    full_change_num="$(get_change_name)"
+    change_num="${full_change_num%%p*}"
+    possible_build_caches="$(mktemp)"
+
+    find "${BASE_BUILD_CACHE_FAILED_OUTSIDE}" -mindepth 1 -maxdepth 1 -type d -name "${change_num}*" -print0 \
+        | xargs -n 1 -r -0 basename > "${possible_build_caches}"
+
+    if (( $(wc -l <"${possible_build_caches}") == 0 )); then
+        return 0
+    fi
+
+    latest_patch_level="$(cat "${possible_build_caches}" \
+        | cut -d p -f 2 | cut -d _ -f 1 | sort -rg | head -n 1)"
+
+    latest_build_num="$(grep "p${latest_patch_level}_" "${possible_build_caches}" \
+        | cut -d _ -f 2 | sort -rg | head -n 1)"
+
+    echo -n "c${change_num}p${latest_patch_level}_${latest_build_num}"
+
+    rm "${possible_build_caches}"
+}
+
 
 #############
 # UTILITIES #

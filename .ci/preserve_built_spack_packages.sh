@@ -10,6 +10,11 @@
 #
 # Packages should be added to the buildcache preliminary (e.g., via symlinks)
 # until it has been established that they have indeed been built correctly.
+#
+# Additionally, a temporary build cache is created under
+# failed/c<num>p<num>_<num> that contains a union of the current build cache
+# and all successfully built packages via symlinks (see
+# .ci/create_temporary_build_cache_after_failure.sh).
 
 set -euo pipefail
 

@@ -109,6 +109,9 @@ pipeline {
 				}
 			}
 			post {
+				failure {
+					sh ".ci/create_temporary_build_cache_after_failure.sh"
+				}
 				cleanup {
 					archiveArtifacts "jenkins.env"
 					script {
