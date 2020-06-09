@@ -4,25 +4,17 @@
 # corresponding changeset is merged.
 #
 # Possible arguments:
+#  status       list all changesets along with their status
 #  clean        delete all images belonging to already merged changesets
 #
 
-set -euo pipefail
+set -Eeuo pipefail
 
-CONTAINER_PATH="/containers/testing"
+sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
+source "${sourcedir}/gerrit.sh"
+
 CONTAINER_HOST="comicsans"
-
-if [ -z "${GERRIT_USERNAME:-}" ]; then
-    GERRIT_USERNAME=$(git config gitreview.username || echo "$USER")
-fi
-
-if [ -z "${GERRIT_PORT:-}" ]; then
-    GERRIT_PORT=29418
-fi
-
-if [ -z "${GERRIT_HOSTNAME:-}" ]; then
-    GERRIT_HOSTNAME="brainscales-r.kip.uni-heidelberg.de"
-fi
+CONTAINER_PATH="/containers/testing"
 
 get_images()
 {
@@ -31,33 +23,18 @@ get_images()
 
 get_changesets()
 {
-    get_images | xargs -n 1 basename | sed "s/c\\(.*\\)p.*/\\1/g" | sort | uniq
+    get_images | to_changesets
 }
 
 get_changesets_with_status()
 {
-    for cs in $(get_changesets); do
-        ssh -p ${GERRIT_PORT} \
-            "${GERRIT_USERNAME}@${GERRIT_HOSTNAME}" gerrit query \
-            --current-patch-set "${cs}" | \
-        awk "\$1 ~ \"status:\" { print \"CS:\", \"${cs}\", \"status:\", \$2 }"
-    done
-}
-
-get_merged_or_abandoned_changesets()
-{
-    for cs in $(get_changesets); do
-        ssh -p ${GERRIT_PORT} \
-            "${GERRIT_USERNAME}@${GERRIT_HOSTNAME}" gerrit query \
-            --current-patch-set "${cs}" | \
-        awk "\$1 ~ \"status:\" && (\$2 ~ \"MERGED\" || \$2 ~ \"ABANDONED\") { print ${cs} }"
-    done
+    get_changesets | get_status_for_changesets
 }
 
 get_merged_or_abandoned_images()
 {
     local pattern=""
-    for cs in $(get_merged_or_abandoned_changesets); do
+    for cs in $(get_changesets | filter_merged_or_abandoned_changesets); do
         if [ -z "${pattern}" ]; then
             pattern="\\(c${cs}p"
         else
@@ -98,4 +75,3 @@ else
 
     get_merged_or_abandoned_images
 fi
-
