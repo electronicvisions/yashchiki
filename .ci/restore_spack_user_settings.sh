@@ -21,6 +21,9 @@ find "${MY_SPACK_FOLDER}" \
     \( -type d -wholename "${MY_SPACK_FOLDER}/var/spack/cache" -prune \
     \) -o -not -type l -exec chmod o+rX '{}' \;
 
+# remove build_cache again (prior to changing modules)
+${MY_SPACK_BIN} mirror rm --scope site build_mirror
+
 # allow non-spack users to install new packages
 # Note: modified packages can be loaded by bind-mounting the /var-subdirectory
 # of a locally checked out spack-repo at /opt/spack in the container
@@ -29,8 +32,8 @@ find "${MY_SPACK_FOLDER}" -mindepth 0 -maxdepth 2 -type d -print0 | xargs -0 chm
 # module files need to be updated if the user installs packages (if they exist)
 chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules || /bin/true
 
-# remove build_cache again
-${MY_SPACK_BIN} mirror rm --scope site build_mirror
+# Make db accessible for all to allow for spack modifications within container
+chmod -R 777 /opt/spack/opt/spack/.spack-db
 
 # disable ccache after everything has been build -> make manual spack overlay
 # builds oe step less manual
