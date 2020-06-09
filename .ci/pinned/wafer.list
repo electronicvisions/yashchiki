@@ -66,4 +66,3 @@ py-yq@2.7.2
 py-pyzmq@18.1.0
 openmpi  # needed because otherwise there will be an error regarding spectrum-mpi
 tensorflow@1.13.1
-genpybind@0.2.1

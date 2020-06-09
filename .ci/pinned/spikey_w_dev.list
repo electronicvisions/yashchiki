@@ -112,4 +112,3 @@ py-xmltodict@0.12.0
 py-yapf@0.2.1
 py-yq@2.7.2
 qt~ssl  # otherwise conflict with nodejs in terms of used openssl version
-genpybind@0.2.1
