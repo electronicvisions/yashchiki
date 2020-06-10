@@ -40,7 +40,7 @@ py-pexpect@4.6.0
 py-protobuf@3.6.1  # needed by tensorflow 1.13.1
 protobuf@3.6.1  # needs to be in sync with py-protobuf
 py-ptyprocess@0.5.1
-py-pybind11@2.3.0
+py-pybind11@2.5.0
 py-pydocstyle@3.0.0
 py-pytest@4.4.0
 py-pywavelets@0.5.2
