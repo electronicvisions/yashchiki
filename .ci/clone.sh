@@ -34,19 +34,31 @@ git clone ${MY_GERRIT_URL} -b visionary spack
 # order of importance:
 # 1. jenkins-specified SPACK_GERRIT_REFSPEC
 # 2. jenkins-specified SPACK_GERRIT_CHANGE
-# 3. commit-specified  Depends-On
+# 3. triggered gerrit comment contains WITH_SPACK_CHANGE
+# 4. triggered gerrit comment contains WITH_SPACK_REFSPEC
+# 5. commit-specified Depends-On
 #
 # If multiple are specified, take the first variable defined according the
 # order above.
 
 if [ -z "${SPACK_GERRIT_CHANGE:-}" ] && [ -z "${SPACK_GERRIT_REFSPEC:-}" ]; then
-    # see if the commit message contains a "Depends-On: xy" line
-    # if there are several lines, concatenate with commas
-    SPACK_GERRIT_CHANGE=$(git log -1 --pretty=%B \
-        | awk '$1 ~ "Depends-On:" { $1 = ""; print $0 }' | tr '\n' ',' | tr -d \[:space:\])
+    GERRIT_SPECIFIED_SPACK_CHANGE="$(get_jenkins_env GERRIT_SPECIFIED_SPACK_CHANGE)"
+    GERRIT_SPECIFIED_SPACK_REFSPEC="$(get_jenkins_env GERRIT_SPECIFIED_SPACK_REFSPEC)"
+
+    if [ -n "${GERRIT_SPECIFIED_SPACK_CHANGE}" ]; then
+        SPACK_GERRIT_CHANGE="${GERRIT_SPECIFIED_SPACK_CHANGE}"
+    elif [ -n "${GERRIT_SPECIFIED_SPACK_REFSPEC}" ]; then
+        SPACK_GERRIT_REFSPEC="${GERRIT_SPECIFIED_SPACK_REFSPEC}"
+    else
+        # see if the commit message contains a "Depends-On: xy" line
+        # if there are several lines, concatenate with commas
+        SPACK_GERRIT_CHANGE=$(git log -1 --pretty=%B \
+            | awk '$1 ~ "Depends-On:" { $1 = ""; print $0 }' | tr '\n' ',' | tr -d \[:space:\])
+    fi
 else
     echo "SPACK_GERRIT_CHANGE or SPACK_GERRIT_REFSPEC specified, ignoring "\
-         "possible 'Depends-On'-line in commit message!" >&2
+         "possible 'WITH_SPACK_CHANGE' in gerrit commit message or "\
+         "'Depends-On'-line in commit message!" >&2
 fi
 
 

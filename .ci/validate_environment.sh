@@ -38,6 +38,11 @@ source "${SOURCE_DIR}/commons.sh"
 # `USE_CACHE_NAME=<name>`. If not, check if there is a saved build cache from a
 # previous build of this changeset and use that as build cache. If the comment
 # contains `NO_FAILED_CACHE` we do nothing, i.e. we use the default cache.
+#
+# Also we check if the gerrit comment message contains a spack change with
+# which we should build specified via `WITH_SPACK_CHANGE=<change-id>`.
+GERRIT_SPECIFIED_SPACK_CHANGE=""
+GERRIT_SPECIFIED_SPACK_REFSPEC=""
 if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
     && [ -n "${GERRIT_EVENT_COMMENT_TEXT:-}" ]; then
 
@@ -62,8 +67,22 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
             fi
         fi
     fi
+
+    if grep -q "WITH_SPACK_CHANGE" "${tmpfile_comment}"; then
+        GERRIT_SPECIFIED_SPACK_CHANGE="$(sed -nE \
+            -e "s:.*\<WITH_SPACK_CHANGE=(\S*)\>.*:\1:gp" \
+            "${tmpfile_comment}")"
+
+    elif grep -q "WITH_SPACK_REFSPEC" "${tmpfile_comment}"; then
+        GERRIT_SPECIFIED_SPACK_REFSPEC="$(sed -nE \
+            -e "s:.*\<WITH_SPACK_REFSPEC=(\S*)\>.*:\1:gp" \
+            "${tmpfile_comment}")"
+    fi
+
     rm "${tmpfile_comment}"
 fi
+export GERRIT_SPECIFIED_SPACK_CHANGE
+export GERRIT_SPECIFIED_SPACK_REFSPEC
 
 # store environment for usage within container
 env > "${JENKINS_ENV_FILE}"
