@@ -43,7 +43,7 @@ pipeline {
 				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
-				                   returnStdout: true).trim()
+								   returnStdout: true).trim()
 				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
@@ -68,6 +68,12 @@ pipeline {
 				stage('Spack Clone') {
 					steps {
 						sh ".ci/clone.sh"
+					}
+				}
+				stage('Dump Meta Info') {
+					steps {
+						sh ".ci/dump_meta_info.sh"
+						sh ".ci/notify_gerrit.sh -m 'Build containing this change started..'"
 					}
 				}
 				stage('Spack Fetch') {
@@ -107,15 +113,17 @@ pipeline {
 					steps {
 						script {
 							// we only want the container name, tail everything else
-							CONTAINER_NAME = sh(script: ".ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
+							CONTAINER_IMAGE = sh(script: ".ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
-						sh ".ci/update_build_cache.sh -c \"$CONTAINER_NAME\""
+						sh ".ci/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
+						sh ".ci/notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
 					}
 				}
 			}
 			post {
 				failure {
 					sh ".ci/create_temporary_build_cache_after_failure.sh"
+					sh ".ci/notify_gerrit.sh -v -1 -t Build"
 				}
 				cleanup {
 					archiveArtifacts "jenkins.env"
@@ -134,7 +142,7 @@ pipeline {
 				stage('NMPM Software') {
 					steps {
 						build(job: 'bld_gerrit-meta-nmpm-software',
-						      parameters: [string(name: 'CONTAINER_IMAGE', value: CONTAINER_NAME)])
+						      parameters: [string(name: 'CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
 
@@ -142,13 +150,13 @@ pipeline {
 				stage('PPU Toolchain') {
 					steps {
 						build(job: 'bld_gerrit-ppu-toolchain-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
 				stage('haldls') {
 					steps {
 						build(job: 'bld_gerrit-haldls-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
 
@@ -156,21 +164,47 @@ pipeline {
 				stage('HDBIOAI project') {
 					steps {
 						build(job: 'bld_gerrit-model-hw-hdbioai-dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
 				// neuromorphic sampling library
 				stage('model-nmsampling-sbs') {
 					steps {
 						build(job: 'bld_gerrit_model-nmsampling-sbs_dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
 				// Visionary KiCad library
 				stage('pcb-kicad-lib') {
 					steps {
 						build(job: 'bld_gerrit_pcb-kicad-lib_dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_NAME)])
+							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
+					}
+				}
+			}
+			post {
+				success {
+					node('conviz1||conviz2') {
+						// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
+						inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
+							jesh "/opt/spack_install_scripts/notify_gerrit.sh -v 1 -t Tests -c '${CONTAINER_IMAGE}'"
+						}
+					}
+				}
+				unstable {
+					node ('conviz1||conviz2') {
+						// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
+						inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
+							jesh "/opt/spack_install_scripts/notify_gerrit.sh -v 0 -t Tests -c '${CONTAINER_IMAGE}'"
+						}
+					}
+				}
+				failure {
+					node ('conviz1||conviz2') {
+						// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
+						inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
+							jesh "/opt/spack_install_scripts/notify_gerrit.sh -v -1 -t Tests -c '${CONTAINER_IMAGE}'"
+						}
 					}
 				}
 			}

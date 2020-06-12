@@ -31,6 +31,20 @@ get_jenkins_env() {
     || ( echo "Variable not found in environment: $*" >&2; return 1 )
 }
 
+# Get the _{INSIDE,OUTSIDE} variant of a variable based in whether we are in a
+# complete container or not.
+#
+# Usage: get_var_in_out <variable-name>
+get_var_in_out() {
+    local var_name;
+    var_name="$1"
+    if [ -n "${SINGULARITY_NAME:-}" ]; then
+        printenv "${var_name}_INSIDE"
+    else
+        printenv "${var_name}_OUTSIDE"
+    fi
+}
+
 export MY_SPACK_FOLDER=/opt/spack
 export MY_SPACK_BIN=/opt/spack/bin/spack
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
@@ -69,6 +83,11 @@ PRESERVED_PACKAGES_INSIDE="/opt/preserved_packages"
 PRESERVED_PACKAGES_OUTSIDE="$(get_jenkins_env HOME)/preserved_packages"
 export PRESERVED_PACKAGES_INSIDE
 export PRESERVED_PACKAGES_OUTSIDE
+
+META_DIR_INSIDE="/opt/meta"
+META_DIR_OUTSIDE="$(get_jenkins_env WORKSPACE)${META_DIR_INSIDE}"
+export META_DIR_INSIDE
+export META_DIR_OUTSIDE
 
 COMMONS_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 export COMMONS_DIR
@@ -280,8 +299,9 @@ fi
 #
 parallel_cmds() {
     local num_jobs
+    local opts OPTIND OPTARG
     num_jobs="$(nproc)"
-    while getopts ":j:" opt
+    while getopts ":j:" opts
     do
         case $opt in
             j) num_jobs="${OPTARG}" ;;
@@ -332,8 +352,9 @@ lock_file() {
     local exclusive=0
     local info_exclusive=""
     local wait_secs=10
+    local opts OPTIND OPTARG
 
-    while getopts ":ew:" opt
+    while getopts ":ew:" opts
     do
         case $opt in
             e) exclusive=1 ;;
@@ -555,7 +576,7 @@ get_latest_failed_build_cache_name() {
     latest_build_num="$(grep "p${latest_patch_level}_" "${possible_build_caches}" \
         | cut -d _ -f 2 | sort -rg | head -n 1)"
 
-    echo -n "c${change_num}p${latest_patch_level}_${latest_build_num}"
+    echo -n "failed/${change_num}p${latest_patch_level}_${latest_build_num}"
 
     rm "${possible_build_caches}"
 }
@@ -615,4 +636,106 @@ get_latest_hash() {
 EOF
   ${MY_SPACK_BIN} find -vL "$@" | awk -f "${FILE_AWK}"| sort -V | cut -d ' ' -f 2 | tail -n 1
   rm "${FILE_AWK}"
+}
+
+##########
+# GERRIT #
+##########
+
+# Get gerrit username
+gerrit_username() {
+    get_jenkins_env "GERRIT_USERNAME" 2>/dev/null || echo "hudson"
+}
+
+# Read the current gerrit config from `.gitreview` into global variables:
+# * gerrit_branch
+# * gerrit_remote
+# * gerrit_host
+# * gerrit_port
+# * gerrit_project
+#
+# Unfortunately, since we cannot return values from function, they have to be
+# global variables.
+gerrit_read_config() {
+    local git_dir
+    git_dir="$(git rev-parse --show-toplevel)"
+    # remote branch
+    gerrit_branch="$(grep "^defaultbranch=" "${git_dir}/.gitreview" | cut -d = -f 2)"
+    gerrit_remote="$(grep "^defaultremote=" "${git_dir}/.gitreview" | cut -d = -f 2)"
+    gerrit_host="$(grep "^host=" "${git_dir}/.gitreview" | cut -d = -f 2)"
+    gerrit_port="$(grep "^port=" "${git_dir}/.gitreview" | cut -d = -f 2)"
+    gerrit_project="$(grep "^project=" "${git_dir}/.gitreview" | cut -d = -f 2)"
+}
+
+# Ensure that the gerrit remote is properly set up in the current git directory.
+gerrit_ensure_setup() {
+    gerrit_read_config
+
+    if ! git remote | grep -q "${gerrit_remote}"; then
+        # ensure git review is set up
+        git remote add "${gerrit_remote}" "ssh://$(gerrit_username)@${gerrit_host}:${gerrit_port}/${gerrit_project}"
+    fi
+    git fetch "${gerrit_remote}" "${gerrit_branch}"
+}
+
+gerrit_filter_current_change_commits() {
+    awk '$1 ~ /^commit$/ { commit=$2 }; $1 ~ /^Change-Id:/ { print commit }'
+}
+
+# Get the current stack of changesets in the current git repo as commit ids.
+gerrit_get_current_change_commits() {
+    gerrit_ensure_setup
+
+    git log "${gerrit_remote}/${gerrit_branch}..HEAD" \
+        | gerrit_filter_current_change_commits
+}
+
+# Convenience method to print the ssh command necessary to connect to gerrit.
+#
+# Note: Make sure the gerrit config was read prior to calling this!
+gerrit_cmd_ssh() {
+    echo -n "ssh -p ${gerrit_port} $(gerrit_username)@${gerrit_host} gerrit"
+}
+
+# Post comment on the given change-id
+#
+# Gerrit host/post will be read from current git repository.
+#
+# Args:
+#   -c <change>
+#   -m <message>
+gerrit_notify_change() {
+    local change=""
+    local message=""
+    local verified=""
+    local opts OPTIND OPTARG
+    while getopts ":c:m:v:" opts; do
+        case "${opts}" in
+            c)  change="${OPTARG}"
+                ;;
+            m)  message="${OPTARG}"
+                ;;
+            v)  verified="${OPTARG}"
+                ;;
+            *)
+                echo "Invalid argument: ${opts}" >&2
+                return 1
+                ;;
+        esac
+    done
+    shift $(( OPTIND - 1 ))
+
+    if [ -z "${change}" ]; then
+        echo "ERROR: No change to post to given!" >&2
+        return 1
+    fi
+    if [ -z "${message}" ]; then
+        echo "ERROR: No message given!" >&2
+        return 1
+    fi
+
+    gerrit_read_config
+    $(gerrit_cmd_ssh) review --message "\"${message}\"" \
+        "$([ -n "${verified}" ] && echo --verified "${verified}")" \
+        "${change}"
 }

@@ -26,7 +26,6 @@ MY_GERRIT_URL="${GERRIT_BASE_URL}/spack"
 rm -rf spack
 git clone ${MY_GERRIT_URL} -b visionary spack
 
-
 # Checkout specific spack change in case we have a testing build.
 #
 # Please note that stable builds should ALWAYS build stable!

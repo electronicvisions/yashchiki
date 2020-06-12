@@ -3,9 +3,6 @@
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
-GITLOG="git_log_yashchiki.txt"
-( cd ${SOURCE_DIR} && git log > "${WORKSPACE}/${GITLOG}" )
-
 RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 
 # create container description file
@@ -44,6 +41,8 @@ From: ${DOCKER_BASE_IMAGE}
     rsync -av "${SOURCE_DIR}"/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/pinned "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    mkdir -p "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
+    rsync -av "${META_DIR_OUTSIDE}"/* "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
     rsync -av "${WORKSPACE}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
@@ -53,7 +52,6 @@ From: ${DOCKER_BASE_IMAGE}
     # be surrounded in quotes.. ergo there should be no spaces in filenames! If
     # there are, I pray for your poor soul that escaping them works..
     # --obreitwi, 17-02-19 # 23:45:51
-    ${WORKSPACE}/${GITLOG} ${GITLOG}
     # provide spack command to login shells
     ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
     ${WORKSPACE}/misc-files/locale.gen /etc/locale.gen

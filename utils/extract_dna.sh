@@ -98,18 +98,10 @@ run_in_container()
     )
 }
 
-cat >${tmpdir}/dump_spack_git_log.sh <<EOF
-#!/bin/bash
-cd /opt/spack
-git log > /opt/dumptarget/spack_git.log
-EOF
-
-chmod +x "${tmpdir}/dump_spack_git_log.sh"
-
 echo "Dumping spack git log.." >&2
-run_in_container "${tmpdir}/dump_spack_git_log.sh"
+run_in_container "cp /opt/meta/spack_git.log /opt/dumptarget/spack_git.log"
 echo "Dumping yashchiki git log.." >&2
-run_in_container "cp /git_log_yashchiki.txt /opt/dumptarget/yashchiki_git.log"
+run_in_container "cp /opt/meta/yashchiki_git.log /opt/dumptarget/yashchiki_git.log"
 echo "Dumping spack spec files.." >&2
 run_in_container "cp -a /opt/spack_specs /opt/dumptarget"
 

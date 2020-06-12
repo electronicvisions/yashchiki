@@ -1,0 +1,29 @@
+#!/bin/bash -x
+
+# Dump some meta information about yashchiki in the container to help other
+# scripts.
+
+set -Eeuo pipefail
+
+SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
+source "${SOURCE_DIR}/commons.sh"
+
+mkdir -p "${META_DIR_OUTSIDE}"
+
+(
+    cd "${WORKSPACE}"
+    git log > "${META_DIR_OUTSIDE}/yashchiki_git.log"
+    if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
+        gerrit_get_current_change_commits \
+            > "${META_DIR_OUTSIDE}/current_changes-yashchiki.dat"
+    fi
+)
+
+(
+    cd "${WORKSPACE}/spack"
+    git log > "${META_DIR_OUTSIDE}/spack_git.log"
+    if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
+        gerrit_get_current_change_commits \
+            > "${META_DIR_OUTSIDE}/current_changes-spack.dat"
+    fi
+)
