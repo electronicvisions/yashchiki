@@ -1,0 +1,73 @@
+@Library("jenlib") _
+
+Closure cleanupSteps = {
+	// NOTE: sudo commands have been manually permitted
+	// remove sandboxes
+	sh "sudo /bin/rm -rf \"${WORKSPACE}/sandboxes/\" || exit 0"
+	// remove tmp (not only for spack)
+	sh "sudo /bin/rm -rf \"/tmp/${NODE_NAME}/\""
+}
+
+pipeline {
+	agent none
+
+	options {
+		timestamps()
+		skipDefaultCheckout()
+	}
+
+	stages {
+		stage('Container Build') {
+			agent { label 'conviz1||conviz2' }
+			environment {
+				DOCKER_BASE_IMAGE = "centos:7"
+				TMPDIR = "/tmp/${env.NODE_NAME}"
+				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
+				                   returnStdout: true).trim()
+			}
+			stages {
+				stage('Pre-build Cleanup') {
+					steps {
+						script {
+							cleanupSteps()
+						}
+						sh "mkdir -p \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
+					}
+				}
+				stage('yashchiki Checkout') {
+					steps {
+						checkout scm
+					}
+				}
+				stage('Create asic recipe') {
+					steps {
+						sh ".ci/asic_create_recipe.sh"
+					}
+				}
+				stage('Build sandbox') {
+					steps {
+						sh ".ci/asic_build_sandbox.sh"
+					}
+				}
+				stage('Build container image') {
+					steps {
+						sh ".ci/asic_build_image.sh"
+					}
+				}
+				stage('Update build cache and export container') {
+					steps {
+						script {
+							// we only want the container name, tail everything else
+							CONTAINER_NAME = sh(script: ".ci/asic_deploy_container.sh | tail -n 1", returnStdout: true).trim()
+						}
+					}
+				}
+			}
+		}
+	}
+	post {
+		failure {
+			notifyFailure(mattermostChannel: "#spack")
+		}
+	}
+}

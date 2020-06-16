@@ -13,27 +13,18 @@ unset LC_NUMERIC
 unset LC_TIME
 unset LC_MESSAGES
 
-echo "creating visionary_recipe.def" >&2
+echo "creating asic_recipe.def" >&2
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-"${SOURCE_DIR}/create_visionary_recipe.sh"
+"${SOURCE_DIR}/asic_create_recipe.sh"
 
-echo "created visionary_recipe.def" >&2
-cat "${WORKSPACE}/visionary_recipe.def"
-
-# create some jenkins-owned temp folder for spack build
-if [ ! -d "${JOB_TMP_SPACK}" ]; then
-    echo "${JOB_TMP_SPACK} should exist, aborting!" >&2
-    exit 1
-fi
-
-# make job temp folder writable for all users (i.e., spack)
-chmod 777 "${JOB_TMP_SPACK}"
+echo "created asic_recipe.def" >&2
+cat "${WORKSPACE}/asic_recipe.def"
 
 # build the container (using scripts from above)
 export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
 export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
-TARGET_FOLDER="sandboxes/buster_spack"
+TARGET_FOLDER="sandboxes/asic"
 
 # Do not change: special sudo permit for jenkins user...
 sudo rm -rf sandboxes/
@@ -41,4 +32,4 @@ sudo rm -rf sandboxes/
 mkdir sandboxes
 
 # Do not change: special sudo permit for jenkins user...
-sudo -E singularity build --sandbox "${TARGET_FOLDER}" visionary_recipe.def
+sudo -E singularity build --sandbox "${TARGET_FOLDER}" asic_recipe.def
