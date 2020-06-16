@@ -57,7 +57,8 @@ if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     container_basename="$(basename ${CONTAINER_NAME})"
     container_basename="${container_basename%%.*}"
 
-    /container/utils/extract_dna.sh -c "${CONTAINER_NAME}" -d "/containers/dna/${container_basename}"
+    /containers/utils/extract_dna.sh -c "${CONTAINER_NAME}" -d "/containers/dna/${container_basename}"
+
 fi
 
 # delete temporary image
