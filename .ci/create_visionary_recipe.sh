@@ -17,10 +17,8 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 #   (-> installs to /opt/spack, and creates views)
 # * provide "apps" which set environment variables to appropriate views
 cat <<EOF >"${RECIPE_FILENAME}"
-Bootstrap: debootstrap
-MirrorURL: http://httpredir.debian.org/debian
-OSVersion: buster
-Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git, lbzip2, less, libc6-dev, locales, make, netbase, parallel, patch, patchelf, procps, python, python-yaml, python3, python3-yaml, rsync, ssh, sudo, udev, unzip, xz-utils
+Bootstrap: docker
+From: ${DOCKER_BASE_IMAGE}
 
 %setup
     # bind-mount spack-folder as moving involves copying the complete download cache
@@ -64,6 +62,8 @@ Include: ca-certificates, ccache, curl, file, g++, gawk, gcc, git, lbzip2, less,
     ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
 
 %post
+    # prerequisites
+    "${SPACK_INSTALL_SCRIPTS}/install_prerequisites.sh" || exit 1
     # cannot specify permissions in files-section
     chmod 440 /etc/sudoers
     chown root:root /etc/sudoers

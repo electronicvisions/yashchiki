@@ -31,6 +31,7 @@ pipeline {
 		stage('Container Build') {
 			agent { label 'conviz1||conviz2' }
 			environment {
+				DOCKER_BASE_IMAGE = "debian:buster"
 				// FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
 				DEPENDENCY_PYTHON = "python@2.7.18"
 				// This needs to be here because otherwise the default python
