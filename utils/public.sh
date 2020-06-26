@@ -63,8 +63,12 @@ check_container_inner() {
     local container
     container="$1"
 
+    # ASIC containers are not safe to publish
+    if [[ "$(basename "${container}")" =~ ^asic_ ]]; then
+        return 1
+    fi
+
     # check that there are no blacklisted packages in the container
-    local retval
     if singularity shell "${container}" -l \
         -c "spack find | grep -q \"$(get_grep_pattern_blacklisted)\"" \
         &>/dev/null; then
