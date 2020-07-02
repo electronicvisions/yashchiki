@@ -67,9 +67,14 @@ pipeline {
 				}
 				stage('Spack Clone') {
 					steps {
+						sh ".ci/clone.sh"
+					}
+				}
+				stage('Spack Fetch') {
+					steps {
 						script {
 							try {
-								sh ".ci/clone.sh"
+								sh ".ci/fetch.sh"
 							}
 							catch (Throwable t) {
 								archiveArtifacts "errors_concretization.log"
