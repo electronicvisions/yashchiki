@@ -10,7 +10,8 @@ set -euo pipefail
 TARGET="/opt/init/modules.sh"
 PATH_SOURCE="$(readlink -m "${BASH_SOURCE[0]}")"
 
-PATH_MODULES="$(find "$(/opt/spack/bin/spack location -i environment-modules)" -type d -path "*init" | head -n 1)"
+MODULESHOME="$(/opt/spack/bin/spack location -i environment-modules)"
+PATH_MODULES="$(find "${MODULESHOME}" -type d -path "*init" | head -n 1)"
 
 cat <<EOF > "${TARGET}"
 #!/bin/bash
@@ -28,6 +29,12 @@ EOF
 
 cat <<EOF >> "${TARGET}"
 source "${PATH_MODULES}/\$(readlink -f /proc/\$\$/exe | xargs basename)"
+EOF
+
+# Provide MODULESHOME for all singularity environments
+cat <<EOF >> ${SINGULARITY_ENVIRONMENT}
+MODULESHOME=${MODULESHOME}
+export MODULESHOME
 EOF
 
 # ensure that the directories with spack-generated module files are available
