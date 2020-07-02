@@ -35,12 +35,13 @@ export MY_SPACK_FOLDER=/opt/spack
 export MY_SPACK_BIN=/opt/spack/bin/spack
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
-LOCK_FILENAME=lock
+export LOCK_FILENAME=lock
 
 BUILD_CACHE_NAME="$(get_jenkins_env BUILD_CACHE_NAME)"
 if [ -z "${BUILD_CACHE_NAME:-}" ]; then
     BUILD_CACHE_NAME=visionary_manual
 fi
+export BUILD_CACHE_NAME
 
 # NOTE: build caches contain relavite symlinks to preserved_packages, so the
 # relation that build_caches and preserved_packages are in the same folder
@@ -50,21 +51,33 @@ fi
 BASE_BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches"
 BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_jenkins_env HOME)/build_caches/failed"
 BUILD_CACHE_OUTSIDE="${BASE_BUILD_CACHE_OUTSIDE}/${BUILD_CACHE_NAME}"
+export BASE_BUILD_CACHE_OUTSIDE
+export BASE_BUILD_CACHE_FAILED_OUTSIDE
+export BUILD_CACHE_OUTSIDE
 
 BASE_BUILD_CACHE_INSIDE="/opt/build_cache"
 BUILD_CACHE_INSIDE="${BASE_BUILD_CACHE_INSIDE}/${BUILD_CACHE_NAME}"
 BUILD_CACHE_LOCK="${BUILD_CACHE_INSIDE}/${LOCK_FILENAME}"
+export BASE_BUILD_CACHE_INSIDE
+export BUILD_CACHE_INSIDE
+export BUILD_CACHE_LOCK
 
 SOURCE_CACHE_DIR="$(get_jenkins_env HOME)/download_cache"
+export SOURCE_CACHE_DIR
 
 PRESERVED_PACKAGES_INSIDE="/opt/preserved_packages"
 PRESERVED_PACKAGES_OUTSIDE="$(get_jenkins_env HOME)/preserved_packages"
+export PRESERVED_PACKAGES_INSIDE
+export PRESERVED_PACKAGES_OUTSIDE
 
 COMMONS_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
+export COMMONS_DIR
 
 SPACK_INSTALL_SCRIPTS="/opt/spack_install_scripts"
+export SPACK_INSTALL_SCRIPTS
 
 SPEC_FOLDER_IN_CONTAINER="/opt/spack_specs"
+export SPEC_FOLDER_IN_CONTAINER
 
 if [ -d "${SPEC_FOLDER_IN_CONTAINER}" ]; then
     # only valid in container
@@ -72,6 +85,7 @@ if [ -d "${SPEC_FOLDER_IN_CONTAINER}" ]; then
 else
     SPEC_FOLDER="$(mktemp -d)"
 fi
+export SPEC_FOLDER
 
 ###############
 # BOOKKEEPING #
