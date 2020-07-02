@@ -38,4 +38,11 @@ From: ${DOCKER_BASE_IMAGE}
     # required to load the module environment)
     MODULESHOME=/usr/share/Modules
     export MODULESHOME
+
+    # CentOS 7 does not support C.UTF-8; unset everything if encountered.
+    if [ "${LANG}" = "C.UTF-8" ]; then
+        LANG=C
+        export LANG
+        unset LC_COLLATE LC_CTYPE LC_MONETARY LC_NUMERIC LC_TIME LC_MESSAGES LC_ALL
+    fi
 EOF
