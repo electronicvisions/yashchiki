@@ -51,7 +51,7 @@ get_folders_to_clean()
     readarray -t folders < <(get_preserved_packages; get_failed_build_caches)
     readarray -t changes < <(printf '%s\n' "${folders[@]}" | to_changesets | filter_merged_or_abandoned_changesets)
 
-    local pattern
+    local pattern=""
     for cs in "${changes[@]}"; do
         if [ -z "${pattern}" ]; then
             pattern="\\(c${cs}p"
