@@ -54,4 +54,6 @@ From: ${DOCKER_BASE_IMAGE}
 
     # python now from conda...
     PATH=/opt/conda/bin:${PATH}
+    # ensure conda sees a clean env
+    unset PYTHONHOME
 EOF
