@@ -64,6 +64,19 @@ pipeline {
 				}
 			}
 		}
+
+		// Container verification stage: Build visionary metaprojects
+		stage('Container Verification') {
+			parallel {
+				stage('tools-xilinx') {
+					steps {
+						build(job: 'bld_gerrit_tools-xilinx_dependencies',
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_ASIC_CONTAINER_IMAGE',
+						                          value: CONTAINER_NAME)])
+					}
+				}
+			}
+		}
 	}
 	post {
 		failure {
