@@ -546,6 +546,17 @@ _install_from_buildcache() {
     # install if available in buildcache
     cat "${FILE_HASHES_SPACK}" "${FILE_HASHES_BUILDCACHE}" | sort | uniq -d > "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
 
+    # get all top-level directories that have to be created so that each tar process only creates its own directory
+    local toplevel_dirs
+    mapfile -t toplevel_dirs < <(parallel -j "$(nproc)" \
+        "bash -c 'tar Ptf ${BUILD_CACHE_INSIDE}/{}.tar.gz | head -n 1'" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" \
+        | xargs dirname | sort | uniq )
+
+    # ensure all toplevel directories exist
+    for dir in "${toplevel_dirs[@]}"; do
+        [ ! -d "${dir}" ] && mkdir -p "${dir}"
+    done
+
     parallel -v -j $(nproc) tar Pxf "${BUILD_CACHE_INSIDE}/{}.tar.gz" \
         < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
 
