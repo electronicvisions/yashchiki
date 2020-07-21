@@ -697,8 +697,11 @@ gerrit_filter_current_change_commits() {
 gerrit_get_current_change_commits() {
     gerrit_ensure_setup
 
-    git log "${gerrit_remote}/${gerrit_branch}..HEAD" \
-        | gerrit_filter_current_change_commits
+    # only provide change-ids that are actually present in gerrit
+    comm -1 -2 \
+        <(git log "${gerrit_remote}/${gerrit_branch}..HEAD" \
+            | gerrit_filter_current_change_commits | sort) \
+        <(git ls-remote "${gerrit_remote}" | awk '$2 ~ /^refs\/changes/ { print $1 }' | sort)
 }
 
 # Convenience method to print the ssh command necessary to connect to gerrit.
