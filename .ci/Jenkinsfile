@@ -142,7 +142,7 @@ pipeline {
 				stage('NMPM Software') {
 					steps {
 						build(job: 'bld_gerrit-meta-nmpm-software',
-						      parameters: [string(name: 'CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
 
