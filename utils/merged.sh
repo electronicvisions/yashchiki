@@ -14,7 +14,7 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/gerrit.sh"
 
 CONTAINER_HOST="comicsans"
-CONTAINER_PATH="/containers/testing"
+CONTAINER_PATH="${CONTAINER_PATH:-/containers/testing}"
 
 get_images()
 {

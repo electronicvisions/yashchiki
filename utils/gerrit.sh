@@ -17,7 +17,7 @@ fi
 
 # Extract change number from folders adhering to yashchiki naming scheme
 to_changesets() {
-    xargs --no-run-if-empty -n 1 basename | sed "s/c\\(.*\\)p.*/\\1/g" | sort | uniq
+    xargs --no-run-if-empty -n 1 basename | sed "s/^.*c\\([0-9]\+\\)p[0-9]\+.*/\\1/g" | sort | uniq
 }
 
 # Read changes from stdin and print their status
