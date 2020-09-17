@@ -60,6 +60,9 @@ From: ${DOCKER_BASE_IMAGE}
     ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
 
 %post
+    # create a fingerprint by which we can identify the container from within
+    cat /proc/sys/kernel/random/uuid > /opt/fingerprint
+
     # prerequisites
     "${SPACK_INSTALL_SCRIPTS}/install_prerequisites.sh" || exit 1
     # cannot specify permissions in files-section
