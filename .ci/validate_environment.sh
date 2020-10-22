@@ -51,10 +51,10 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
     echo "${GERRIT_EVENT_COMMENT_TEXT}" | base64 -d > "${tmpfile_comment}"
 
     if ! grep -q "\bNO_FAILED_CACHE\b" "${tmpfile_comment}"; then
-        if grep -q "\bUSE_CACHE=" "${tmpfile_comment}"; then
+        if grep -q "\bUSE_CACHE_NAME=" "${tmpfile_comment}"; then
             # use specified cache
             BUILD_CACHE_NAME="$(sed -nE \
-                -e "s:.*\<USE_CACHE_NAME=(\S*)\>.*:\1:gp"
+                -e "s:.*\<USE_CACHE_NAME=(\S*)\>.*:\1:gp" \
                 "${tmpfile_comment}")"
             export BUILD_CACHE_NAME
         else
