@@ -516,6 +516,9 @@ get_specfiles() {
     done
 }
 
+# Usage: install_from_buildcache PACKAGE...
+#
+# Install the given set of packages from yashchiki's buildcache.
 install_from_buildcache() {
     local install_failed=0
     # don't forget to unlock builcache in case of error, but then propagate
