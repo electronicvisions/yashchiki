@@ -50,6 +50,11 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
 
     echo "${GERRIT_EVENT_COMMENT_TEXT}" | base64 -d > "${tmpfile_comment}"
 
+    if grep -q "\bWITH_DEBUG\b" "${tmpfile_comment}"; then
+        export YASHCHIKI_DEBUG=enabled
+        set_debug_output_from_env
+    fi
+
     if ! grep -q "\bNO_FAILED_CACHE\b" "${tmpfile_comment}"; then
         if grep -q "\bUSE_CACHE_NAME=" "${tmpfile_comment}"; then
             # use specified cache

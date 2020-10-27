@@ -47,3 +47,8 @@ This changeset adds the possibility to specify:
 These take priority over commit-specified `Depends-On:` and are mutually
 exclusive with jenkins-specified build parameters since each build gets
 either triggered manually in jenkins or via gerrit.
+
+
+### `WITH_DEBUG`
+
+Specifying `WITH_DEBUG` in the triggering comment will enable debug output.
