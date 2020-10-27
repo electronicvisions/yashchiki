@@ -28,9 +28,10 @@ From: ${DOCKER_BASE_IMAGE}
     mkdir -p "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
     # create buildcache directory if it does not exist
     [ ! -d "${BUILD_CACHE_OUTSIDE}" ] && mkdir -p "${BUILD_CACHE_OUTSIDE}"
-    mount --no-mtab --bind "${BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
+    # mount the full build cache folder into container because some files might be symlinked to other buildcaches
+    mount --no-mtab --bind "${BASE_BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}${BASE_BUILD_CACHE_INSIDE}"
     # bind-mount preserved packages in case the build fails
-    mkdir "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
+    mkdir -p "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
     mount --no-mtab --bind "${PRESERVED_PACKAGES_OUTSIDE}" "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
     # bind-mount tmp-folder
     mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack"
