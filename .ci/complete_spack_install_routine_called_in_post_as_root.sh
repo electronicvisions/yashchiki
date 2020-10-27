@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # This script governs the whole spack install procedure.
 # It is needed because the post-install routine is executed in sh which has

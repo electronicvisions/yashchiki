@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # Install visionary spack packages (this should only be done after the compiler
 # has been installed).
 

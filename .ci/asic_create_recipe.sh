@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/asic_dummy_variables.sh"

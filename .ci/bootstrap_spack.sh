@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Prepare spack by bootstrapping and installing the visionary compiler
 #

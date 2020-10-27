@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # This script creates a temporary build cache via symlinks in
 # failed/c<num>p<num>_<num>.

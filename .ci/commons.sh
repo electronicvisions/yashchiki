@@ -45,6 +45,19 @@ get_var_in_out() {
     fi
 }
 
+#####################
+# SETUP ENVIRONMENT #
+#####################
+
+set_debug_output_from_env() {
+    if [ -n "$(get_jenkins_env YASHCHIKI_DEBUG)" ]; then
+        set -x
+    else
+        set +x
+    fi
+}
+set_debug_output_from_env
+
 export MY_SPACK_FOLDER=/opt/spack
 export MY_SPACK_BIN=/opt/spack/bin/spack
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"

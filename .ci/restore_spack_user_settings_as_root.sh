@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Restore settings that are used during build but should be reset for the end
 # user

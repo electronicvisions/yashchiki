@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # General plan of action:
 #

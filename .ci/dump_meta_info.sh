@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Dump some meta information about yashchiki in the container to help other
 # scripts.

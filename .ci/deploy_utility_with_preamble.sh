@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Deploys the given file while inserting a preamble after shebang.
 #

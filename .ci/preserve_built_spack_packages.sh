@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # This script tries to save all successfully built spack packages to fallback
 # location in case of a builderror.
