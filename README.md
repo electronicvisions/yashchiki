@@ -9,21 +9,21 @@ Visionary "containering"…
 Start a yashicki build with this change as toplevel.
 
 
-### `NO_FAILED_CACHE`
+### `WITHOUT_FAILED_CACHE`
 
 If a testing build fails, link all preserved packages and the current build
 cache to a new temporary build cache under `failed/c<num>p<num>_<num>`.
 
 Behaviour for testing builds triggered from gerrit:
-* Unless the user specifies `NO_FAILED_CACHE` in the gerrit commit,
+* Unless the user specifies `WITHOUT_FAILED_CACHE` in the gerrit commit,
   check if there is a failed build cache for this changeset that was
   created as described above and use the latest one as build cache for
   the current build.
-* The user can also supply `USE_CACHE_NAME=<name>` to specify a
+* The user can also supply `WITH_CACHE_NAME=<name>` to specify a
   different build cache to be used for this build.
 
 
-### `USE_CACHE_NAME=<name>`
+### `WITH_CACHE_NAME=<name>`
 
 Use `/home/vis_jenkins/build_caches/<name>` on `conviz` as buildcache instead
 of the default one. Can also be used for failed caches.
