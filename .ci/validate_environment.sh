@@ -58,7 +58,7 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
     if grep -q "\bWITH_CACHE_NAME=" "${tmpfile_comment}"; then
         # use specified cache
         BUILD_CACHE_NAME="$(sed -nE \
-            -e "s:.*\<WITH_CACHE_NAME=(\S*)\>.*:\1:gp" \
+            -e "s:.*\<WITH_CACHE_NAME=(\S*)(\s|$).*:\1:gp" \
             "${tmpfile_comment}")"
         export BUILD_CACHE_NAME
     elif ! grep -q "\bWITHOUT_FAILED_CACHE\b" "${tmpfile_comment}"; then
