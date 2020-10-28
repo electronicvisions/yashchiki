@@ -90,4 +90,5 @@ export GERRIT_SPECIFIED_SPACK_CHANGE
 export GERRIT_SPECIFIED_SPACK_REFSPEC
 
 # store environment for usage within container
-env > "${JENKINS_ENV_FILE}"
+echo "# Jenkins environment set to:" >&2
+env | tee "${JENKINS_ENV_FILE}"
