@@ -55,21 +55,19 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
         set_debug_output_from_env
     fi
 
-    if ! grep -q "\bWITHOUT_FAILED_CACHE\b" "${tmpfile_comment}"; then
-        if grep -q "\bWITH_CACHE_NAME=" "${tmpfile_comment}"; then
-            # use specified cache
-            BUILD_CACHE_NAME="$(sed -nE \
-                -e "s:.*\<WITH_CACHE_NAME=(\S*)\>.*:\1:gp" \
-                "${tmpfile_comment}")"
-            export BUILD_CACHE_NAME
-        else
-            latest_failed_build_cache="$(get_latest_failed_build_cache_name)"
+    if grep -q "\bWITH_CACHE_NAME=" "${tmpfile_comment}"; then
+        # use specified cache
+        BUILD_CACHE_NAME="$(sed -nE \
+            -e "s:.*\<WITH_CACHE_NAME=(\S*)\>.*:\1:gp" \
+            "${tmpfile_comment}")"
+        export BUILD_CACHE_NAME
+    elif ! grep -q "\bWITHOUT_FAILED_CACHE\b" "${tmpfile_comment}"; then
+        latest_failed_build_cache="$(get_latest_failed_build_cache_name)"
 
-            # If there is no previous build cache the while loop will terminate
-            # immedately and build_num be zero.
-            if [ -n "${latest_failed_build_cache}" ]; then
-                export BUILD_CACHE_NAME="${latest_failed_build_cache}"
-            fi
+        # If there is no previous build cache the while loop will terminate
+        # immedately and build_num be zero.
+        if [ -n "${latest_failed_build_cache}" ]; then
+            export BUILD_CACHE_NAME="${latest_failed_build_cache}"
         fi
     fi
 
