@@ -215,8 +215,16 @@ spack_packages=(
 PINNED_TARGET="sandybridge"
 spack_packages=( "${spack_packages[@]/ / target=${PINNED_TARGET} }" )
 
-# control view creation with verbosity for more debuggability
-SPACK_VIEW_ARGS="--verbose"
+# Control verbosity etc of commands
+SPACK_ARGS_INSTALL=()
+SPACK_ARGS_REINDEX=()
+SPACK_ARGS_VIEW=()
+
+if [ -n "$(get_jenkins_env SPACK_VERBOSE)" ]; then
+    SPACK_ARGS_INSTALL+=("--verbose")
+    SPACK_ARGS_VIEW+=("--verbose")
+    SPACK_ARGS_REINDEX+=("--verbose")
+fi
 
 # TODO: Keep in sync with <spack-repo>/lib/spack/spack/cmd/bootstrap.py since
 # there is no straight-forward way to extract bootstrap dependencies
@@ -577,7 +585,7 @@ _install_from_buildcache() {
         < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
 
     # have spack reindex its install contents to find the new packages
-    ${MY_SPACK_BIN} --verbose reindex
+    ${MY_SPACK_BIN} "${SPACK_ARGS_REINDEX[@]}" reindex
 }
 
 get_latest_failed_build_cache_name() {

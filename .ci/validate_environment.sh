@@ -73,6 +73,12 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
         fi
     fi
 
+    if grep -q "\bWITH_SPACK_VERBOSE\b" "${tmpfile_comment}"; then
+        export SPACK_VERBOSE="enabled"
+    else
+        export SPACK_VERBOSE=""
+    fi
+
     if grep -q "WITH_SPACK_CHANGE" "${tmpfile_comment}"; then
         GERRIT_SPECIFIED_SPACK_CHANGE="$(sed -nE \
             -e "s:.*\<WITH_SPACK_CHANGE=(\S*)\>.*:\1:gp" \
