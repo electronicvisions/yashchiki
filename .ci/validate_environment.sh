@@ -53,6 +53,8 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
     if grep -q "\bWITH_DEBUG\b" "${tmpfile_comment}"; then
         export YASHCHIKI_DEBUG=enabled
         set_debug_output_from_env
+    else
+        export YASHCHIKI_DEBUG=""
     fi
 
     if grep -q "\bWITH_CACHE_NAME=" "${tmpfile_comment}"; then
