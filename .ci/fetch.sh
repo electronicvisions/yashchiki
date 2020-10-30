@@ -58,13 +58,14 @@ ${MY_SPACK_BIN} spec aida >/dev/null
 for package in "${packages_to_fetch[@]}"; do
     echo "Concretizing ${package} for fetching.."
     # pause if we have sufficient concretizing jobs
+    oldstate="$(shopt -po xtrace)"
     set +x  # do not clobber build log so much
     while (( $(jobs | wc -l) >= $(nproc) )); do
         # call jobs because otherwise we will not exit the loop
         jobs &>/dev/null
         sleep 1
     done
-    set -x
+    eval "${oldstate}"
     tmp_err="$(mktemp)"
     tmpfiles_concretize_err+=("${tmp_err}")
     # We need to strip the compiler spec starting with '%' from the spec string
