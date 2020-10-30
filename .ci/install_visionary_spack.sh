@@ -89,7 +89,7 @@ populate_views
 # view-provided python2 binary. Since we set PYTHONHOME this leads to
 # incompatible python libraries search paths.
 for pyf in ${MY_SPACK_VIEW_PREFIX}/visionary-*/bin/python2; do
-    ln -fs ${pyf} $(dirname ${pyf})/python3
+    ln -fs ${pyf} "$(dirname ${pyf})/python3"
 done
 
 umask ${OLD_UMASK}
