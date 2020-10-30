@@ -28,7 +28,7 @@ for package in "${spack_packages[@]}"; do
 done
 
 # create the filesystem views (exposed via singularity --app option)
-echo "CREATING VIEWS OF META PACKAGES"
+echo "CREATING VIEWS OF META PACKAGES" >&2
 cd ${MY_SPACK_FOLDER}
 
 # make views writable for non-spack users in container
@@ -55,8 +55,8 @@ cat <<EOF
 ${MY_SPACK_BIN} "${SPACK_ARGS_VIEW[@]}" view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey $(get_latest_hash visionary-spikey+dev)
 ${MY_SPACK_BIN} "${SPACK_ARGS_VIEW[@]}" view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-nodev $(get_latest_hash visionary-spikey~dev)
 
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]}"" view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer $(get_latest_hash visionary-wafer+dev+tensorflow~gccxml)
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]}"" view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-nodev $(get_latest_hash visionary-wafer~dev+tensorflow~gccxml)
+${MY_SPACK_BIN} "${SPACK_ARGS_VIEW[@]}" view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer $(get_latest_hash visionary-wafer+dev+tensorflow~gccxml)
+${MY_SPACK_BIN} "${SPACK_ARGS_VIEW[@]}" view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-nodev $(get_latest_hash visionary-wafer~dev+tensorflow~gccxml)
 
 ##################################################
 # Strong independent packages who need no gccxml #
