@@ -83,9 +83,11 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
     fi
 
     for change in "${commits[@]}"; do
-        gerrit_notify_change -c "${change}" \
+        if ! gerrit_notify_change -c "${change}" \
             -v "${verified}" \
-            -m "${message}" 1>&2
+            -m "${message}" 1>&2; then
+            echo "ERROR during gerrit notification regarding: ${change}" >&2
+        fi
     done
 
     if [ -n "${SINGULARITY_CONTAINER:-}" ]; then
