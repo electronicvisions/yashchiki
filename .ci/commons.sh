@@ -344,7 +344,7 @@ populate_views() {
         local dependencies="${spack_add_to_view_with_dependencies["${addition}"]}"
         {
             for viewname in ${spack_add_to_view["${addition}"]}; do
-                echo "${MY_SPACK_BIN} ${SPACK_VIEW_ARGS} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
+                echo "${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[*]} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
             done
         } | parallel_cmds
     done
