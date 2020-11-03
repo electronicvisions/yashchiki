@@ -50,7 +50,7 @@ get_var_in_out() {
 #####################
 
 set_debug_output_from_env() {
-    if [ -n "$(get_jenkins_env YASHCHIKI_DEBUG)" ]; then
+    if get_jenkins_env YASHCHIKI_DEBUG; then
         set -x
     else
         set +x
@@ -220,7 +220,7 @@ SPACK_ARGS_INSTALL=()
 SPACK_ARGS_REINDEX=()
 SPACK_ARGS_VIEW=()
 
-if [ -n "$(get_jenkins_env SPACK_VERBOSE)" ]; then
+if get_jenkins_env SPACK_VERBOSE; then
     SPACK_ARGS_INSTALL+=("--verbose")
     SPACK_ARGS_VIEW+=("--verbose")
     SPACK_ARGS_REINDEX+=("--verbose")
