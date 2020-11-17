@@ -54,11 +54,12 @@ trap rm_tmp_fetch_err EXIT
 echo "Regenerating database index." >&2
 ${MY_SPACK_BIN} spec aida >/dev/null
 
+# for some reason the exit code of shopt indicates if option is set despite -q not being specified
+oldstate="$(shopt -po xtrace)" || true
 
 for package in "${packages_to_fetch[@]}"; do
-    echo "Concretizing ${package} for fetching.."
+    echo "Concretizing ${package} for fetching.." >&2
     # pause if we have sufficient concretizing jobs
-    oldstate="$(shopt -po xtrace)"
     set +x  # do not clobber build log so much
     while (( $(jobs | wc -l) >= $(nproc) )); do
         # call jobs because otherwise we will not exit the loop
