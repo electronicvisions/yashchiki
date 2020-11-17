@@ -50,7 +50,8 @@ get_var_in_out() {
 #####################
 
 set_debug_output_from_env() {
-    if get_jenkins_env YASHCHIKI_DEBUG; then
+    # Enable debug if YASHCHIKI_DEBUG is NOT (-n) empty string
+    if [ -n "$(get_jenkins_env YASHCHIKI_DEBUG)" ]; then
         set -x
     else
         set +x
