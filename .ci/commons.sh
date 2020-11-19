@@ -453,7 +453,8 @@ get_hashes_in_buildcache() {
 
 
 get_hashes_in_spack() {
-    ${MY_SPACK_BIN} find -L | awk '/^[a-z0-9]/ { print $1 }' | sort
+    # we only return hashes that are actually IN spack, i.e., that reside under /opt/spack/opt/spack
+    ${MY_SPACK_BIN} find --no-groups -Lp | awk '$3 ~ /^\/opt\/spack\/opt\/spack\// { print $1 }' | sort
 }
 
 
