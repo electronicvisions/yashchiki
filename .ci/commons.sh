@@ -221,7 +221,7 @@ SPACK_ARGS_INSTALL=()
 SPACK_ARGS_REINDEX=()
 SPACK_ARGS_VIEW=()
 
-if get_jenkins_env SPACK_VERBOSE; then
+if [ -n "$(get_jenkins_env SPACK_VERBOSE)" ]; then
     SPACK_ARGS_INSTALL+=("--verbose")
     SPACK_ARGS_VIEW+=("--verbose")
     SPACK_ARGS_REINDEX+=("--verbose")
