@@ -8,6 +8,7 @@ set -euo pipefail
 system_dependencies=(
         "arping"
         "bash-completion"
+        "binfmt-support"
         "binutils-aarch64-linux-gnu"
         "corkscrew"
         "cpio"
@@ -21,6 +22,7 @@ system_dependencies=(
         "iproute2"
         "iptables"
         "iputils-ping"
+        "libc6:arm64"
         "libc6-arm64-cross"
         "libc6-dbg"
         "libc6-dev-arm64-cross"
@@ -37,6 +39,8 @@ system_dependencies=(
         "ncurses-term"
         "net-tools"
         "psmisc"
+        "qemu"
+        "qemu-user-static"
         "strace"
         "tshark"
         "tsocks"
@@ -72,5 +76,9 @@ if /bin/false; then
     apt-get update | apply_prefix
     apt-get install -y singularity-container/buster-backports | apply_prefix
 fi
+
+# add multiarch support, esp. arm64 for zynq binaries
+dpkg --add-architecture arm64
+apt-get update
 
 apt-get install -y "${system_dependencies[@]}" | apply_prefix
