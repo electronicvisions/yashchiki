@@ -86,6 +86,8 @@ pipeline {
 								archiveArtifacts "errors_concretization.log"
 								throw t
 							}
+							spec_folder_in_container = sh(script: ".ci/get_jenkins_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
+							archiveArtifacts(artifacts: "sandboxes/*/$spec_folder_in_container/*.yaml", allowEmptyArchive: true)
 						}
 					}
 				}
