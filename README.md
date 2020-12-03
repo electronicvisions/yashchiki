@@ -4,6 +4,12 @@ Visionary "containering"…
 
 ## Supported keywords in gerrit message
 
+NOTE: These options are to be specified in the gerrit COMMENT message, NOT in
+the git COMMIT message!
+
+The idea is that, often times, these modifiers are just temporarily attached to
+a single build rather than a complete change.
+
 ### `BUILD_THIS`
 
 Start a yashicki build with this change as toplevel.
