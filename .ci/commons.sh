@@ -198,7 +198,7 @@ spack_packages=(
     "visionary-wafer+gccxml +tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
     "visionary-wafer-visu ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
-    "visionary-slurmviz ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
