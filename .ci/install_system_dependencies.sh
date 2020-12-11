@@ -25,6 +25,7 @@ system_dependencies=(
         "libc6-dbg"
         "libc6-dev-arm64-cross"
         "libcap2-bin"
+        "libi2c-dev"
         "libpam0g-dev"
         "libstdc++6-arm64-cross"
         "libudev-dev"
