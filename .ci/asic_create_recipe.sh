@@ -33,6 +33,10 @@ From: ${DOCKER_BASE_IMAGE}
 
     yum -y install vim-minimal unzip tar rsync SDL-devel autoconf automake bc bison bzip2 chrpath gcc gcc-c++ gdb cups-client dos2unix ed file flex freetype git glib2-devel glibc-devel ksh less libICE libSM libX11-devel libXau-devel libXdamage-devel libXext-devel libXfixes-devel libXrandr libXrender-devel libstdc++-devel lsof m4 make mailx ncurses-devel openssl-devel openssh patch perl psmisc redhat-lsb-core screen socat spax strace sysvinit-tools tcl glibc.i686 diffstat fontconfig gpm-libs libXScrnSaver libXaw libXdmcp libXfont2 libXft libXi libXmu libXpm libXt libXtst libgcc libfontenc libstdc++.i686 libtool libuuid-devel libxkbfile net-tools pax perl-libintl perl-Text-Unidecode pixman python3 python3-pip python3-setuptools qemu-guest-agent tcsh texinfo uuid-devel wget which xkeyboard-config xorg-x11-xauth xorg-x11-xkb-utils xterm xorg-x11-server-Xvfb environment-modules
 
+    # VK introduced jq into build flow
+    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    yum -y install jq
+
     # ECM: people (YS) just need pylint, etc. (upgrade to spack if more is needed)
     wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh
     bash Miniconda3-py38_4.8.3-Linux-x86_64.sh -b -p /opt/conda
