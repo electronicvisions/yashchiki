@@ -102,7 +102,7 @@ expose() {
 
     # add latest symlink to latest container by name
     local latest
-    latest=$(ls -1 ${CONTAINER_PUBLIC} | grep -v "latest\.img" | tail -n 1)
+    latest=$(ls -1 ${CONTAINER_PUBLIC} | grep "\.img$" | grep -v "latest\.img" | tail -n 1)
     ln -sfv "${latest}" "${CONTAINER_PUBLIC}/latest.img"
 }
 
