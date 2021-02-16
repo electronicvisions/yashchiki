@@ -42,7 +42,7 @@ have no real dependency on one another, we misuse the `Depends-On`
 mechanism in the commit message to build a container with a specific
 spack and yashchiki changeset.
 
-This changeset adds the possibility to specify:
+You can use:
 * `WITH_SPACK_CHANGE=<change-num>` to use the latest patch set of the
   given spack changeset for the build
 * `WITH_SPACK_REFSPEC=<refspec>` to specify a complete spack refspec
