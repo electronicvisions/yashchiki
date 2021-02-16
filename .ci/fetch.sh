@@ -17,8 +17,28 @@ export MY_SPACK_FOLDER="$PWD/spack"
 export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
 ${MY_SPACK_BIN} mirror rm --scope site global
 
-# add system compiler (needed for fetching)
-${MY_SPACK_BIN} compiler add --scope site /usr/bin
+PATH_COMPILERS="${PWD}/spack/etc/spack/compilers.yaml"
+
+# Add fake system compiler (needed for fetching)
+# This is NOT the correct version but we need to concretize with the same
+# version as we intend to build.
+# TODO: Spack needs to support concretizing with non-existent compiler.
+cat >"${PATH_COMPILERS}" <<EOF
+compilers:
+- compiler:
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    operating_system: $(${MY_SPACK_BIN} arch -o)
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+    flags: {}
+    spec: ${VISIONARY_GCC}
+EOF
 
 # Need KIP proxy to fetch all the packages (also needed in container due to pip)
 export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
@@ -148,5 +168,8 @@ if (( fetch_failed != 0 )); then
     exit 1
 fi
 
+echo
+
 # remove f***ing compiler config
-rm ${PWD}/spack/etc/spack/compilers.yaml
+[ -f "${PATH_COMPILERS}" ] && rm "${PATH_COMPILERS}"
+
