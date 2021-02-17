@@ -3,10 +3,10 @@
 SOURCE_FOLDER="utils"
 
 TARGET_FOLDER="/containers/utils"
-NAME_FILTER="*.sh"
+NAME_FILTER=( "(" -name "*.py" -or -name "*.sh" ")" )
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-    find "${TARGET_FOLDER}" -name "${NAME_FILTER}" -delete
-    find "${SOURCE_FOLDER}" -name "${NAME_FILTER}" -print0 \
+    find "${TARGET_FOLDER}" "${NAME_FILTER[@]}" -delete
+    find "${SOURCE_FOLDER}" "${NAME_FILTER[@]}" -print0 \
         | xargs -n 1 -0 "$(git rev-parse --show-toplevel)/.ci/deploy_utility_with_preamble.sh" "${TARGET_FOLDER}"
 fi
