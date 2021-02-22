@@ -64,5 +64,6 @@ py-wcwidth@0.1.7
 py-yccp@0.5.0
 py-yq@2.7.2
 py-pyzmq@18.1.0
+py-jupyter-client@5.3.4
 openmpi  # needed because otherwise there will be an error regarding spectrum-mpi
 tensorflow@1.13.1
