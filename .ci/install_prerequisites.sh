@@ -25,8 +25,6 @@ prerequisites=(
     "patch"
     "patchelf"
     "procps"
-    "python"
-    "python-yaml"
     "python3"
     "python3-yaml"
     "rsync"

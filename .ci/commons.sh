@@ -639,7 +639,7 @@ get_latest_hash() {
   # insert compiler name into spec name at appropriate position (i.e., prior to
   # specifying any variants)
   # \$1 is the hash, \$2 is the spec
-  idx = match(\$2, /(\\+|\\~|$)/);
+  idx = match(\$2, /(\\+|~|$)/);
   printf("%s%%%s%s /%s\\n", substr(\$2, 0, idx-1), compiler, substr(\$2, idx), \$1)
 }
 EOF
