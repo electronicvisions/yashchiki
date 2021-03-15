@@ -6,6 +6,7 @@ py-cloudpickle@0.5.2
 py-configparser@3.5.1
 py-cpuinfo@0.2.3
 py-dask@1.1.2
+py-distributed@1.28.1
 py-doxypypy@0.8.8.6
 py-enum34@1.1.6
 py-functools32@3.2.3-2
