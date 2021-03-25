@@ -53,7 +53,7 @@ if (( build_num > 0 )) && \
     find "${BUILD_CACHE_OUTSIDE}" -name "*.tar.gz" -print0 | link_into_failed_buildcache
 
     # echo created failed buildcache
-    echo "${failed_build_cache#${BASE_BUILD_CACHE_OUTSIDE}}"
+    echo "${failed_build_cache#${BASE_BUILD_CACHE_OUTSIDE}/}"
 else
     echo "<no preserved packages found>"
 fi
