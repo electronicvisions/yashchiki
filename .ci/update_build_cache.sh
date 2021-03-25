@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 # only update build cache for stable builds
 if [ "${CONTAINER_BUILD_TYPE:-}" != "stable" ]; then

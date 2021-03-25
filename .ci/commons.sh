@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 JENKINS_ENV_FILE_INSIDE="/tmp/spack/jenkins.env"
 if [ -n "${WORKSPACE:-}" ]; then

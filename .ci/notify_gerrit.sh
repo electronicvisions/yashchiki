@@ -9,6 +9,7 @@
 #
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 if ! [ "${CONTAINER_BUILD_TYPE:-}" = "testing" ]; then
     exit 0

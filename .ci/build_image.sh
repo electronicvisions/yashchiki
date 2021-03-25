@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 if (( $(find sandboxes -mindepth 1 -maxdepth 1 | wc -l) > 1 )); then
     echo "More than one sandbox found, this should never happen!" >&2

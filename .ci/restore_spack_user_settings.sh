@@ -5,6 +5,7 @@
 #
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/commons.sh"

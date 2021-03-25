@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 # Usage:
 #   get_jenkins_env.sh <variable-name>

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 # NOTE: stdout of this script is parsed within the Jenkinsfile.
 #       Think twice before adding any output!

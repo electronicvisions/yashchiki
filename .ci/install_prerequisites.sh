@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 # This file is to install all packages that are a pre-requisite for spack to be
 # installed.

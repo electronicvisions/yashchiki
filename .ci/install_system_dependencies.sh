@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+shopt -s inherit_errexit
 
 # This file is to install all packages needed from apt that are not required by
 # spack in order to bootstrap itself.

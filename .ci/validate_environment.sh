@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+shopt -s inherit_errexit
 
 #
 # Some early checks to make sure all needed environment variables are defined.
