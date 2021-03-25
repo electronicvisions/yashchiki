@@ -13,6 +13,9 @@ source "${sourcedir}/setup_env_spack.sh"
 
 # rebuild all modules
 ${MY_SPACK_BIN} module tcl refresh -y
+# remove the generated cache again to avoid permission problems in the final
+# container
+${MY_SPACK_BIN} clean --misc-cache
 
 # non-spack user/group shall be allowed to read/execute everything we installed here
 chmod -R o+rX "${MY_SPACK_VIEW_PREFIX}"

@@ -131,9 +131,7 @@ pipeline {
 				}
 				cleanup {
 					archiveArtifacts "jenkins.env"
-					script {
-						cleanupSteps()
-					}
+					archiveArtifacts "out_singularity_build_visionary_recipe.txt"
 				}
 			}
 		}

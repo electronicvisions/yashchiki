@@ -215,7 +215,6 @@ spack_packages=(
 # occur if target is specified too far back in the string.
 # --obreitwi, 21-10-19 14:33:45
 PINNED_TARGET="sandybridge"
-spack_packages=( "${spack_packages[@]/ / target=${PINNED_TARGET} }" )
 
 # Control verbosity etc of commands
 SPACK_ARGS_INSTALL=()
@@ -515,7 +514,7 @@ get_specfiles() {
     for sf in "${specfiles[@]}"; do
         if grep broadwell "${sf}" >/dev/null; then
             {
-                echo "Found target broadwell in specfile, aborting:"
+                echo "Error: Found target broadwell in specfile. This is incompatible with our AMTHost machines, aborting:"
                 head -n 10 "${sf}"
             } >&2
             exit 1

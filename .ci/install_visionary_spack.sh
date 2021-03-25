@@ -101,6 +101,3 @@ umask ${OLD_UMASK}
 # which is independent of any app. Especially, this allows custom loading of
 # modules within the container.
 ln -s "$(${MY_SPACK_BIN} location -i zsh)/bin/zsh" /opt/shell/zsh
-
-# remove temporary cache folder
-rm -rfv /opt/spack/.spack

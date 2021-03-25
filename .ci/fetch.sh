@@ -16,7 +16,6 @@ find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
 # set download mirror stuff to prefill outside of container
 export MY_SPACK_FOLDER="$PWD/spack"
 export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
-${MY_SPACK_BIN} mirror rm --scope site global
 
 PATH_COMPILERS="${PWD}/spack/etc/spack/compilers.yaml"
 
@@ -79,7 +78,7 @@ ${MY_SPACK_BIN} spec aida >/dev/null
 oldstate="$(shopt -po xtrace)" || true
 
 for package in "${packages_to_fetch[@]}"; do
-    echo "Concretizing ${package} for fetching.." >&2
+    echo "Concretizing ${package:0:30} for fetching.." >&2
     # pause if we have sufficient concretizing jobs
     set +x  # do not clobber build log so much
     while (( $(jobs | wc -l) >= $(nproc) )); do
@@ -173,4 +172,3 @@ echo
 
 # remove f***ing compiler config
 [ -f "${PATH_COMPILERS}" ] && rm "${PATH_COMPILERS}"
-

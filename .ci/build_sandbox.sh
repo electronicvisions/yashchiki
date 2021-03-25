@@ -42,4 +42,4 @@ sudo rm -rf sandboxes/
 mkdir sandboxes
 
 # Do not change: special sudo permit for jenkins user...
-sudo -E singularity build --sandbox "${TARGET_FOLDER}" visionary_recipe.def
+sudo -E singularity build --sandbox "${TARGET_FOLDER}" visionary_recipe.def | tee out_singularity_build_visionary_recipe.txt

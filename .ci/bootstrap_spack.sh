@@ -46,7 +46,6 @@ done
 
 num_packages_pre_boostrap="$(${MY_SPACK_BIN} find 2>&1 | head -n 1 | awk '/installed packages/ { print $2 }')"
 
-${MY_SPACK_BIN} bootstrap -v --no-cache
 
 num_packages_post_boostrap="$(${MY_SPACK_BIN} find 2>&1 | head -n 1 | awk '/installed packages/ { print $2 }')"
 
@@ -68,12 +67,14 @@ system_compilers="$(${MY_SPACK_BIN} compiler list --scope site | grep \@)"
 
 # upgrade to newer gcc
 echo "INSTALL NEW GCC"
+set -x
 ${MY_SPACK_BIN} "${SPACK_ARGS_INSTALL[@]}" install --no-cache --show-log-on-error "${spec_compiler}"
 
-# add fresh compiler to spack
-${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
-
-# remove system compilers from spack (just testing! FIXME!)
+# remove system compilers from spack to avoid conflicting concretization
+echo "$(${MY_SPACK_BIN} compiler list)"
 for system_compiler in ${system_compilers}; do
     ${MY_SPACK_BIN} compiler rm --scope site "${system_compiler}"
 done
+
+# add fresh compiler to spack
+${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
