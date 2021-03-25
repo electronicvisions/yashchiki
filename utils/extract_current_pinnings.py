@@ -6,7 +6,7 @@ import yaml
 import argparse
 
 
-apps = ['wafer', 'dls', 'spikey', 'simulation', 'slurmviz']
+apps = ['wafer', 'dls', 'simulation', 'slurmviz']
 
 
 for app in apps:

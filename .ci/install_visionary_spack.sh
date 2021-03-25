@@ -53,11 +53,8 @@ cat <<EOF
 # Packages still plagued by gccxml #
 ####################################
 
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey $(get_latest_hash visionary-spikey+dev)
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-spikey-nodev $(get_latest_hash visionary-spikey~dev)
-
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer $(get_latest_hash visionary-wafer+dev+tensorflow~gccxml)
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-nodev $(get_latest_hash visionary-wafer~dev+tensorflow~gccxml)
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer $(get_latest_hash visionary-wafer+dev~gccxml)
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-wafer-nodev $(get_latest_hash visionary-wafer~dev~gccxml)
 
 ##################################################
 # Strong independent packages who need no gccxml #

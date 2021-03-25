@@ -180,30 +180,24 @@ get_pinned_deps() {
 }
 
 # the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dev) %${VISIONARY_GCC}"
 
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
     "visionary-simulation~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
     "visionary-simulation ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
-    "visionary-spikey~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_wout_dev) %${VISIONARY_GCC}"
-    "visionary-spikey ^${DEPENDENCY_PYTHON} $(get_pinned_deps spikey_w_dev) %${VISIONARY_GCC}"
     "visionary-wafer~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
     "visionary-wafer ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
     "visionary-wafer ~dev+gccxml^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer ~dev+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer ~dev+gccxml+tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
     "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer+tensorflow ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer+gccxml +tensorflow^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
     "visionary-wafer-visu ^${DEPENDENCY_PYTHON} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
     # START python 3 packages
     "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${VISIONARY_GCC}"
+    "visionary-dls ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${VISIONARY_GCC}"
+    "py-jupyterhub ^${DEPENDENCY_PYTHON3} $(get_pinned_deps jupyter) %${VISIONARY_GCC}"
+    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} $(get_pinned_deps jupyter) %${VISIONARY_GCC}"
     "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     # END python 3 packages
 )
@@ -250,8 +244,6 @@ spack_views=(\
         visionary-dls-nodev
         visionary-simulation
         visionary-simulation-nodev
-        visionary-spikey
-        visionary-spikey-nodev
         visionary-wafer
         visionary-wafer-nodev
     )
