@@ -24,7 +24,9 @@ CONTAINER_ARCHIVE="/ley/data/containers/archive"
 
 get_images()
 {
-    find ${CONTAINER_PATH} -name "*.img" | grep -v "^${CONTAINER_PATH}/public"
+    find ${CONTAINER_PATH} \
+        \( -type d \( -name public -o -name manual \) -prune -false \) \
+        -o -type f -name "*.img"
 }
 
 get_last_access_reset()
