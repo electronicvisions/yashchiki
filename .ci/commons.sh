@@ -196,19 +196,11 @@ spack_packages=(
     "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "visionary-dls~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${VISIONARY_GCC}"
     "visionary-dls ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${VISIONARY_GCC}"
-    "py-jupyterhub ^${DEPENDENCY_PYTHON3} $(get_pinned_deps jupyter) %${VISIONARY_GCC}"
-    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} $(get_pinned_deps jupyter) %${VISIONARY_GCC}"
+    "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
     # END python 3 packages
 )
-
-# WIP fix to allow all software to run on AMTHosts, more permanent solution is
-# forthcoming.
-# Note: We insert target directly after the package name and variants (i.e.,
-# the first space) in order to deal with concretization errors that sometimes
-# occur if target is specified too far back in the string.
-# --obreitwi, 21-10-19 14:33:45
-PINNED_TARGET="sandybridge"
 
 # Control verbosity etc of commands
 SPACK_ARGS_INSTALL=()

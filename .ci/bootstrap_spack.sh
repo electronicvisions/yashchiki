@@ -59,7 +59,7 @@ echo ""
 fi
 
 # check if it can be specialized
-spec_compiler="${VISIONARY_GCC} target=${PINNED_TARGET}"
+spec_compiler="${VISIONARY_GCC}"
 install_from_buildcache "${spec_compiler}"
 
 # remember system compiler versions (to be removed later)
