@@ -73,6 +73,7 @@ From: ${DOCKER_BASE_IMAGE}
     yum reinstall -y glibc-common
 
     yum -y install \
+        apr-util \
         autoconf \
         automake \
         bc \
@@ -102,6 +103,7 @@ From: ${DOCKER_BASE_IMAGE}
         less \
         libfontenc \
         libgcc \
+        libgfortran \
         libICE \
         libjpeg-turbo \
         libmng \
@@ -123,6 +125,7 @@ From: ${DOCKER_BASE_IMAGE}
         libXi \
         libxkbfile \
         libXmu \
+        libXp \
         libXpm \
         libXrandr \
         libXrender-devel \
@@ -133,8 +136,11 @@ From: ${DOCKER_BASE_IMAGE}
         m4 \
         mailx \
         make \
+        mesa-dri-drivers \
+        motif \
         ncurses-devel \
         net-tools \
+        numactl-libs \
         openssh \
         openssl-devel \
         patch \
@@ -148,7 +154,7 @@ From: ${DOCKER_BASE_IMAGE}
         python3-pip \
         python3-setuptools \
         qemu-guest-agent \
-        redhat-lsb-core \
+        redhat-lsb \
         rsync \
         screen \
         SDL-devel \
@@ -167,6 +173,12 @@ From: ${DOCKER_BASE_IMAGE}
         wget \
         which \
         xkeyboard-config \
+        xorg-x11-fonts-100dpi \
+        xorg-x11-fonts-75dpi \
+        xorg-x11-fonts-ISO8859-1-100dpi \
+        xorg-x11-fonts-ISO8859-1-75dpi \
+        xorg-x11-fonts-misc \
+        xorg-x11-fonts-Type1 \
         xorg-x11-server-Xvfb \
         xorg-x11-xauth \
         xorg-x11-xkb-utils \
