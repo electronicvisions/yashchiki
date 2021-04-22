@@ -41,7 +41,7 @@ From: ${DOCKER_BASE_IMAGE}
     wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh
     bash Miniconda3-py38_4.8.3-Linux-x86_64.sh -b -p /opt/conda
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
-    /opt/conda/bin/conda install -y pylint pycodestyle nose
+    /opt/conda/bin/conda install -y pylint pycodestyle nose pyyaml
 
 %environment
     # NOTE: We provide a MODULESHOME in all cases (otherwise a login shell is
