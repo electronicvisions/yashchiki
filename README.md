@@ -1,6 +1,11 @@
 # Yashchiki
 
-Visionary "containering"…
+Visionary container image build flow.
+This repository contains code and CI configuration files to build a singularity-based container image containing all visionary software dependencies.
+Currently two different images are generated:
+firstly, a standard image for experimenting/modeling, software development and related activities with BrainScaleS and other systems — software is provided by a Spack-based installation process;
+secondly, an *ASIC*-image providing an environment for ASIC-related tools (RTL simulators, etc.).
+The CI flow (via Jenkins) integrates into Gerrit (Code-Review tool) for triggering container image builds as well as software builds based on *testing* container images.
 
 ## Supported keywords in gerrit message
 
