@@ -37,6 +37,9 @@ From: ${DOCKER_BASE_IMAGE}
     yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     yum -y install jq
 
+    # gtest is F9's C++ test framework of choice
+    yum -y install gtest-devel
+
     # ECM: people (YS) just need pylint, etc. (upgrade to spack if more is needed)
     wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh
     bash Miniconda3-py38_4.8.3-Linux-x86_64.sh -b -p /opt/conda
