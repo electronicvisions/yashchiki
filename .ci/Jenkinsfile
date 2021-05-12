@@ -195,6 +195,13 @@ pipeline {
 							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
+				// Visionary lab tools
+				stage('labcontrol') {
+					steps {
+						build(job: 'bld_gerrit_labcontrol_dependencies',
+							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
+					}
+				}
 			}
 			post {
 				success {
