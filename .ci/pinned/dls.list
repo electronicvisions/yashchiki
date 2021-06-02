@@ -1,7 +1,9 @@
 boost@1.73.0
+genpybind@ebrains
 hwloc@1.11.13
+llvm@11.1.0
 openmpi@3.1.6
 py-astroid@2.4.2
-py-llvmlite@0.31.0
-py-numba@0.48.0
-py-torch
+py-llvmlite@0.37.0
+py-numba@0.54.1
+py-torch@1.9.1

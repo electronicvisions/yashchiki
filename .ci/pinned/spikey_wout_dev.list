@@ -24,7 +24,7 @@ gdk-pixbuf@2.31.2
 genpybind@visions
 git-fat-git@2018-08-21
 gobject-introspection@1.56.1
-googletest@2.0.0
+googletest@1.11.0
 gsl@2.5
 gtkplus@2.24.32
 hwloc@1.11.13

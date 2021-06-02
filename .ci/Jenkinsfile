@@ -43,7 +43,7 @@ pipeline {
 				// can be removed as soon as the explicit preferred version
 				// is dropped
 				DEPENDENCY_PYTHON3 = "python@3.8.2"
-				VISIONARY_GCC_VERSION = "10.2.0"
+				VISIONARY_GCC_VERSION = "11.2.0"
 				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
