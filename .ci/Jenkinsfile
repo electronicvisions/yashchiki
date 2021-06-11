@@ -132,6 +132,11 @@ pipeline {
 				cleanup {
 					archiveArtifacts "jenkins.env"
 					archiveArtifacts "out_singularity_build_visionary_recipe.txt"
+					// Clean build artifacts because otherwise the latest build from each jenkins job can take up to 50GB.
+					// 2 executors and 5 Jenkins-Jobs (testing, testing-spack, testing-asic, stable, stable-asic) will slowly but surely eat away memory.
+					script {
+						cleanupSteps()
+					}
 				}
 			}
 		}
