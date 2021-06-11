@@ -56,7 +56,7 @@ fi
 
 message="[$(get_jenkins_env BUILD_URL)] \
 ${container_name:+Change included in container: ${container_name}} \
-${custom_message:- }\
+${custom_message:-} \
 ${result:+${result_type:+${result_type} }Result: ${result}}"
 
 if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
