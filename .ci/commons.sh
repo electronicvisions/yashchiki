@@ -360,9 +360,9 @@ lock_file() {
     local wait_secs=10
     local opts OPTIND OPTARG
 
-    while getopts ":ew:" opts
+    while getopts ":ew:" opt
     do
-        case $opt in
+        case "${opt}" in
             e) exclusive=1 ;;
             w) wait_secs="${OPTARG}" ;;
             *) echo -e "Invalid option to lock_file(): $OPTARG\n" >&2; exit 1 ;;
