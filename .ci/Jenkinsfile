@@ -178,6 +178,12 @@ pipeline {
 						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
 					}
 				}
+				stage('documentation-brainscales2') {
+					steps {
+						build(job: 'doc_gerrit_documentation-brainscales2-dependencies',
+						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
+					}
+				}
 
 				// HDBIOAI project code
 				stage('HDBIOAI project') {
