@@ -12,24 +12,46 @@ else
 fi
 
 # Usage:
-#   get_jenkins_env <variable-name>
+#   get_jenkins_env <variable-name> [<default>]
 #
 # Get <variable-name> from the jenkins environment dumped at the start of the
 # jenkins job.  If the jenkins environment was not dumped at the beginning of
 # the jenkins job, the regular environment is taken.
 #
-# If the variable is not found, return 1.
+# If the variable is not found and no default value is specified, return 1.
 get_jenkins_env() {
     # match on variable name at the beginning of line and then delete everyting
     # up to and including the first equal sign
-    {
+    local default default_specified name
+    if (( $# < 0 )); then
+        echo "ERR: Did not specify variable name to query from jenkins env.">&2
+        return 1
+    else
+        name="$1"
+    fi
+
+    if (( $# > 1 )); then
+        default="$2"
+        default_specified=1
+    else
+        default=""
+        default_specified=0
+    fi
+
+    if ! {
         if [ -f "${JENKINS_ENV_FILE}" ]; then
-            cat ${JENKINS_ENV_FILE}
+            cat "${JENKINS_ENV_FILE}"
         else
             env
         fi
-    } | grep "^$*=" | sed -e "s:[^=]*=::" \
-    || ( echo "Variable not found in environment: $*" >&2; return 1 )
+    } | grep "^${name}=" | sed -e "s:^[^=]*=::"; then
+        if (( default_specified )); then
+            echo "${default}"
+        else
+            echo "Variable not found in environment: ${name}" >&2
+            return 1
+        fi
+    fi
 }
 
 # Get the _{INSIDE,OUTSIDE} variant of a variable based in whether we are in a
@@ -52,7 +74,7 @@ get_var_in_out() {
 
 set_debug_output_from_env() {
     # Enable debug if YASHCHIKI_DEBUG is NOT (-n) empty string
-    if [ -n "$(get_jenkins_env YASHCHIKI_DEBUG)" ]; then
+    if [ -n "$(get_jenkins_env YASHCHIKI_DEBUG "")" ]; then
         set -x
     else
         set +x
@@ -66,10 +88,7 @@ export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 export LOCK_FILENAME=lock
 
-BUILD_CACHE_NAME="$(get_jenkins_env BUILD_CACHE_NAME)"
-if [ -z "${BUILD_CACHE_NAME:-}" ]; then
-    BUILD_CACHE_NAME=visionary_manual
-fi
+BUILD_CACHE_NAME="$(get_jenkins_env BUILD_CACHE_NAME visionary_manual)"
 export BUILD_CACHE_NAME
 
 # NOTE: build caches contain relavite symlinks to preserved_packages, so the
@@ -665,7 +684,7 @@ EOF
 
 # Get gerrit username
 gerrit_username() {
-    get_jenkins_env "GERRIT_USERNAME" 2>/dev/null || echo "hudson"
+    get_jenkins_env GERRIT_USERNAME hudson
 }
 
 # Read the current gerrit config from `.gitreview` into global variables:
