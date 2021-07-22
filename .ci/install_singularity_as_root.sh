@@ -9,7 +9,7 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/commons.sh"
 source "${sourcedir}/setup_env_spack.sh"
 SINGULARITY_REPO="https://github.com/electronicvisions/singularity.git"
-SINGULARITY_BRANCH="bugfix/express_delivery_for_sschmitt"  # temporary branch with hotfixes for sschmitt
+SINGULARITY_BRANCH="bugfix/for_EINCHosts"  # temporary branch with hotfixes for sschmitt as well as newer kernels
 
 GO_INSTALL_PATH=/opt/go
 GO_VERSION=1.11.5
