@@ -336,7 +336,7 @@ parallel_cmds() {
     done
     shift $(( OPTIND - 1 ))
 
-    grep -v "^\(#\|[[:space:]]*$\)" "${@}" | parallel -j "${num_jobs}"
+    grep -v "^\(#\|[[:space:]]*$\)" "${@}" | parallel -r -j "${num_jobs}"
 }
 
 populate_views() {
@@ -446,7 +446,7 @@ get_hashes_in_buildcache() {
     if [ -d "${buildcache_dir}" ]; then
         # Naming scheme in the build_cache is <checksum>.tar.gz -> extract from full path
         ( find "${buildcache_dir}" -name "*.tar.gz" -mindepth 1 -maxdepth 1 -print0 \
-            | xargs -0 -n 1 basename \
+            | xargs -r -0 -n 1 basename \
             | sed -e "s:\.tar\.gz$::g" \
 	    | sort >"${resultsfile}") || /bin/true
     fi
@@ -512,7 +512,7 @@ get_specfiles() {
         fi
         idx=$((idx + 1))
     done
-    ) | parallel -j$(nproc) 1>/dev/null
+    ) | parallel -r -j$(nproc) 1>/dev/null
 
     # TODO: DELME
     for sf in "${specfiles[@]}"; do
@@ -580,7 +580,7 @@ _install_from_buildcache() {
     local toplevel_dirs
     mapfile -t toplevel_dirs < <(parallel -j "$(nproc)" \
         "bash -c 'tar Ptf ${BUILD_CACHE_INSIDE}/{}.tar.gz | head -n 1'" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" \
-        | xargs dirname | sort | uniq )
+        | xargs -r dirname | sort | uniq )
 
     # ensure all toplevel directories exist
     for dir in "${toplevel_dirs[@]+"${toplevel_dirs[@]}"}"; do
@@ -605,7 +605,7 @@ get_latest_failed_build_cache_name() {
     possible_build_caches="$(mktemp)"
 
     find "${BASE_BUILD_CACHE_FAILED_OUTSIDE}" -mindepth 1 -maxdepth 1 -type d -name "${change_num}*" -print0 \
-        | xargs -n 1 -r -0 basename > "${possible_build_caches}"
+        | xargs -r -n 1 -r -0 basename > "${possible_build_caches}"
 
     if (( $(wc -l <"${possible_build_caches}") == 0 )); then
         return 0

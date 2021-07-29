@@ -11,7 +11,7 @@ source "${SOURCE_DIR}/commons.sh"
 # cache, so we switch from $HOME/download_cache to $HOME/source_cache
 mkdir -p "${PWD}/spack/var/spack/cache/"
 find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
-    | xargs -n 1 "-I{}" -0 cp -vrl '{}' "${PWD}/spack/var/spack/cache/"
+    | xargs -r -n 1 "-I{}" -0 cp -vrl '{}' "${PWD}/spack/var/spack/cache/"
 
 # set download mirror stuff to prefill outside of container
 export MY_SPACK_FOLDER="$PWD/spack"

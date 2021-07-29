@@ -29,7 +29,7 @@ EOF
 (echo; echo) >> "${TARGET}"
 
 cat <<EOF >> "${TARGET}"
-source "${PATH_MODULES}/\$(readlink -f /proc/\$\$/exe | xargs basename)"
+source "${PATH_MODULES}/\$(readlink -f /proc/\$\$/exe | xargs -r basename)"
 EOF
 
 # Provide MODULESHOME for all singularity environments
