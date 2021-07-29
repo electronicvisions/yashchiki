@@ -149,7 +149,7 @@ if [[ ! -v _yashchiki_exit_fns[@] ]]; then
     _yashchiki_exit_fns=()
 
     _yashchiki_exit_trap() {
-        for fn in "${_yashchiki_exit_fns[@]}"; do
+        for fn in "${_yashchiki_exit_fns[@]+"${_yashchiki_exit_fns[@]}"}"; do
             eval "${fn}"
         done
     }
@@ -282,11 +282,11 @@ done | tr '\n' ' '
 # (defined above)
 spack_add_to_view_with_dependencies["${VISIONARY_GCC}"]="no"
 spack_add_to_view["${VISIONARY_GCC}"]="$(
-    for viewname in "${spack_views[@]}"; do
+    for viewname in "${spack_views[@]+"${spack_views[@]}"}"; do
         # check if the current view matches any view that does not get the
         # default gcc
         # Note: Currently this allow partial matches
-        if printf "%s\n" "${spack_views_no_default_gcc[@]}" \
+        if printf "%s\n" "${spack_views_no_default_gcc[@]+"${spack_views_no_default_gcc[@]}"}" \
                 | grep -qF "${viewname}"; then
             continue
         fi
@@ -349,7 +349,7 @@ populate_views() {
         local dependencies="${spack_add_to_view_with_dependencies["${addition}"]}"
         {
             for viewname in ${spack_add_to_view["${addition}"]}; do
-                echo "${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[*]} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
+                echo "${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[*]+"${SPACK_ARGS_VIEW[*]}"} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
             done
         } | parallel_cmds
     done
@@ -583,7 +583,7 @@ _install_from_buildcache() {
         | xargs dirname | sort | uniq )
 
     # ensure all toplevel directories exist
-    for dir in "${toplevel_dirs[@]}"; do
+    for dir in "${toplevel_dirs[@]+"${toplevel_dirs[@]}"}"; do
         [ ! -d "${dir}" ] && mkdir -p "${dir}"
     done
 
@@ -591,7 +591,7 @@ _install_from_buildcache() {
         < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
 
     # have spack reindex its install contents to find the new packages
-    ${MY_SPACK_BIN} "${SPACK_ARGS_REINDEX[@]}" reindex
+    ${MY_SPACK_BIN} "${SPACK_ARGS_REINDEX[@]+"${SPACK_ARGS_REINDEX[@]}"}" reindex
 }
 
 get_latest_failed_build_cache_name() {
