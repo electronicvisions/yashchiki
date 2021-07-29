@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
-shopt -s inherit_errexit
+shopt -s inherit_errexit 2>/dev/null || true
 
 # This script searches the environment-modules install folder for the init
 # folder which contains the init scripts for a variety of shells.

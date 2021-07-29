@@ -7,7 +7,7 @@
 #
 
 set -euo pipefail
-shopt -s inherit_errexit
+shopt -s inherit_errexit 2>/dev/null || true
 
 usage() { cat  1>&2 <<EOF
 Usage: ${0} [-c <base-cache>] [-d <destination-folder>]

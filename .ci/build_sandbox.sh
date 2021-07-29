@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
-shopt -s inherit_errexit
+shopt -s inherit_errexit 2>/dev/null || true
 
 # set generic locale for building
 export LANG=C.UTF-8

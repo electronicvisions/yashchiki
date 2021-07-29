@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
-shopt -s inherit_errexit
+shopt -s inherit_errexit 2>/dev/null || true
 
 # inside the container the tmpdir is mounted to /tmp/spack
 export SPACK_TMPDIR="/tmp/spack"
