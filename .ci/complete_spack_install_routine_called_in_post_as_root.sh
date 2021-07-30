@@ -11,7 +11,7 @@ shopt -s inherit_errexit 2>/dev/null || true
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
-"${SPACK_INSTALL_SCRIPTS}/${CONTAINER_PREFIX}_prepare_spack_as_root.sh"
+"${SPACK_INSTALL_SCRIPTS}/prepare_spack_as_root.sh"
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/bootstrap_spack.sh"
 
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_spack.sh" && \
@@ -20,7 +20,7 @@ sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings.sh" && \
 # remove temporary cache folder
 rm -rfv /opt/spack/.spack
 
-"${SPACK_INSTALL_SCRIPTS}/${CONTAINER_PREFIX}_restore_spack_user_settings_as_root.sh" && \
+"${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings_as_root.sh" && \
 "${SPACK_INSTALL_SCRIPTS}/generate_modules.sh" || \
 (
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&

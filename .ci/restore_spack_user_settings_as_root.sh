@@ -12,4 +12,4 @@ source "${sourcedir}/commons.sh"
 
 # shrink image: remove download cache (owned by vis_jenkins)
 rm -rf "${MY_SPACK_FOLDER}"/var/spack/cache/*
-chown spack:nogroup "${MY_SPACK_FOLDER}"/var/spack/cache
+chown spack:$spack_gid "${MY_SPACK_FOLDER}"/var/spack/cache
