@@ -14,12 +14,12 @@ unset LC_NUMERIC
 unset LC_TIME
 unset LC_MESSAGES
 
-echo "creating visionary_recipe.def" >&2
+echo "creating ${CONTAINER_STYLE}_recipe.def" >&2
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-"${SOURCE_DIR}/create_visionary_recipe.sh"
+"${SOURCE_DIR}/${CONTAINER_STYLE}_create_recipe.sh"
 
-echo "created visionary_recipe.def" >&2
-cat "${WORKSPACE}/visionary_recipe.def"
+echo "created ${CONTAINER_STYLE}_recipe.def" >&2
+cat "${WORKSPACE}/${CONTAINER_STYLE}_recipe.def"
 
 # create some jenkins-owned temp folder for spack build
 if [ ! -d "${JOB_TMP_SPACK}" ]; then
@@ -34,7 +34,7 @@ chmod 777 "${JOB_TMP_SPACK}"
 export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
 export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
-TARGET_FOLDER="sandboxes/buster_spack"
+TARGET_FOLDER="sandboxes/${CONTAINER_STYLE}"
 
 # Do not change: special sudo permit for jenkins user...
 sudo rm -rf sandboxes/
@@ -42,4 +42,4 @@ sudo rm -rf sandboxes/
 mkdir sandboxes
 
 # Do not change: special sudo permit for jenkins user...
-sudo -E singularity build --sandbox "${TARGET_FOLDER}" visionary_recipe.def | tee out_singularity_build_visionary_recipe.txt
+sudo -E singularity build --sandbox "${TARGET_FOLDER}" ${CONTAINER_STYLE}_recipe.def | tee out_singularity_build_${CONTAINER_STYLE}_recipe.txt

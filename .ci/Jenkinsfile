@@ -27,6 +27,10 @@ pipeline {
 			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
 	}
 
+	environment {
+		CONTAINER_STYLE = "visionary"
+	}
+
 	stages {
 		stage('Container Build') {
 			agent { label 'conviz1||conviz2' }
@@ -43,7 +47,7 @@ pipeline {
 				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
-								   returnStdout: true).trim()
+				                   returnStdout: true).trim()
 				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
@@ -98,7 +102,7 @@ pipeline {
 				}
 				stage('Create visionary recipe') {
 					steps {
-						sh ".ci/create_visionary_recipe.sh"
+						sh ".ci/visionary_create_recipe.sh"
 					}
 				}
 				stage('Build sandbox') {

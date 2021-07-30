@@ -11,7 +11,7 @@ fi
 TARGET_FOLDER="$(find sandboxes -mindepth 1 -maxdepth 1)"
 
 # create image file
-IMAGE_NAME=singularity_spack_temp.img
+IMAGE_NAME=singularity_${CONTAINER_STYLE}_temp.img
 
 # We want the spack folder to be available inside the container image
 # -> it needs to be bind mounted to the sandbox folder
@@ -22,9 +22,9 @@ sudo singularity build ${IMAGE_NAME} "${TARGET_FOLDER}"
 # umount spack folder afterwards
 sudo umount "${TARGET_FOLDER}/opt/spack"
 
-sudo chown -R vis_jenkins singularity_spack_*.img
+sudo chown -R vis_jenkins singularity_${CONTAINER_STYLE}_*.img
 
 if [[ "${CONTAINER_BUILD_TYPE}" =~ "^stable$" ]]; then
     # allow spack user to execute image
-    chmod +rx singularity_spack_*.img
+    chmod +rx singularity_${CONTAINER_STYLE}_*.img
 fi

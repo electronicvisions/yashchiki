@@ -58,23 +58,25 @@ echo ""
     exit 1
 fi
 
-# check if it can be specialized
-spec_compiler="${VISIONARY_GCC}"
-install_from_buildcache "${spec_compiler}"
+if [ "${CONTAINER_STYLE}" = "visionary" ]; then
+    # check if it can be specialized
+    spec_compiler="${VISIONARY_GCC}"
+    install_from_buildcache "${spec_compiler}"
 
-# remember system compiler versions (to be removed later)
-system_compilers="$(${MY_SPACK_BIN} compiler list --scope site | grep \@)"
+    # remember system compiler versions (to be removed later)
+    system_compilers="$(${MY_SPACK_BIN} compiler list --scope site | grep \@)"
 
-# upgrade to newer gcc
-echo "INSTALL NEW GCC"
-set -x
-${MY_SPACK_BIN} "${SPACK_ARGS_INSTALL[@]}" install --no-cache --show-log-on-error "${spec_compiler}"
+    # upgrade to newer gcc
+    echo "INSTALL NEW GCC"
+    set -x
+    ${MY_SPACK_BIN} "${SPACK_ARGS_INSTALL[@]}" install --no-cache --show-log-on-error "${spec_compiler}"
 
-# remove system compilers from spack to avoid conflicting concretization
-echo "$(${MY_SPACK_BIN} compiler list)"
-for system_compiler in ${system_compilers}; do
-    ${MY_SPACK_BIN} compiler rm --scope site "${system_compiler}"
-done
+    # remove system compilers from spack to avoid conflicting concretization
+    echo "$(${MY_SPACK_BIN} compiler list)"
+    for system_compiler in ${system_compilers}; do
+        ${MY_SPACK_BIN} compiler rm --scope site "${system_compiler}"
+    done
 
-# add fresh compiler to spack
-${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
+    # add fresh compiler to spack
+    ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
+fi

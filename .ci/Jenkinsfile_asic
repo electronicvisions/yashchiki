@@ -16,6 +16,10 @@ pipeline {
 		skipDefaultCheckout()
 	}
 
+	environment {
+		CONTAINER_STYLE = "asic"
+	}
+
 	stages {
 		stage('Container Build') {
 			agent { label 'conviz1||conviz2' }
@@ -24,6 +28,7 @@ pipeline {
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
 				                   returnStdout: true).trim()
+				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
 				stage('Pre-build Cleanup') {
@@ -46,19 +51,19 @@ pipeline {
 				}
 				stage('Build sandbox') {
 					steps {
-						sh ".ci/asic_build_sandbox.sh"
+						sh ".ci/build_sandbox.sh"
 					}
 				}
 				stage('Build container image') {
 					steps {
-						sh ".ci/asic_build_image.sh"
+						sh ".ci/build_image.sh"
 					}
 				}
 				stage('Update build cache and export container') {
 					steps {
 						script {
 							// we only want the container name, tail everything else
-							CONTAINER_NAME = sh(script: ".ci/asic_deploy_container.sh | tail -n 1", returnStdout: true).trim()
+							CONTAINER_IMAGE = sh(script: ".ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
 					}
 				}

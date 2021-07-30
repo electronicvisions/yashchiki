@@ -11,16 +11,22 @@ source "${SOURCE_DIR}/commons.sh"
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
 FALLBACK_DIR="${HOME}/container_mount_full"
-IMAGE_NAME="singularity_spack_temp.img"
+IMAGE_NAME="singularity_${CONTAINER_STYLE}_temp.img"
 DATE=$(date --iso)
+
+declare -A CONTAINER_PREFIX_LUT
+CONTAINER_PREFIX_LUT[visionary]=""
+CONTAINER_PREFIX_LUT[asic]="asic"
+
+CONTAINER_PREFIX=${CONTAINER_PREFIX_LUT[$CONTAINER_STYLE]}
 
 get_container_name()
 {
     local local_num="$1"
     if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
-        echo -n "${INSTALL_DIR}/$(get_change_name)_${DATE}_${local_num}.img"
+        echo -n "${INSTALL_DIR}/${CONTAINER_PREFIX}${CONTAINER_PREFIX:+_}$(get_change_name)_${DATE}_${local_num}.img"
     else
-        echo -n "${INSTALL_DIR}/${DATE}_${local_num}.img"
+        echo -n "${INSTALL_DIR}/${CONTAINER_PREFIX}${CONTAINER_PREFIX:+_}${DATE}_${local_num}.img"
     fi
 }
 
@@ -43,7 +49,7 @@ cp "${IMAGE_NAME}" "${CONTAINER_NAME}" || (
 )
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-    ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/latest
+    ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/${CONTAINER_PREFIX}${CONTAINER_PREFIX:+_}latest
 
     # Announce new container in "Building & Deployment" channel
     # Since the output of this script is used in other parts, we have to hide curl's output
@@ -51,7 +57,7 @@ if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
     curl -i -X POST -H 'Content-Type: application/json' \
-        -d "{\"text\": \"@channel New stable container built: \`${CONTAINER_NAME}\`\"}" \
+        -d "{\"text\": \"@channel New stable ${CONTAINER_PREFIX} container built: \`${CONTAINER_NAME}\`\"}" \
         https://chat.bioai.eu/hooks/iuhwp9k3h38c3d98uhwh5fxe9h &>/dev/null
 
     # extract dna
