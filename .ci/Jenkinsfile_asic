@@ -6,6 +6,11 @@ Closure cleanupSteps = {
 	sh "sudo /bin/rm -rf \"${WORKSPACE}/sandboxes/\" || exit 0"
 	// remove tmp (not only for spack)
 	sh "sudo /bin/rm -rf \"/tmp/${NODE_NAME}/\""
+	// the spack repository gets bind mounted into the sandbox and owned by
+	// spack user during build -> revert prior to cleaning worksapce
+	sh "[ -d \"$WORKSPACE/spack\" ] && sudo chown -R vis_jenkins \"$WORKSPACE/spack\" || true"
+	cleanWs(patterns: [[pattern: 'download_cache/', type: 'EXCLUDE']],
+	        deleteDirs: true)
 }
 
 pipeline {
@@ -14,6 +19,12 @@ pipeline {
 	options {
 		timestamps()
 		skipDefaultCheckout()
+	}
+
+	parameters {
+		string(name: 'BUILD_CACHE_NAME',
+			   defaultValue: 'asic_init_from_2021-06-18_1',
+			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
 	}
 
 	environment {
@@ -25,6 +36,11 @@ pipeline {
 			agent { label 'conviz1||conviz2' }
 			environment {
 				DOCKER_BASE_IMAGE = "centos:7"
+				// versions from system packages
+				DEPENDENCY_PYTHON = "python@2.7.5"
+				DEPENDENCY_PYTHON3 = "python@3.6.8"
+				VISIONARY_GCC_VERSION = "4.8.5"
+				VISIONARY_GCC = "gcc@${VISIONARY_GCC_VERSION}"
 				TMPDIR = "/tmp/${env.NODE_NAME}"
 				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
 				                   returnStdout: true).trim()
@@ -42,6 +58,42 @@ pipeline {
 				stage('yashchiki Checkout') {
 					steps {
 						checkout scm
+					}
+				}
+				stage('Validate environment') {
+					steps {
+						sh ".ci/validate_environment.sh"
+					}
+				}
+				stage('Spack Clone') {
+					steps {
+						sh ".ci/clone.sh"
+					}
+				}
+				stage('Dump Meta Info') {
+					steps {
+						sh ".ci/dump_meta_info.sh"
+						sh ".ci/notify_gerrit.sh -m 'Build containing this change started..'"
+					}
+				}
+				stage('Spack Fetch') {
+					steps {
+						script {
+							try {
+								sh ".ci/fetch.sh"
+							}
+							catch (Throwable t) {
+								archiveArtifacts "errors_concretization.log"
+								throw t
+							}
+							spec_folder_in_container = sh(script: ".ci/get_jenkins_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
+							archiveArtifacts(artifacts: "sandboxes/*/$spec_folder_in_container/*.yaml", allowEmptyArchive: true)
+						}
+					}
+				}
+				stage('Deploy utilities') {
+					steps {
+						sh ".ci/deploy_utilities.sh"
 					}
 				}
 				stage('Create asic recipe') {
@@ -65,6 +117,25 @@ pipeline {
 							// we only want the container name, tail everything else
 							CONTAINER_IMAGE = sh(script: ".ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
+						sh ".ci/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
+						sh ".ci/notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
+					}
+				}
+			}
+			post {
+				failure {
+					script {
+						cache_failed = sh(script: ".ci/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
+					}
+					sh ".ci/notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
+				}
+				cleanup {
+					archiveArtifacts "jenkins.env"
+					archiveArtifacts "out_singularity_build_asic_recipe.txt"
+					// Clean build artifacts because otherwise the latest build from each jenkins job can take up to 50GB.
+					// 2 executors and 5 Jenkins-Jobs (testing, testing-spack, testing-asic, stable, stable-asic) will slowly but surely eat away memory.
+					script {
+						cleanupSteps()
 					}
 				}
 			}
@@ -77,7 +148,7 @@ pipeline {
 					steps {
 						build(job: 'bld_gerrit_tools-xilinx_dependencies',
 						      parameters: [string(name: 'OVERWRITE_DEFAULT_ASIC_CONTAINER_IMAGE',
-						                          value: CONTAINER_NAME)])
+						                          value: CONTAINER_IMAGE)])
 					}
 				}
 			}
