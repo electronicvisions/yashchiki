@@ -255,6 +255,7 @@ spack_views=(\
         visionary-dls-nodev
         visionary-simulation
         visionary-simulation-nodev
+        visionary-slurmviz
         visionary-wafer
         visionary-wafer-nodev
     )
