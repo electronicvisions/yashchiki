@@ -32,9 +32,6 @@ add_cleanup_step rm_tmp_modules
 source "${TMP_MODULES}"
 # --------- 8< ---------- 8< -------- 8< ---------
 
-# don't use spack, build against debian
-apt-get install -y libssl-dev uuid-dev
-
 if [ ! -d "${GO_INSTALL_PATH}" ]; then
     mkdir -p "${GO_INSTALL_PATH}"
 fi
