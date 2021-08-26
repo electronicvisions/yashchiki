@@ -12,7 +12,7 @@ SINGULARITY_REPO="https://github.com/electronicvisions/singularity.git"
 SINGULARITY_BRANCH="bugfix/for_EINCHosts"  # temporary branch with hotfixes for sschmitt as well as newer kernels
 
 GO_INSTALL_PATH=/opt/go
-GO_VERSION=1.11.5
+GO_VERSION=1.17
 OS=linux
 ARCH=amd64
 
@@ -58,7 +58,8 @@ if [ ! -d "${GOPATH}}" ]; then
 fi
 
 # build singularity
-# golang is a bit finicky about where things are placed. Here is the correct way to build Singularity from source.
+# this is a go 1.11-based install flow which probably should be adjusted for
+# modern go (no need to build from source within the gopath folder anymore)
 SINGULARITY_INSTALL_PATH="${GOPATH}/src/github.com/sylabs/singularity"
 mkdir -p "${SINGULARITY_INSTALL_PATH}/../"
 git clone -b "${SINGULARITY_BRANCH}" \
@@ -72,7 +73,7 @@ pushd "${SINGULARITY_INSTALL_PATH}"
     --sysconfdir=/etc
 
 pushd "${SPACK_TMPDIR}/singularity-builddir"
-make && make install
+GO111MODULE=auto make && make install
 popd
 
 popd
