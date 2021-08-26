@@ -19,6 +19,7 @@ system_dependencies=(
         "g++-aarch64-linux-gnu"
         "gcc-aarch64-linux-gnu"
         "gfortran-aarch64-linux-gnu"
+        "gocryptfs"
         "htop"
         "iproute2"
         "iptables"

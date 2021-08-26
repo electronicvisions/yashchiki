@@ -81,6 +81,9 @@ From: ${DOCKER_BASE_IMAGE}
     # ECM: and now some abspacking
     yum -y install ccache sudo parallel
 
+    # ECM: and userspace mount stuff
+    yum -y install fuse3
+
     # create a fingerprint by which we can identify the container from within
     cat /proc/sys/kernel/random/uuid > /opt/fingerprint
 
@@ -99,7 +102,10 @@ From: ${DOCKER_BASE_IMAGE}
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post_as_root.sh"
     wait
-    "${SPACK_INSTALL_SCRIPTS}/install_singularity_as_root.sh" || \
+    (
+        "${SPACK_INSTALL_SCRIPTS}/install_singularity_as_root.sh" && \
+        "${SPACK_INSTALL_SCRIPTS}/install_gocryptfs_as_root.sh"
+    ) || \
     (
     sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&
         exit 1  # propagate the error
@@ -118,8 +124,8 @@ From: ${DOCKER_BASE_IMAGE}
         unset LC_COLLATE LC_CTYPE LC_MONETARY LC_NUMERIC LC_TIME LC_MESSAGES LC_ALL
     fi
 
-    # python now from conda...
-    PATH=/opt/conda/bin:${PATH}
+    # python now from conda... and gopath/bin (gocryptfs)
+    PATH=/opt/conda/bin:/opt/go/gopath/bin:${PATH}
     # ensure conda sees a clean env
     unset PYTHONHOME
 EOF
