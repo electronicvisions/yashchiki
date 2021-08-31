@@ -56,6 +56,12 @@ From: ${DOCKER_BASE_IMAGE}
     ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
 
 %post
+    # ECM: drop docker image caches (often outdated)
+    yum clean all
+
+    # ECM: disable http caching
+    echo "http_caching=none" >> /etc/yum.conf
+
     # Apparently, upon building the CentOS docker images it has been decided that
     # (for space-saving reasons) exactly one locale (en_US.utf8) is installed.
     # We don't care about the little extra space and user experience benefits from
@@ -83,6 +89,9 @@ From: ${DOCKER_BASE_IMAGE}
 
     # ECM: and userspace mount stuff
     yum -y install fuse3
+
+    # ECM: save some more space
+    yum clean all
 
     # create a fingerprint by which we can identify the container from within
     cat /proc/sys/kernel/random/uuid > /opt/fingerprint
