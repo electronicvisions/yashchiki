@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOURCE_FOLDER="utils"
+SOURCE_FOLDER="yashchiki/utils"
 
 TARGET_FOLDER="/containers/utils"
 NAME_FILTER=( "(" -name "*.py" -or -name "*.sh" ")" )

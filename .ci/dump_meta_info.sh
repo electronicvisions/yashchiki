@@ -12,7 +12,7 @@ source "${SOURCE_DIR}/commons.sh"
 mkdir -p "${META_DIR_OUTSIDE}"
 
 (
-    cd "${WORKSPACE}"
+    cd "${WORKSPACE}/yashchiki"
     git log > "${META_DIR_OUTSIDE}/yashchiki_git.log"
     if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
         gerrit_get_current_change_commits \

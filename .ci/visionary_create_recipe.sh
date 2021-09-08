@@ -46,7 +46,7 @@ From: ${DOCKER_BASE_IMAGE}
     rsync -av "${META_DIR_OUTSIDE}"/* "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
-    rsync -av "${WORKSPACE}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
+    rsync -av "${WORKSPACE}"/yashchiki/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
 
 %files
     # NOTE: Due to a bug in singularity 2.6 all paths in this section _cannot_
@@ -54,10 +54,10 @@ From: ${DOCKER_BASE_IMAGE}
     # there are, I pray for your poor soul that escaping them works..
     # --obreitwi, 17-02-19 # 23:45:51
     # provide spack command to login shells
-    ${WORKSPACE}/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
-    ${WORKSPACE}/misc-files/locale.gen /etc/locale.gen
-    ${WORKSPACE}/misc-files/locale.alias /etc/locale.alias
-    ${WORKSPACE}/misc-files/sudoers /etc/sudoers
+    ${WORKSPACE}/yashchiki/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
+    ${WORKSPACE}/yashchiki/misc-files/locale.gen /etc/locale.gen
+    ${WORKSPACE}/yashchiki/misc-files/locale.alias /etc/locale.alias
+    ${WORKSPACE}/yashchiki/misc-files/sudoers /etc/sudoers
     ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
 
 %post

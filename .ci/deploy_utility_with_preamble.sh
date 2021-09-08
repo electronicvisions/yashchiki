@@ -16,14 +16,16 @@ echo "#"
 echo "# auto-deployed on $(date --iso) via"
 echo "# https://brainscales-r.kip.uni-heidelberg.de:11443/job/bld_install-yashchiki/"
 echo -n "# from git-commit: "
-git log --no-decorate --oneline -n 1
+(
+cd yashchiki && git log --no-decorate --oneline -n 1
+)
 echo "#"
 echo "# Please submit changes at ssh://brainscales-r.kip.uni-heidelberg.de:29418/yashchiki"
 echo ""
 }
 
 # source and destination are reversed for xargs!
-len_preamble=$(awk -f "$(git rev-parse --show-toplevel)/.ci/find_num_lines_shebang.awk" "${src}")
+len_preamble=$(awk -f "$(cd yashchiki && git rev-parse --show-toplevel)/.ci/find_num_lines_shebang.awk" "${src}")
 head -n "${len_preamble}" "${src}" > "${dst}"
 make_preamble >> "${dst}"
 tail -n +$(( len_preamble + 1 )) "${src}" >> "${dst}"

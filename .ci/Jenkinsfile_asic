@@ -57,77 +57,80 @@ pipeline {
 				}
 				stage('yashchiki Checkout') {
 					steps {
-						checkout scm
+						script {
+							sh "git clone ssh://hudson@brainscales-r.kip.uni-heidelberg.de:29418/waf.git symwaf2ic"
+							sh "cd symwaf2ic && singularity exec /containers/stable/latest make"
+							if (!env.GERRIT_CHANGE_NUMBER) {
+								sh "singularity exec /containers/stable/latest ./symwaf2ic/waf setup --project=yashchiki --clone-depth=2"
+							} else {
+								sh "singularity exec /containers/stable/latest ./symwaf2ic/waf setup --project=yashchiki --clone-depth=2 --gerrit-changes=${GERRIT_CHANGE_NUMBER} --gerrit-url=ssh://hudson@${GERRIT_HOST}:${GERRIT_PORT}"
+							}
+						}
 					}
 				}
 				stage('Validate environment') {
 					steps {
-						sh ".ci/validate_environment.sh"
-					}
-				}
-				stage('Spack Clone') {
-					steps {
-						sh ".ci/clone.sh"
+						sh "yashchiki/.ci/validate_environment.sh"
 					}
 				}
 				stage('Dump Meta Info') {
 					steps {
-						sh ".ci/dump_meta_info.sh"
-						sh ".ci/notify_gerrit.sh -m 'Build containing this change started..'"
+						sh "yashchiki/.ci/dump_meta_info.sh"
+						sh "yashchiki/.ci/notify_gerrit.sh -m 'Build containing this change started..'"
 					}
 				}
 				stage('Spack Fetch') {
 					steps {
 						script {
 							try {
-								sh ".ci/fetch.sh"
+								sh "yashchiki/.ci/fetch.sh"
 							}
 							catch (Throwable t) {
 								archiveArtifacts "errors_concretization.log"
 								throw t
 							}
-							spec_folder_in_container = sh(script: ".ci/get_jenkins_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
+							spec_folder_in_container = sh(script: "yashchiki/.ci/get_jenkins_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
 							archiveArtifacts(artifacts: "sandboxes/*/$spec_folder_in_container/*.yaml", allowEmptyArchive: true)
 						}
 					}
 				}
 				stage('Deploy utilities') {
 					steps {
-						sh ".ci/deploy_utilities.sh"
+						sh "yashchiki/.ci/deploy_utilities.sh"
 					}
 				}
 				stage('Create asic recipe') {
 					steps {
-						sh ".ci/asic_create_recipe.sh"
+						sh "yashchiki/.ci/asic_create_recipe.sh"
 					}
 				}
 				stage('Build sandbox') {
 					steps {
-						sh ".ci/build_sandbox.sh"
+						sh "yashchiki/.ci/build_sandbox.sh"
 					}
 				}
 				stage('Build container image') {
 					steps {
-						sh ".ci/build_image.sh"
+						sh "yashchiki/.ci/build_image.sh"
 					}
 				}
 				stage('Update build cache and export container') {
 					steps {
 						script {
 							// we only want the container name, tail everything else
-							CONTAINER_IMAGE = sh(script: ".ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
+							CONTAINER_IMAGE = sh(script: "yashchiki/.ci/deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
-						sh ".ci/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
-						sh ".ci/notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
+						sh "yashchiki/.ci/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
+						sh "yashchiki/.ci/notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
 					}
 				}
 			}
 			post {
 				failure {
 					script {
-						cache_failed = sh(script: ".ci/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
+						cache_failed = sh(script: "yashchiki/.ci/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
 					}
-					sh ".ci/notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
+					sh "yashchiki/.ci/notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
 				}
 				cleanup {
 					archiveArtifacts "jenkins.env"

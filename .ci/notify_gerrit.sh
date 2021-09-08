@@ -83,6 +83,8 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
         pushd "${MY_SPACK_FOLDER}" &>/dev/null || exit 1
     fi
 
+    # needs to be in git repo for gerrit_notify_change to work
+    cd ${WORKSPACE}/yashchiki
     for change in "${commits[@]}"; do
         if ! gerrit_notify_change -c "${change}" \
             -v "${verified}" \

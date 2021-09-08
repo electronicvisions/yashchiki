@@ -40,26 +40,14 @@ Use `/home/vis_jenkins/build_caches/<name>` on `conviz` as buildcache instead
 of the default one. Can also be used for failed caches.
 
 
-### `WITH_SPACK_{CHANGE,REFSPEC}`
+### `WITH_DEBUG`
+
+Specifying `WITH_DEBUG` in the triggering comment will enable debug output.
+
+
+## Supported keywords in commit message
 
 Since often times yashchiki and spack changes are tested together but
 have no real dependency on one another, we misuse the `Depends-On`
 mechanism in the commit message to build a container with a specific
 spack and yashchiki changeset.
-
-You can use:
-* `WITH_SPACK_CHANGE=<change-num>` to use the latest patch set of the
-  given spack changeset for the build
-* `WITH_SPACK_REFSPEC=<refspec>` to specify a complete spack refspec
-  that is to be used for this build (i.e.,
-  refs/changes/<change-num[-2:]>/<change-num>/<patch-level>) to have
-  full control over which changeset/patch level to build.
-
-These take priority over commit-specified `Depends-On:` and are mutually
-exclusive with jenkins-specified build parameters since each build gets
-either triggered manually in jenkins or via gerrit.
-
-
-### `WITH_DEBUG`
-
-Specifying `WITH_DEBUG` in the triggering comment will enable debug output.
