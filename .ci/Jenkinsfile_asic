@@ -28,41 +28,30 @@ pipeline {
 	}
 
 	environment {
-		CONTAINER_STYLE = "asic"
 		YASHCHIKI_HOST_ENV_PATH = "${WORKSPACE}/host.env"
 	}
 
 	stages {
 		stage('Container Build') {
-			agent { label 'conviz1||conviz2' }
+			// TODO: remove once unused
 			environment {
-				DOCKER_BASE_IMAGE = "centos:7"
-				// versions from system packages
-				DEPENDENCY_PYTHON = "python@3.8.3"
+				CONTAINER_STYLE = "asic"
 				YASHCHIKI_INSTALL = "${WORKSPACE}/yashchiki"
 				YASHCHIKI_META_DIR = "${WORKSPACE}/meta"
-				YASHCHIKI_RECIPE_PATH = "${WORKSPACE}/asic_recipe.def"
 				YASHCHIKI_CACHES_ROOT = "${HOME}"
 				YASHCHIKI_SPACK_PATH = "${env.WORKSPACE}/spack"
-				YASHCHIKI_IMAGE_NAME = "singularity_asic_temp.img"
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
 				YASHCHIKI_PROXY_HTTPS = "http://proxy.kip.uni-heidelberg.de:8080"
-				YASHCHIKI_BUILD_SPACK_GCC = 0
-				YASHCHIKI_SPACK_GCC_VERSION = "4.8.5"
-				YASHCHIKI_SPACK_GCC = "gcc@${YASHCHIKI_SPACK_GCC_VERSION}"
-				TMPDIR = "/tmp/${env.NODE_NAME}"
-				JOB_TMP_SPACK = sh(script: "mkdir -p ${env.TMPDIR} &>/dev/null; mktemp -d ${env.TMPDIR}/spack-XXXXXXXXXX",
-				                   returnStdout: true).trim()
 				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
+			agent { label 'conviz1||conviz2' }
 			stages {
 				stage('Pre-build Cleanup') {
 					steps {
 						script {
 							cleanupSteps()
 						}
-						sh "mkdir -p \"${env.JOB_TMP_SPACK}\" && chmod 777 \"${env.JOB_TMP_SPACK}\""
 					}
 				}
 				stage('yashchiki Checkout') {
@@ -79,59 +68,49 @@ pipeline {
 						}
 					}
 				}
-				stage('Validate environment') {
-					steps {
-						sh "bash lib/yashchiki/validate_environment.sh"
-					}
-				}
-				stage('Dump Meta Info') {
-					steps {
-						sh "bash bin/yashchiki_dump_meta_info.sh"
-						sh "bash bin/yashchiki_notify_gerrit.sh -m 'Build containing this change started..'"
-					}
-				}
-				stage('Spack Fetch') {
-					steps {
-						script {
-							try {
-								sh "bash lib/yashchiki/fetch.sh"
-							}
-							catch (Throwable t) {
-								archiveArtifacts "errors_concretization.log"
-								throw t
-							}
-							spec_folder_in_container = sh(script: "lib/yashchiki/get_host_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
-							archiveArtifacts(artifacts: "sandboxes/*/$spec_folder_in_container/*.yaml", allowEmptyArchive: true)
-						}
-					}
-				}
 				stage('Deploy utilities') {
 					steps {
 						sh "bash bin/yashchiki_deploy_utilities.sh"
 					}
 				}
-				stage('Create asic recipe') {
+				stage('Dump Meta Info') {
 					steps {
-						sh "share/yashchiki/styles/asic/create_recipe.sh"
-					}
-				}
-				stage('Build sandbox') {
-					steps {
-						sh "bash lib/yashchiki/build_sandbox.sh"
+						sh "mkdir -p ${YASHCHIKI_META_DIR}"
+						sh "bash bin/yashchiki_dump_meta_info.sh"
+						sh "bash bin/yashchiki_notify_gerrit.sh -m 'Build containing this change started..'"
 					}
 				}
 				stage('Build container image') {
 					steps {
-						sh "bash lib/yashchiki/build_image.sh"
+						script {
+							try {
+								sh "python3 bin/yashchiki visionary ${WORKSPACE}/spack singularity_asic_temp.img " +
+								   "--log-dir=log " +
+								   "--proxy-${YASHCHIKI_PROXY_HTTP} " +
+								   "--proxy-https=${YASHCHIKI_PROXY_HTTPS} " +
+								   "--tmp-subdir=${env.NODE_NAME} " +
+								   "--meta-dir=${YASHCHIKI_META_DIR} " +
+								   "--caches-dir=${YASHCHIKI_CACHES_ROOT} " +
+								   "--build-cache-name=${BUILD_CACHE_NAME} " +
+								   "--sandboxes-dir=${YASHCHIKI_SANDBOXES} " +
+								   "--host-env-filename=${WORKSPACE}/host.env " +
+								   ("${CONTAINER_BUILD_TYPE}" == "stable" ? "--update-build-cache " : "") +
+								   "--recipe-filename=${WORKSPACE}/asic_recipe.def "
+							} catch (Throwable t) {
+								archiveArtifacts "errors_concretization.log"
+								throw t
+							}
+							archiveArtifacts(artifacts: "sandboxes/*/opt/spack_specs/*.yaml", allowEmptyArchive: true)
+							archiveArtifacts(artifacts: "log/*.log", allowEmptyArchive: true)
+						}
 					}
 				}
-				stage('Update build cache and export container') {
+				stage('Export container') {
 					steps {
 						script {
 							// we only want the container name, tail everything else
 							CONTAINER_IMAGE = sh(script: "bin/yashchiki_deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
-						sh "bash lib/yashchiki/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
 						sh "bash bin/yashchiki_notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
 					}
 				}

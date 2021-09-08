@@ -3,12 +3,6 @@
 set -euo pipefail
 shopt -s inherit_errexit 2>/dev/null || true
 
-# only update build cache for stable builds
-if [ "${CONTAINER_BUILD_TYPE:-}" != "stable" ]; then
-    echo "Not updating build cache for testing builds." 1>&2
-    exit 0
-fi
-
 usage() { echo "Usage: ${0} -c <container>" 1>&2; exit 1; }
 
 while getopts ":c:" opts; do

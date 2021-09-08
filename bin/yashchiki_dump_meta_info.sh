@@ -7,24 +7,26 @@ set -Eeuo pipefail
 shopt -s inherit_errexit
 
 ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
-source "${ROOT_DIR}/lib/yashchiki/commons.sh"
+source "${ROOT_DIR}/lib/yashchiki/gerrit.sh"
 
-mkdir -p "${META_DIR_OUTSIDE}"
+mkdir -p "${YASHCHIKI_META_DIR}"
 
 (
-    cd "${YASHCHIKI_INSTALL}"
-    git log > "${META_DIR_OUTSIDE}/yashchiki_git.log"
-    if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
-        gerrit_get_current_change_commits \
-            > "${META_DIR_OUTSIDE}/current_changes-yashchiki.dat"
+    if [ -n "${YASHCHIKI_INSTALL:-}" ]; then
+        cd "${YASHCHIKI_INSTALL}"
+        git log > "${YASHCHIKI_META_DIR}/yashchiki_git.log"
+        if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
+            gerrit_get_current_change_commits \
+                > "${YASHCHIKI_META_DIR}/current_changes-yashchiki.dat"
+        fi
     fi
 )
 
 (
     cd ${YASHCHIKI_SPACK_PATH}
-    git log > "${META_DIR_OUTSIDE}/spack_git.log"
+    git log > "${YASHCHIKI_META_DIR}/spack_git.log"
     if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
         gerrit_get_current_change_commits \
-            > "${META_DIR_OUTSIDE}/current_changes-spack.dat"
+            > "${YASHCHIKI_META_DIR}/current_changes-spack.dat"
     fi
 )

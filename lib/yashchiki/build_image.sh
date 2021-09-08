@@ -14,6 +14,11 @@ TARGET_FOLDER="$(find ${YASHCHIKI_SANDBOXES} -mindepth 1 -maxdepth 1)"
 # -> it needs to be bind mounted to the sandbox folder
 sudo mount --bind "${YASHCHIKI_SPACK_PATH}" "${TARGET_FOLDER}/opt/spack"
 
+if test -f "${YASHCHIKI_IMAGE_NAME}"; then
+    echo "Image at ${YASHCHIKI_IMAGE_NAME} exists."
+    exit 1
+fi
+
 # TODO: singularity 3.1 produces SIF w/o setuid flags on files, using a newer
 # singularity for the image build
 #sudo singularity build ${YASHCHIKI_IMAGE_NAME} "${TARGET_FOLDER}"

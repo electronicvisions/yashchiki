@@ -1,0 +1,248 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import pathlib
+import subprocess
+import tempfile
+import textwrap
+from typing import Optional
+
+
+def check_no_globbing(path: Optional[str]) -> None:
+    """
+    Check that no globbing characters are used in the given path.
+
+    :param path: Path to check.
+    :raises ContainsGlobError: If glob cahracters are used in path.
+    """
+    globs = ["*", "?", "[", "]", "$", "{", "}", "|"]
+
+    class ContainsGlobError(RuntimeError):
+        pass
+
+    # note: str(None) is 'None' and is therefore handled correctly
+    if any(glob in str(path) for glob in globs):
+        raise ContainsGlobError(f"Path {path} containing any of "
+                                f"{' '.join(globs)} is not supported.")
+
+
+class HelpFormatter(
+        argparse.RawDescriptionHelpFormatter,
+        argparse.ArgumentDefaultsHelpFormatter):
+    """
+    Formatting for argument parser help message generation.
+    """
+
+
+parser = argparse.ArgumentParser(
+    prog="yashchiki",
+    formatter_class=HelpFormatter,
+    description=textwrap.dedent("""\
+        Yashchiki singularity image builder.
+
+        For a successful image build, a style of container to build, a spack
+        installation and a name for the resulting image is required.
+
+        Read: yashchiki builds a container of STYLE with spack in SPACK_DIR
+              to OUTPUT.
+    """))
+
+# mandatory
+parser.add_argument(
+    "style", type=str, choices=["visionary", "asic"],
+    help="Style of container to build.")
+parser.add_argument(
+    "spack_dir", type=pathlib.Path,
+    help="Location of spack to use.")
+parser.add_argument(
+    "output", type=pathlib.Path,
+    help="File name of the resulting container image.")
+# optional but important
+parser.add_argument(
+    "--update-build-cache", action="store_true",
+    help="Update build cache.")
+# optional with persistent default
+parser.add_argument(
+    "--caches-dir", type=pathlib.Path,
+    default=os.path.expanduser("~/.yashchiki/"),
+    help="Location of caches to use.")
+parser.add_argument(
+    "--log-dir", type=pathlib.Path,
+    default=os.path.expanduser("~/.yashchiki/log/"),
+    help="Location of logs to use.")
+parser.add_argument(
+    "--sandboxes-dir", type=pathlib.Path,
+    default=os.path.expanduser("~/.yashchiki/sandboxes"),
+    help="Location of sandboxes for container creation to use.")
+# optional with temporary default
+parser.add_argument(
+    "--meta-dir", type=pathlib.Path,
+    help="Folder where to store meta information to be copied into the "
+         "container. If not provided, a temporary directory is used.")
+parser.add_argument(
+    "--host-env-filename", type=pathlib.Path,
+    help="Location of host environment storage file to use within container "
+         "build. If not provided, a temporary location is used.")
+parser.add_argument(
+    "--tmp-subdir", type=pathlib.Path, default="",
+    help=f"Directory under {tempfile.gettempdir()} which to use as root for "
+         "temporary files to be owned by spack.")
+parser.add_argument(
+    "--recipe-filename", type=pathlib.Path,
+    help=f"Explicit filename for singularity recipe to construct. If not "
+         "provided, a temporary location is used.")
+parser.add_argument(
+    "--build-cache-name", type=str, default="default",
+    help="Name of build cache to use, resides under "
+         "<CACHES_DIR>/build_caches/<BUILD_CACHE_NAME>.")
+
+# optional options
+parser.add_argument(
+    "--proxy-http", type=str,
+    help="HTTP proxy to use when required.")
+parser.add_argument(
+    "--proxy-https", type=str,
+    help="HTTPS proxy to use when required.")
+parser.add_argument(
+    "--debug", action="store_true",
+    help="Enable debug-level logging.")
+
+args = parser.parse_args()
+
+# yashchiki program root directory to use for script location
+root_dir = pathlib.Path(__file__).parent.parent
+
+# check provided paths
+if not args.spack_dir.is_dir():
+    raise NotADirectoryError("spack_dir is required to be a path to an "
+                             "existing directory.")
+if (args.meta_dir is not None) and (not args.meta_dir.is_dir()):
+    raise NotADirectoryError("meta-dir is required to be a path to an "
+                             "existing directory.")
+
+paths = [
+    args.spack_dir,
+    args.output,
+    args.caches_dir,
+    args.log_dir,
+    args.sandboxes_dir,
+    args.meta_dir,
+    args.host_env_filename,
+    args.tmp_subdir,
+    args.recipe_filename
+]
+# ensure no globbing is performed in the paths for shell scripts to work
+for path_to_check in paths:
+    check_no_globbing(path_to_check)
+
+# collection of environment variables used to configure the shell scripts'
+# behavior
+env = {
+    "DOCKER_BASE_IMAGE": "debian:bullseye" if args.style == "visionary" else "centos:7",
+    # This needs to be here because otherwise the default python
+    # (2.7.18) will pollute the spec and lead to a conflict
+    # can be removed as soon as the explicit preferred version
+    # is dropped
+    "DEPENDENCY_PYTHON": "python@3." + ("8.2" if args.style == "visionary" else "6.8"),
+    "YASHCHIKI_BUILD_SPACK_GCC": "1" if args.style == "visionary" else "0",
+    "YASHCHIKI_SPACK_GCC_VERSION": "11.2.0" if args.style == "visionary" else "4.8.5",
+    "YASHCHIKI_SPACK_GCC": "gcc@11.2.0" if args.style == "visionary" else "gcc@4.8.5",
+    "WORKSPACE": os.getcwd(), # FIXME: should not be required
+    "CONTAINER_STYLE": args.style,
+    "CONTAINER_BUILD_TYPE": "testing", # FIXME: should not be required
+    "YASHCHIKI_DEBUG": str(int(args.debug)),
+    "YASHCHIKI_SANDBOXES": args.sandboxes_dir,
+    "YASHCHIKI_IMAGE_NAME": args.output,
+    "YASHCHIKI_SPACK_PATH": args.spack_dir,
+    "YASHCHIKI_BUILD_CACHE_NAME": args.build_cache_name,
+    "TMPDIR": os.path.join(tempfile.gettempdir(), args.tmp_subdir),
+    "YASHCHIKI_CACHES_ROOT": args.caches_dir,
+} | os.environ
+
+
+# optionally forward http{,s} proxy if argument given
+if args.proxy_http:
+    env = env | {"YASHCHIKI_PROXY_HTTP": args.proxy_http}
+
+if args.proxy_https:
+    env = env | {"YASHCHIKI_PROXY_HTTPS": args.proxy_https}
+
+# create directory for logs
+args.log_dir.mkdir(parents=True, exist_ok=True)
+
+pathlib.Path(env["TMPDIR"]).mkdir(exist_ok=True, parents=True)
+
+
+def run(script: str, env: dict, script_args: list = []):
+    """
+    Execute the given script.
+
+    :param script: Script to execute.
+    :param env: Enviroment to use for execution.
+    :param script_args: Arguments to supply to the script.
+    """
+    stdout = ""
+    try:
+        if args.debug:
+            print(f"executing: {script} {script_args}")
+        out = subprocess.run(
+            ["bash", os.path.join(root_dir, script)] + script_args,
+            env=env, check=True, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, encoding="utf-8")
+        stdout = out.stdout
+        if args.debug:
+            print(stdout)
+    except subprocess.CalledProcessError as error:
+        stdout = error.stdout
+        print(stdout)
+        with args.log_dir.joinpath(
+                script.replace("/", "_") + ".log").open("w+") as file:
+            file.write(stdout)
+        raise
+    else:
+        with args.log_dir.joinpath(
+                script.replace("/", "_") + ".log").open("w+") as file:
+            file.write(stdout)
+
+
+with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
+        as temporary_directory_spack, \
+        tempfile.TemporaryDirectory() as temporary_directory:
+    temporary_directory = pathlib.Path(temporary_directory)
+
+    env = env | {"JOB_TMP_SPACK": temporary_directory_spack}
+
+    # singularity recipe filename defaults to temporary file
+    if args.recipe_filename is not None:
+        recipe_filename = args.recipe_filename
+    else:
+        recipe_filename = temporary_directory.joinpath("recipe.def")
+    env = env | {"YASHCHIKI_RECIPE_PATH": recipe_filename}
+
+    # meta data directory defaults to temporary folder
+    if args.meta_dir is not None:
+        meta_dir = args.meta_dir
+    else:
+        meta_dir = temporary_directory.joinpath("meta")
+    env = env | {"YASHCHIKI_META_DIR": meta_dir}
+
+    # host environment storage filename defaults to temporary file
+    if args.host_env_filename is not None:
+        host_env_filename = args.host_env_filename
+    else:
+        host_env_filename = temporary_directory.joinpath("host.env")
+    env = env | {"YASHCHIKI_HOST_ENV_PATH": host_env_filename}
+
+    run("lib/yashchiki/validate_environment.sh", env)
+    run("lib/yashchiki/create_spack_user.sh", env)
+    run("lib/yashchiki/create_caches.sh", env)
+    run("lib/yashchiki/fetch.sh", env)
+    run(str(pathlib.Path("share", "yashchiki", "styles", args.style,
+                         "create_recipe.sh")),
+        env)
+    run("lib/yashchiki/build_sandbox.sh", env)
+    run("lib/yashchiki/build_image.sh", env)
+    if args.update_build_cache:
+        run("lib/yashchiki/update_build_cache.sh", env, ["-c", args.output])
+    run("lib/yashchiki/restore_host_user_ownership.sh", env)
