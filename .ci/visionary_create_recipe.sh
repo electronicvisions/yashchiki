@@ -74,8 +74,9 @@ From: ${DOCKER_BASE_IMAGE}
     # propagate environment variables to container recipe
     export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
     export DEPENDENCY_PYTHON3="${DEPENDENCY_PYTHON3}"
-    export VISIONARY_GCC="${VISIONARY_GCC}"
-    export VISIONARY_GCC_VERSION="${VISIONARY_GCC_VERSION}"
+    export YASHCHIKI_BUILD_SPACK_GCC=${YASHCHIKI_BUILD_SPACK_GCC}
+    export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
+    export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     # Improve efficiency by installing system packages in the background (even
     # though we set the number of worker to \$(nproc), often times - e.g. when

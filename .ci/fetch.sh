@@ -37,7 +37,7 @@ compilers:
     environment: {}
     extra_rpaths: []
     flags: {}
-    spec: ${VISIONARY_GCC}
+    spec: ${YASHCHIKI_SPACK_GCC}
 EOF
 
 # Need KIP proxy to fetch all the packages (also needed in container due to pip)
@@ -49,7 +49,7 @@ echo "FETCHING..."
 
 # concretize all spack packages in parallel
 packages_to_fetch=(
-    "${VISIONARY_GCC}"
+    "${YASHCHIKI_SPACK_GCC}"
     "${spack_bootstrap_dependencies[@]}"
     "${spack_packages[@]}"
 )

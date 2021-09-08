@@ -27,9 +27,8 @@ rm_tmp_modules() {
 add_cleanup_step rm_tmp_modules
 {
     echo "source /opt/init/modules.sh"
-    if [ "${CONTAINER_STYLE}" != "asic" ]; then
-        # TODO: the ASIC container does not feature a spack compiler yet
-        spack module tcl loads -r "$(get_latest_hash "${VISIONARY_GCC}")"
+    if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
+        spack module tcl loads -r "$(get_latest_hash "${YASHCHIKI_SPACK_GCC}")"
     fi
 } | tee "${TMP_MODULES}"
 source "${TMP_MODULES}"

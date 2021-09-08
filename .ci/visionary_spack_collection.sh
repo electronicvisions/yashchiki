@@ -1,20 +1,20 @@
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
-    "visionary-simulation~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
-    "visionary-simulation ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${VISIONARY_GCC}"
+    "visionary-simulation~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-simulation ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${YASHCHIKI_SPACK_GCC}"
     # START python 3 packages
-    "visionary-wafer~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer~dev+gccxml ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${VISIONARY_GCC}"
-    "visionary-wafer-visu ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer-visu) %${VISIONARY_GCC}"
-    "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${VISIONARY_GCC}"
-    "visionary-dls ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${VISIONARY_GCC}"
-    "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
-    "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${VISIONARY_GCC}"
+    "visionary-wafer~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer~dev+gccxml ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer-visu ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer-visu) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${YASHCHIKI_SPACK_GCC}"
+    "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     # END python 3 packages
 )
 
@@ -47,8 +47,8 @@ spack_add_to_view_with_dependencies["gccxml"]="no"
 
 # all views get the default gcc except those in spack_views_no_default_gcc
 # (defined above)
-spack_add_to_view_with_dependencies["${VISIONARY_GCC}"]="no"
-spack_add_to_view["${VISIONARY_GCC}"]="$(
+spack_add_to_view_with_dependencies["${YASHCHIKI_SPACK_GCC}"]="no"
+spack_add_to_view["${YASHCHIKI_SPACK_GCC}"]="$(
     for viewname in "${spack_views[@]+"${spack_views[@]}"}"; do
         # check if the current view matches any view that does not get the
         # default gcc

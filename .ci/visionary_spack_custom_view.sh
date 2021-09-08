@@ -19,7 +19,7 @@ ${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlin
 ${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-nodev $(get_latest_hash visionary-dls~dev "^${DEPENDENCY_PYTHON3}")
 
 # slurvmiz needs no dev-tools because it is not for end-users
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz $(get_latest_hash "visionary-slurmviz %${VISIONARY_GCC}")
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz $(get_latest_hash "visionary-slurmviz %${YASHCHIKI_SPACK_GCC}")
 
 #############
 # dev tools #

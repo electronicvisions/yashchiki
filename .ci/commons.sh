@@ -201,7 +201,7 @@ get_pinned_deps() {
 }
 
 # the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dev) %${VISIONARY_GCC}"
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dev) %${YASHCHIKI_SPACK_GCC}"
 
 # used in VIEWS section below but needs to be defined before sourcing
 # associative array: spec to add -> view names seperated by spaces

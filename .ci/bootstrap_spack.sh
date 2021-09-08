@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Prepare spack by bootstrapping and installing the visionary compiler
+# Prepare spack by bootstrapping and installing the compiler via spack
 #
 set -euo pipefail
 shopt -s inherit_errexit 2>/dev/null || true
@@ -58,9 +58,9 @@ echo ""
     exit 1
 fi
 
-if [ "${CONTAINER_STYLE}" = "visionary" ]; then
+if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
     # check if it can be specialized
-    spec_compiler="${VISIONARY_GCC}"
+    spec_compiler="${YASHCHIKI_SPACK_GCC}"
     install_from_buildcache "${spec_compiler}"
 
     # remember system compiler versions (to be removed later)
@@ -78,5 +78,5 @@ if [ "${CONTAINER_STYLE}" = "visionary" ]; then
     done
 
     # add fresh compiler to spack
-    ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${VISIONARY_GCC_VERSION}-*
+    ${MY_SPACK_BIN} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${YASHCHIKI_SPACK_GCC_VERSION}-*
 fi
