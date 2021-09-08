@@ -58,7 +58,7 @@ From: ${DOCKER_BASE_IMAGE}
     ${WORKSPACE}/yashchiki/misc-files/locale.gen /etc/locale.gen
     ${WORKSPACE}/yashchiki/misc-files/locale.alias /etc/locale.alias
     ${WORKSPACE}/yashchiki/misc-files/sudoers /etc/sudoers
-    ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
+    ${HOST_ENV_FILE} ${HOST_ENV_FILE_INSIDE}
 
 %post
     # create a fingerprint by which we can identify the container from within

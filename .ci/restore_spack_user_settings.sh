@@ -20,7 +20,7 @@ ${MY_SPACK_BIN} clean --misc-cache
 # non-spack user/group shall be allowed to read/execute everything we installed here
 chmod -R o+rX "${MY_SPACK_VIEW_PREFIX}"
 # remember: var/spack/cache still contains hardlinked files owned by
-# vis_jenkins-user
+# host-user
 find "${MY_SPACK_FOLDER}" \
     \( -type d -wholename "${MY_SPACK_FOLDER}/var/spack/cache" -prune \
     \) -o -not -type l -exec chmod o+rX '{}' \;

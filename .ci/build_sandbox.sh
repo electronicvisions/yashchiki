@@ -21,7 +21,7 @@ SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 echo "created ${CONTAINER_STYLE}_recipe.def" >&2
 cat "${WORKSPACE}/${CONTAINER_STYLE}_recipe.def"
 
-# create some jenkins-owned temp folder for spack build
+# check if host-user-owned temp folder for spack build exists
 if [ ! -d "${JOB_TMP_SPACK}" ]; then
     echo "${JOB_TMP_SPACK} should exist, aborting!" >&2
     exit 1
@@ -36,10 +36,10 @@ export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
 
 TARGET_FOLDER="sandboxes/${CONTAINER_STYLE}"
 
-# Do not change: special sudo permit for jenkins user...
+# Do not change: special sudo permit for the host user...
 sudo rm -rf sandboxes/
 
 mkdir sandboxes
 
-# Do not change: special sudo permit for jenkins user...
+# Do not change: special sudo permit for the host user...
 sudo -E singularity build --sandbox "${TARGET_FOLDER}" ${CONTAINER_STYLE}_recipe.def | tee out_singularity_build_${CONTAINER_STYLE}_recipe.txt

@@ -23,7 +23,7 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/commons.sh"
 source "${sourcedir}/setup_env_spack.sh"
 
-build_type=$(get_jenkins_env CONTAINER_BUILD_TYPE)
+build_type=$(get_host_env CONTAINER_BUILD_TYPE)
 
 # find empty directory to dump into
 build_num=1

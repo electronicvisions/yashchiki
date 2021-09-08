@@ -20,7 +20,7 @@ chown spack:$spack_gid "${BUILD_CACHE_INSIDE}"
 chmod go=rwx /opt
 # in the final image /opt/spack* should be owned by the spack user.
 # Therefore: chown everything to the spack user except for var/cache (contains
-# hardlinks to vis_jenkins-owned files)
+# hardlinks to host-user-owned files)
 find "/opt/spack" \
     \( -type d -wholename "/opt/spack/var/spack/cache" -prune \
     \) -o -exec chown spack:$spack_gid '{}' \;

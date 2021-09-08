@@ -89,7 +89,7 @@ pipeline {
 								archiveArtifacts "errors_concretization.log"
 								throw t
 							}
-							spec_folder_in_container = sh(script: "yashchiki/.ci/get_jenkins_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
+							spec_folder_in_container = sh(script: "yashchiki/.ci/get_host_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
 							archiveArtifacts(artifacts: "sandboxes/*/$spec_folder_in_container/*.yaml", allowEmptyArchive: true)
 						}
 					}
@@ -133,7 +133,7 @@ pipeline {
 					sh "yashchiki/.ci/notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
 				}
 				cleanup {
-					archiveArtifacts "jenkins.env"
+					archiveArtifacts "host.env"
 					archiveArtifacts "out_singularity_build_asic_recipe.txt"
 					// Clean build artifacts because otherwise the latest build from each jenkins job can take up to 50GB.
 					// 2 executors and 5 Jenkins-Jobs (testing, testing-spack, testing-asic, stable, stable-asic) will slowly but surely eat away memory.

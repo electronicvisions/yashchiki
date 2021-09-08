@@ -80,5 +80,5 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ] \
 fi
 
 # store environment for usage within container
-echo "# Jenkins environment set to:" >&2
-env | tee "${JENKINS_ENV_FILE}"
+echo "# Host environment set to:" >&2
+env | tee "${HOST_ENV_FILE}"

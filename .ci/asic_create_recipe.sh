@@ -53,7 +53,7 @@ From: ${DOCKER_BASE_IMAGE}
     ${WORKSPACE}/yashchiki/misc-files/locale.gen /etc/locale.gen
     ${WORKSPACE}/yashchiki/misc-files/locale.alias /etc/locale.alias
     ${WORKSPACE}/yashchiki/misc-files/sudoers /etc/sudoers
-    ${JENKINS_ENV_FILE} ${JENKINS_ENV_FILE_INSIDE}
+    ${HOST_ENV_FILE} ${HOST_ENV_FILE_INSIDE}
 
 %post
     # ECM: drop docker image caches (often outdated)

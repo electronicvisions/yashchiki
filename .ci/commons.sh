@@ -5,28 +5,28 @@ shopt -s inherit_errexit 2>/dev/null || true
 
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 
-JENKINS_ENV_FILE_INSIDE="/tmp/spack/jenkins.env"
+HOST_ENV_FILE_INSIDE="/tmp/spack/host.env"
 if [ -n "${WORKSPACE:-}" ]; then
     # we are not in container
-    JENKINS_ENV_FILE="${WORKSPACE}/jenkins.env"
+    HOST_ENV_FILE="${WORKSPACE}/host.env"
 else
-    JENKINS_ENV_FILE="${JENKINS_ENV_FILE_INSIDE}"
+    HOST_ENV_FILE="${HOST_ENV_FILE_INSIDE}"
 fi
 
 # Usage:
-#   get_jenkins_env <variable-name> [<default>]
+#   get_host_env <variable-name> [<default>]
 #
-# Get <variable-name> from the jenkins environment dumped at the start of the
-# jenkins job.  If the jenkins environment was not dumped at the beginning of
-# the jenkins job, the regular environment is taken.
+# Get <variable-name> from the host environment dumped at the start of the
+# host job.  If the host environment was not dumped at the beginning of
+# the host job, the regular environment is taken.
 #
 # If the variable is not found and no default value is specified, return 1.
-get_jenkins_env() {
+get_host_env() {
     # match on variable name at the beginning of line and then delete everyting
     # up to and including the first equal sign
     local default default_specified name
     if (( $# < 0 )); then
-        echo "ERR: Did not specify variable name to query from jenkins env.">&2
+        echo "ERR: Did not specify variable name to query from host env.">&2
         return 1
     else
         name="$1"
@@ -41,8 +41,8 @@ get_jenkins_env() {
     fi
 
     if ! {
-        if [ -f "${JENKINS_ENV_FILE}" ]; then
-            cat "${JENKINS_ENV_FILE}"
+        if [ -f "${HOST_ENV_FILE}" ]; then
+            cat "${HOST_ENV_FILE}"
         else
             env
         fi
@@ -76,7 +76,7 @@ get_var_in_out() {
 
 set_debug_output_from_env() {
     # Enable debug if YASHCHIKI_DEBUG is NOT (-n) empty string
-    if [ -n "$(get_jenkins_env YASHCHIKI_DEBUG "")" ]; then
+    if [ -n "$(get_host_env YASHCHIKI_DEBUG "")" ]; then
         set -x
     else
         set +x
@@ -90,7 +90,7 @@ export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 export LOCK_FILENAME=lock
 
-BUILD_CACHE_NAME="$(get_jenkins_env BUILD_CACHE_NAME visionary_manual)"
+BUILD_CACHE_NAME="$(get_host_env BUILD_CACHE_NAME visionary_manual)"
 export BUILD_CACHE_NAME
 
 # NOTE: build caches contain relavite symlinks to preserved_packages, so the
@@ -98,8 +98,8 @@ export BUILD_CACHE_NAME
 # should be maintained inside the container!
 # --obreitwi, 17-06-20 12:53:20
 
-BASE_BUILD_CACHE_OUTSIDE="$(get_jenkins_env HOME)/build_caches"
-BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_jenkins_env HOME)/build_caches/failed"
+BASE_BUILD_CACHE_OUTSIDE="$(get_host_env HOME)/build_caches"
+BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_host_env HOME)/build_caches/failed"
 BUILD_CACHE_OUTSIDE="${BASE_BUILD_CACHE_OUTSIDE}/${BUILD_CACHE_NAME}"
 export BASE_BUILD_CACHE_OUTSIDE
 export BASE_BUILD_CACHE_FAILED_OUTSIDE
@@ -112,16 +112,16 @@ export BASE_BUILD_CACHE_INSIDE
 export BUILD_CACHE_INSIDE
 export BUILD_CACHE_LOCK
 
-SOURCE_CACHE_DIR="$(get_jenkins_env HOME)/download_cache"
+SOURCE_CACHE_DIR="$(get_host_env HOME)/download_cache"
 export SOURCE_CACHE_DIR
 
 PRESERVED_PACKAGES_INSIDE="/opt/preserved_packages"
-PRESERVED_PACKAGES_OUTSIDE="$(get_jenkins_env HOME)/preserved_packages"
+PRESERVED_PACKAGES_OUTSIDE="$(get_host_env HOME)/preserved_packages"
 export PRESERVED_PACKAGES_INSIDE
 export PRESERVED_PACKAGES_OUTSIDE
 
 META_DIR_INSIDE="/opt/meta"
-META_DIR_OUTSIDE="$(get_jenkins_env WORKSPACE)${META_DIR_INSIDE}"
+META_DIR_OUTSIDE="$(get_host_env WORKSPACE)${META_DIR_INSIDE}"
 export META_DIR_INSIDE
 export META_DIR_OUTSIDE
 
@@ -217,7 +217,7 @@ SPACK_ARGS_INSTALL=()
 SPACK_ARGS_REINDEX=()
 SPACK_ARGS_VIEW=()
 
-if [ -n "$(get_jenkins_env SPACK_VERBOSE)" ]; then
+if [ -n "$(get_host_env SPACK_VERBOSE)" ]; then
     SPACK_ARGS_INSTALL+=("--verbose")
     SPACK_ARGS_VIEW+=("--verbose")
     SPACK_ARGS_REINDEX+=("--verbose")
@@ -580,9 +580,9 @@ get_change_name() {
     local gerrit_patchset_number
     local gerrit_refspec
 
-    gerrit_change_number="$(get_jenkins_env GERRIT_CHANGE_NUMBER)"
-    gerrit_patchset_number="$(get_jenkins_env GERRIT_PATCHSET_NUMBER)"
-    gerrit_refspec="$(get_jenkins_env GERRIT_REFSPEC)"
+    gerrit_change_number="$(get_host_env GERRIT_CHANGE_NUMBER)"
+    gerrit_patchset_number="$(get_host_env GERRIT_PATCHSET_NUMBER)"
+    gerrit_refspec="$(get_host_env GERRIT_REFSPEC)"
 
     if [ -z "${gerrit_change_number:-}" ]; then
         if [ -n "${gerrit_refspec:-}" ]; then
@@ -630,7 +630,7 @@ EOF
 
 # Get gerrit username
 gerrit_username() {
-    get_jenkins_env GERRIT_USERNAME hudson
+    get_host_env GERRIT_USERNAME hudson
 }
 
 # Read the current gerrit config from `.gitreview` into global variables:

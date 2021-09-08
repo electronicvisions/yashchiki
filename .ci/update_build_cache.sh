@@ -31,7 +31,7 @@ source "${SOURCE_DIR}/commons.sh"
 
 # do not fail the build if some updates in the build-cache fail
 #
-# since the spack user cannot read home of vis_jenkins we need to mount the
+# since the spack user cannot read home of the host user we need to mount the
 # update script inside the container
 set +e
 # Arugments needed once we switch to singularity3: --writable-tmpfs
