@@ -38,12 +38,13 @@ if [ -n "${YASHCHIKI_PROXY_HTTPS:-}" ]; then
 	export https_proxy=${YASHCHIKI_PROXY_HTTPS}
 fi
 
-TARGET_FOLDER="sandboxes/${CONTAINER_STYLE}"
+TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
-# Do not change: special sudo permit for the host user...
-sudo rm -rf sandboxes/
+# Do not change: special sudo permit for the host user... (with env var resolved by host user)
+# When changing the env var value the sudo permit needs changing as well
+sudo rm -rf ${YASHCHIKI_SANDBOXES}/
 
-mkdir sandboxes
+mkdir ${YASHCHIKI_SANDBOXES}
 
 # Do not change: special sudo permit for the host user...
 sudo -E singularity build --sandbox "${TARGET_FOLDER}" ${CONTAINER_STYLE}_recipe.def | tee out_singularity_build_${CONTAINER_STYLE}_recipe.txt

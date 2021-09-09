@@ -3,12 +3,12 @@
 set -euo pipefail
 shopt -s inherit_errexit 2>/dev/null || true
 
-if (( $(find sandboxes -mindepth 1 -maxdepth 1 | wc -l) > 1 )); then
+if (( $(find ${YASHCHIKI_SANDBOXES} -mindepth 1 -maxdepth 1 | wc -l) > 1 )); then
     echo "More than one sandbox found, this should never happen!" >&2
     exit 1
 fi
 
-TARGET_FOLDER="$(find sandboxes -mindepth 1 -maxdepth 1)"
+TARGET_FOLDER="$(find ${YASHCHIKI_SANDBOXES} -mindepth 1 -maxdepth 1)"
 
 # create image file
 IMAGE_NAME=singularity_${CONTAINER_STYLE}_temp.img
