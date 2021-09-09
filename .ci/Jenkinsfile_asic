@@ -39,6 +39,8 @@ pipeline {
 				// versions from system packages
 				DEPENDENCY_PYTHON = "python@2.7.5"
 				DEPENDENCY_PYTHON3 = "python@3.6.8"
+				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
+				YASHCHIKI_PROXY_HTTPS = "http://proxy.kip.uni-heidelberg.de:8080"
 				YASHCHIKI_BUILD_SPACK_GCC = 0
 				YASHCHIKI_SPACK_GCC_VERSION = "4.8.5"
 				YASHCHIKI_SPACK_GCC = "gcc@${YASHCHIKI_SPACK_GCC_VERSION}"

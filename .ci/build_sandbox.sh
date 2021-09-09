@@ -31,8 +31,12 @@ fi
 chmod 777 "${JOB_TMP_SPACK}"
 
 # build the container (using scripts from above)
-export http_proxy=http://proxy.kip.uni-heidelberg.de:8080
-export https_proxy=http://proxy.kip.uni-heidelberg.de:8080
+if [ -n "${YASHCHIKI_PROXY_HTTP:-}" ]; then
+	export http_proxy=${YASHCHIKI_PROXY_HTTP}
+fi
+if [ -n "${YASHCHIKI_PROXY_HTTPS:-}" ]; then
+	export https_proxy=${YASHCHIKI_PROXY_HTTPS}
+fi
 
 TARGET_FOLDER="sandboxes/${CONTAINER_STYLE}"
 
