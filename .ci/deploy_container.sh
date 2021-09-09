@@ -11,7 +11,6 @@ source "${SOURCE_DIR}/commons.sh"
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
 FALLBACK_DIR="${HOME}/container_mount_full"
-IMAGE_NAME="singularity_${CONTAINER_STYLE}_temp.img"
 DATE=$(date --iso)
 
 declare -A CONTAINER_PREFIX_LUT
@@ -42,9 +41,9 @@ CONTAINER_NAME="$(get_container_name ${num})"
 echo $CONTAINER_NAME
 
 # copy to target
-cp "${IMAGE_NAME}" "${CONTAINER_NAME}" || (
+cp "${YASHCHIKI_IMAGE_NAME}" "${CONTAINER_NAME}" || (
     echo "Error: Copy failed because the mount point is full, saving container image to fallback location.." >&2
-    cp -v "${IMAGE_NAME}" "${FALLBACK_DIR}/$(basename "${CONTAINER_NAME}")" >&2
+    cp -v "${YASHCHIKI_IMAGE_NAME}" "${FALLBACK_DIR}/$(basename "${CONTAINER_NAME}")" >&2
     exit 1
 )
 
@@ -69,4 +68,4 @@ if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
 fi
 
 # delete temporary image
-rm "${IMAGE_NAME}"
+rm "${YASHCHIKI_IMAGE_NAME}"

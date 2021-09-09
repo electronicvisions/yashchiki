@@ -42,6 +42,7 @@ pipeline {
 				// can be removed as soon as the explicit preferred version
 				// is dropped
 				DEPENDENCY_PYTHON3 = "python@3.8.2"
+				YASHCHIKI_IMAGE_NAME = "singularity_visionary_temp.img"
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
 				YASHCHIKI_PROXY_HTTPS = "http://proxy.kip.uni-heidelberg.de:8080"

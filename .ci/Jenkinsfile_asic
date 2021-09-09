@@ -39,6 +39,7 @@ pipeline {
 				// versions from system packages
 				DEPENDENCY_PYTHON = "python@2.7.5"
 				DEPENDENCY_PYTHON3 = "python@3.6.8"
+				YASHCHIKI_IMAGE_NAME = "singularity_asic_temp.img"
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
 				YASHCHIKI_PROXY_HTTPS = "http://proxy.kip.uni-heidelberg.de:8080"
