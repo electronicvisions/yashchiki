@@ -38,6 +38,7 @@ pipeline {
 				DOCKER_BASE_IMAGE = "centos:7"
 				// versions from system packages
 				DEPENDENCY_PYTHON = "python@3.8.3"
+				YASHCHIKI_META_DIR = "${WORKSPACE}/meta"
 				YASHCHIKI_RECIPE_PATH = "${WORKSPACE}/asic_recipe.def"
 				YASHCHIKI_CACHES_ROOT = "${HOME}"
 				YASHCHIKI_SPACK_PATH = "${env.WORKSPACE}/spack"

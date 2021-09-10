@@ -36,6 +36,7 @@ pipeline {
 			environment {
 				DOCKER_BASE_IMAGE = "debian:bullseye"
 				DEPENDENCY_PYTHON = "python@3.8.2"
+				YASHCHIKI_META_DIR = "${WORKSPACE}/meta"
 				YASHCHIKI_RECIPE_PATH = "${WORKSPACE}/visionary_recipe.def"
 				YASHCHIKI_CACHES_ROOT = "${HOME}"
 				YASHCHIKI_SPACK_PATH = "${env.WORKSPACE}/spack"
