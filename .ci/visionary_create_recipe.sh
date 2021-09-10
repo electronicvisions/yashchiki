@@ -23,7 +23,7 @@ From: ${DOCKER_BASE_IMAGE}
     mount --no-mtab --bind "${YASHCHIKI_SPACK_PATH}" "\${SINGULARITY_ROOTFS}/opt/spack"
     # bind-mount ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
-    mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
+    mount --no-mtab --bind "${YASHCHIKI_CACHES_ROOT}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
     # bind-mount build_cache
     mkdir -p "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
     # create buildcache directory if it does not exist

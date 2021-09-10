@@ -98,8 +98,8 @@ export BUILD_CACHE_NAME
 # should be maintained inside the container!
 # --obreitwi, 17-06-20 12:53:20
 
-BASE_BUILD_CACHE_OUTSIDE="$(get_host_env HOME)/build_caches"
-BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_host_env HOME)/build_caches/failed"
+BASE_BUILD_CACHE_OUTSIDE="$(get_host_env YASHCHIKI_CACHES_ROOT)/build_caches"
+BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_host_env YASHCHIKI_CACHES_ROOT)/build_caches/failed"
 BUILD_CACHE_OUTSIDE="${BASE_BUILD_CACHE_OUTSIDE}/${BUILD_CACHE_NAME}"
 export BASE_BUILD_CACHE_OUTSIDE
 export BASE_BUILD_CACHE_FAILED_OUTSIDE
@@ -112,11 +112,11 @@ export BASE_BUILD_CACHE_INSIDE
 export BUILD_CACHE_INSIDE
 export BUILD_CACHE_LOCK
 
-SOURCE_CACHE_DIR="$(get_host_env HOME)/download_cache"
+SOURCE_CACHE_DIR="$(get_host_env YASHCHIKI_CACHES_ROOT)/download_cache"
 export SOURCE_CACHE_DIR
 
 PRESERVED_PACKAGES_INSIDE="/opt/preserved_packages"
-PRESERVED_PACKAGES_OUTSIDE="$(get_host_env HOME)/preserved_packages"
+PRESERVED_PACKAGES_OUTSIDE="$(get_host_env YASHCHIKI_CACHES_ROOT)/preserved_packages"
 export PRESERVED_PACKAGES_INSIDE
 export PRESERVED_PACKAGES_OUTSIDE
 

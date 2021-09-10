@@ -7,8 +7,6 @@ SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
 # hard-link source cache into spack folder to avoid duplication.
-# https://github.com/spack/spack/pull/12940 introduced a new format for the
-# cache, so we switch from $HOME/download_cache to $HOME/source_cache
 mkdir -p "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
 find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
     | xargs -r -n 1 "-I{}" -0 cp -vrl '{}' "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
