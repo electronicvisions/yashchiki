@@ -8,7 +8,7 @@ SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 HOST_ENV_FILE_INSIDE="/tmp/spack/host.env"
 if [ -n "${WORKSPACE:-}" ]; then
     # we are not in container
-    HOST_ENV_FILE="${WORKSPACE}/host.env"
+    HOST_ENV_FILE="${YASHCHIKI_HOST_ENV_PATH}"
 else
     HOST_ENV_FILE="${HOST_ENV_FILE_INSIDE}"
 fi
