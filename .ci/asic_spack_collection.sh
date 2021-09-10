@@ -12,6 +12,9 @@ spack_views_no_default_gcc=(\
     visionary-asic # ECM: system compiler for now
 )
 
+spack_views_gccxml=(
+)
+
 spack_gid="nobody"
 
 spack_create_user_cmd() {

@@ -34,6 +34,11 @@ spack_views_no_default_gcc=(
     "visionary-nux" # currenlty visionary-nux is no view, but serves as example
 )
 
+spack_views_gccxml=(
+    "visionary-wafer"
+    "visionary-wafer-nodev"
+)
+
 
 
 spack_gid="nogroup"
@@ -41,9 +46,6 @@ spack_gid="nogroup"
 spack_create_user_cmd() {
     adduser spack --uid 888 --no-create-home --home /opt/spack --disabled-password --system --shell /bin/bash
 }
-
-# gccxml is added without dependencies to avoid introducing a second gcc
-spack_add_to_view_with_dependencies["gccxml"]="no"
 
 # all views get the default gcc except those in spack_views_no_default_gcc
 # (defined above)
@@ -61,9 +63,18 @@ spack_add_to_view["${YASHCHIKI_SPACK_GCC}"]="$(
     done | tr '\n' ' '
 )"
 
-# Add gccxml to those views that still depend on it
-spack_add_to_view["gccxml"]="$(
-for view in visionary-wafer{,-nodev}; do
-    echo ${view}
-done | tr '\n' ' '
+## Add gccxml to those views that still depend on it
+spack_add_to_view_gccxml="$(
+    for viewname in "${spack_views[@]+"${spack_views[@]}"}"; do
+        # check if the current view matches any view that gets gccxml
+        # Note: Currently this allow partial matches
+        if printf "%s\n" "${spack_views_gccxml[@]+"${spack_views_gccxml[@]}"}" \
+                | grep -qF "${viewname}"; then
+            echo ${viewname}
+        fi
+    done | tr '\n' ' '
 )"
+if [[ "$spack_add_to_view_gccxml" != "" ]]; then
+    spack_add_to_view_with_dependencies["gccxml"]="no"
+    spack_add_to_view["gccxml"]="$spack_add_to_view_gccxml"
+fi
