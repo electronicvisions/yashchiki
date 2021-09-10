@@ -3,12 +3,10 @@
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
-RECIPE_FILENAME="${WORKSPACE}/asic_recipe.def"
-
 # create container description file
 # * based on CentOS 7's docker image
 # * just manually install everything we need
-cat <<EOF >"${RECIPE_FILENAME}"
+cat <<EOF >"${YASHCHIKI_RECIPE_PATH}"
 Bootstrap: docker
 From: ${DOCKER_BASE_IMAGE}
 
@@ -299,10 +297,10 @@ for view in "${spack_views[@]}"; do
     (
         generate_appenv "${view}" "${view}"
         [[ "${view}" =~ ^visionary- ]] && generate_appenv "${view#visionary-}" "${view}"
-    ) >> "${RECIPE_FILENAME}"
+    ) >> "${YASHCHIKI_RECIPE_PATH}"
 
     if [ "${view}" = "visionary-simulation" ];then
-cat <<EOF >>"${RECIPE_FILENAME}"
+cat <<EOF >>"${YASHCHIKI_RECIPE_PATH}"
     export NEST_MODULES=visionarymodule
 EOF
     fi

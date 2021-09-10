@@ -3,8 +3,6 @@
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
-RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
-
 # create container description file
 # * based on Debian buster (minimal) + a few extra packages (e.g. git, python, ...)
 # * bind mount spack's fetch-cache and ccache into the container -> speed up stuff
@@ -13,7 +11,7 @@ RECIPE_FILENAME="${WORKSPACE}/visionary_recipe.def"
 # * create "spack" user in the container and run spack installation script as spack user
 #   (-> installs to /opt/spack, and creates views)
 # * provide "apps" which set environment variables to appropriate views
-cat <<EOF >"${RECIPE_FILENAME}"
+cat <<EOF >"${YASHCHIKI_RECIPE_PATH}"
 Bootstrap: docker
 From: ${DOCKER_BASE_IMAGE}
 
@@ -135,5 +133,5 @@ for view in "${spack_views[@]}"; do
     (
         generate_appenv "${view}" "${view}"
         [[ "${view}" =~ ^visionary- ]] && generate_appenv "${view#visionary-}" "${view}"
-    ) >> "${RECIPE_FILENAME}"
+    ) >> "${YASHCHIKI_RECIPE_PATH}"
 done
