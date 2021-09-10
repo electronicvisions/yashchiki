@@ -58,12 +58,11 @@ populate_views
 # The host system might provide a python3 binary which spack will prefer over
 # the view-provided python2 binary. Since we set PYTHONHOME this leads to
 # incompatible python libraries search paths.
-for pyf in ${MY_SPACK_VIEW_PREFIX}/visionary-*/bin/python2; do
-    # ignore views w/o python2
-    if [ -f ${pyf} ]; then
+if compgen -G "${MY_SPACK_VIEW_PREFIX}/visionary-*/bin/python2" > /dev/null; then
+    for pyf in ${MY_SPACK_VIEW_PREFIX}/visionary-*/bin/python2; do
         ln -fs ${pyf} "$(dirname ${pyf})/python3"
-    fi
-done
+    done
+fi
 
 umask ${OLD_UMASK}
 
