@@ -21,7 +21,7 @@ mkdir -p "${META_DIR_OUTSIDE}"
 )
 
 (
-    cd "${WORKSPACE}/spack"
+    cd ${YASHCHIKI_SPACK_PATH}
     git log > "${META_DIR_OUTSIDE}/spack_git.log"
     if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
         gerrit_get_current_change_commits \

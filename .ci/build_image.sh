@@ -12,7 +12,7 @@ TARGET_FOLDER="$(find ${YASHCHIKI_SANDBOXES} -mindepth 1 -maxdepth 1)"
 
 # We want the spack folder to be available inside the container image
 # -> it needs to be bind mounted to the sandbox folder
-sudo mount --bind "${PWD}/spack" "${TARGET_FOLDER}/opt/spack"
+sudo mount --bind "${YASHCHIKI_SPACK_PATH}" "${TARGET_FOLDER}/opt/spack"
 
 # TODO: singularity 3.1 produces SIF w/o setuid flags on files, using a newer
 # singularity for the image build

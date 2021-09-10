@@ -9,15 +9,15 @@ source "${SOURCE_DIR}/commons.sh"
 # hard-link source cache into spack folder to avoid duplication.
 # https://github.com/spack/spack/pull/12940 introduced a new format for the
 # cache, so we switch from $HOME/download_cache to $HOME/source_cache
-mkdir -p "${PWD}/spack/var/spack/cache/"
+mkdir -p "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
 find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
-    | xargs -r -n 1 "-I{}" -0 cp -vrl '{}' "${PWD}/spack/var/spack/cache/"
+    | xargs -r -n 1 "-I{}" -0 cp -vrl '{}' "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
 
 # set download mirror stuff to prefill outside of container
-export MY_SPACK_FOLDER="$PWD/spack"
+export MY_SPACK_FOLDER="${YASHCHIKI_SPACK_PATH}"
 export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
 
-PATH_COMPILERS="${PWD}/spack/etc/spack/compilers.yaml"
+PATH_COMPILERS="${MY_SPACK_FOLDER}/etc/spack/compilers.yaml"
 
 # Add fake system compiler (needed for fetching)
 # This is NOT the correct version but we need to concretize with the same
@@ -165,7 +165,7 @@ else
 fi
 
 # update cache in any case to store successfully loaded files
-rsync -av "${PWD}/spack/var/spack/cache/" "${SOURCE_CACHE_DIR}/"
+rsync -av "${MY_SPACK_FOLDER}/var/spack/cache/" "${SOURCE_CACHE_DIR}/"
 
 if (( fetch_failed != 0 )); then
     # propagate error

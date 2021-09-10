@@ -20,7 +20,7 @@ From: ${DOCKER_BASE_IMAGE}
 %setup
     # bind-mount spack-folder as moving involves copying the complete download cache
     mkdir \${SINGULARITY_ROOTFS}/opt/spack
-    mount --no-mtab --bind "${WORKSPACE}/spack" "\${SINGULARITY_ROOTFS}/opt/spack"
+    mount --no-mtab --bind "${YASHCHIKI_SPACK_PATH}" "\${SINGULARITY_ROOTFS}/opt/spack"
     # bind-mount ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
     mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
