@@ -35,7 +35,7 @@ source "${SOURCE_DIR}/commons.sh"
 # update script inside the container
 set +e
 # Arugments needed once we switch to singularity3: --writable-tmpfs
-sudo -Eu spack singularity exec\
+sudo -E singularity exec\
     -B "${BUILD_CACHE_OUTSIDE}:${BUILD_CACHE_INSIDE}:rw"\
     "${IMAGE_NAME}" \
-    /opt/spack_install_scripts/update_build_cache_in_container.sh -q || exit 0
+    sudo -Eu spack /opt/spack_install_scripts/update_build_cache_in_container.sh -q || exit 0

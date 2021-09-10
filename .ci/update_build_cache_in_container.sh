@@ -82,6 +82,9 @@ if (( quiet == 1 )); then
     args_progress=""
 fi
 
+# find requires current working directory to be readable by spack user
+cd ${MY_SPACK_FOLDER}
+
 get_hashes_to_store \
     | parallel -r ${args_progress} -j$(nproc) \
         tar Pcfz "${destination_folder}/{}.tar.gz" \"\$\(spack location -i /{}\)\"
