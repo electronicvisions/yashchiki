@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-source "${SOURCE_DIR}/commons.sh"
+ROOT_DIR="$(dirname "$(dirname "$(dirname "$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")")")")"
+source "${ROOT_DIR}/lib/yashchiki/commons.sh"
 
 # create container description file
 # * based on Debian buster (minimal) + a few extra packages (e.g. git, python, ...)
@@ -36,14 +36,15 @@ From: ${DOCKER_BASE_IMAGE}
     mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${SOURCE_DIR}"/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${SOURCE_DIR}"/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${ROOT_DIR}"/share/yashchiki/styles/visionary/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${ROOT_DIR}"/lib/yashchiki/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     mkdir -p "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
     rsync -av "${META_DIR_OUTSIDE}"/* "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
-    rsync -av "${YASHCHIKI_INSTALL}"/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
+    rsync -av "${ROOT_DIR}"/share/yashchiki/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
 
 %files
     # NOTE: Due to a bug in singularity 2.6 all paths in this section _cannot_
@@ -51,10 +52,10 @@ From: ${DOCKER_BASE_IMAGE}
     # there are, I pray for your poor soul that escaping them works..
     # --obreitwi, 17-02-19 # 23:45:51
     # provide spack command to login shells
-    ${YASHCHIKI_INSTALL}/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
-    ${YASHCHIKI_INSTALL}/misc-files/locale.gen /etc/locale.gen
-    ${YASHCHIKI_INSTALL}/misc-files/locale.alias /etc/locale.alias
-    ${YASHCHIKI_INSTALL}/misc-files/sudoers /etc/sudoers
+    ${ROOT_DIR}/share/yashchiki/misc-files/setup-spack.sh /etc/profile.d/setup-spack.sh
+    ${ROOT_DIR}/share/yashchiki/misc-files/locale.gen /etc/locale.gen
+    ${ROOT_DIR}/share/yashchiki/misc-files/locale.alias /etc/locale.alias
+    ${ROOT_DIR}/share/yashchiki/misc-files/sudoers /etc/sudoers
     ${HOST_ENV_FILE} ${HOST_ENV_FILE_INSIDE}
 
 %post

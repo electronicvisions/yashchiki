@@ -25,7 +25,7 @@ echo ""
 }
 
 # source and destination are reversed for xargs!
-len_preamble=$(awk -f "$(cd yashchiki && git rev-parse --show-toplevel)/.ci/find_num_lines_shebang.awk" "${src}")
+len_preamble=$(awk -f "$(cd yashchiki && git rev-parse --show-toplevel)/lib/yashchiki/find_num_lines_shebang.awk" "${src}")
 head -n "${len_preamble}" "${src}" > "${dst}"
 make_preamble >> "${dst}"
 tail -n +$(( len_preamble + 1 )) "${src}" >> "${dst}"

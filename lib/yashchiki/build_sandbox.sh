@@ -15,8 +15,8 @@ unset LC_TIME
 unset LC_MESSAGES
 
 echo "creating ${YASHCHIKI_RECIPE_PATH}" >&2
-SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-"${SOURCE_DIR}/${CONTAINER_STYLE}_create_recipe.sh"
+ROOT_DIR="$(dirname "$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")")"
+bash "${ROOT_DIR}/share/yashchiki/styles/${CONTAINER_STYLE}/create_recipe.sh"
 
 echo "created ${YASHCHIKI_RECIPE_PATH}" >&2
 cat "${YASHCHIKI_RECIPE_PATH}"

@@ -3,6 +3,7 @@
 set -euo pipefail
 shopt -s inherit_errexit 2>/dev/null || true
 
+ROOT_DIR="$(dirname "$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")")"
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 
 HOST_ENV_FILE_INSIDE="/tmp/spack/host.env"
@@ -179,7 +180,13 @@ declare -A spack_add_to_view
 #                                   "no" otherwise
 declare -A spack_add_to_view_with_dependencies
 
-source "${SOURCE_DIR}/${CONTAINER_STYLE}_spack_collection.sh"
+if test -f "${ROOT_DIR}/share/yashchiki/styles/${CONTAINER_STYLE}/spack_collection.sh"; then
+    # outside of container
+    source "${ROOT_DIR}/share/yashchiki/styles/${CONTAINER_STYLE}/spack_collection.sh"
+else
+    # inside of container
+    source "${SOURCE_DIR}/spack_collection.sh"
+fi
 
 # Control verbosity etc of commands
 SPACK_ARGS_INSTALL=()

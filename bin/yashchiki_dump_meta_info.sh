@@ -6,8 +6,8 @@
 set -Eeuo pipefail
 shopt -s inherit_errexit
 
-SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-source "${SOURCE_DIR}/commons.sh"
+ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
+source "${ROOT_DIR}/lib/yashchiki/commons.sh"
 
 mkdir -p "${META_DIR_OUTSIDE}"
 

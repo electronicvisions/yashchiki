@@ -56,7 +56,7 @@ umask 000
 # several spack packages get linked into the same view and the random order of
 # execution in a parallel context, builds might become unstable otherwise.
 {
-source ${SPACK_INSTALL_SCRIPTS}/${CONTAINER_STYLE}_spack_custom_view.sh
+source ${SPACK_INSTALL_SCRIPTS}/spack_custom_view.sh
 } | parallel_cmds
 
 # Perform the remaining additions to the views defined in commons.

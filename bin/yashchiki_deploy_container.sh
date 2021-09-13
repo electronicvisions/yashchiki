@@ -6,8 +6,8 @@ shopt -s inherit_errexit
 # NOTE: stdout of this script is parsed within the Jenkinsfile.
 #       Think twice before adding any output!
 
-SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-source "${SOURCE_DIR}/commons.sh"
+ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
+source "${ROOT_DIR}/lib/yashchiki/commons.sh"
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
 FALLBACK_DIR="${HOME}/container_mount_full"

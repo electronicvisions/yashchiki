@@ -15,9 +15,9 @@ if ! [ "${CONTAINER_BUILD_TYPE:-}" = "testing" ]; then
     exit 0
 fi
 
-SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-source "${SOURCE_DIR}/dummy_variables.sh"
-source "${SOURCE_DIR}/commons.sh"
+ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
+source "${ROOT_DIR}/lib/yashchiki/dummy_variables.sh"
+source "${ROOT_DIR}/lib/yashchiki/commons.sh"
 
 container_name=""
 result_type=""
