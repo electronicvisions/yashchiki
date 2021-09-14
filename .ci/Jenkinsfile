@@ -29,6 +29,7 @@ pipeline {
 
 	environment {
 		CONTAINER_STYLE = "visionary"
+		YASHCHIKI_HOST_ENV_PATH = "${WORKSPACE}/host.env"
 	}
 
 	stages {
@@ -37,7 +38,6 @@ pipeline {
 				DOCKER_BASE_IMAGE = "debian:bullseye"
 				DEPENDENCY_PYTHON = "python@3.8.2"
 				YASHCHIKI_INSTALL = "${WORKSPACE}/yashchiki"
-				YASHCHIKI_HOST_ENV_PATH = "${WORKSPACE}/host.env"
 				YASHCHIKI_META_DIR = "${WORKSPACE}/meta"
 				YASHCHIKI_RECIPE_PATH = "${WORKSPACE}/visionary_recipe.def"
 				YASHCHIKI_CACHES_ROOT = "${HOME}"
@@ -73,72 +73,73 @@ pipeline {
 							} else {
 								sh "singularity exec /containers/stable/latest ./symwaf2ic/waf setup --project=yashchiki --clone-depth=2 --gerrit-changes=${GERRIT_CHANGE_NUMBER} --gerrit-url=ssh://hudson@${GERRIT_HOST}:${GERRIT_PORT}"
 							}
+							sh "singularity exec /containers/stable/latest ./symwaf2ic/waf configure install"
 						}
 					}
 				}
 				stage('Validate environment') {
 					steps {
-						sh "yashchiki/lib/yashchiki/validate_environment.sh"
+						sh "bash lib/yashchiki/validate_environment.sh"
 					}
 				}
 				stage('Dump Meta Info') {
 					steps {
-						sh "yashchiki/bin/yashchiki_dump_meta_info.sh"
-						sh "yashchiki/bin/yashchiki_notify_gerrit.sh -m 'Build containing this change started..'"
+						sh "bash bin/yashchiki_dump_meta_info.sh"
+						sh "bash bin/yashchiki_notify_gerrit.sh -m 'Build containing this change started..'"
 					}
 				}
 				stage('Spack Fetch') {
 					steps {
 						script {
 							try {
-								sh "yashchiki/lib/yashchiki/fetch.sh"
+								sh "bash lib/yashchiki/fetch.sh"
 							}
 							catch (Throwable t) {
 								archiveArtifacts "errors_concretization.log"
 								throw t
 							}
-							spec_folder_in_container = sh(script: "yashchiki/lib/yashchiki/get_host_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
+							spec_folder_in_container = sh(script: "bash lib/yashchiki/get_host_env.sh SPEC_FOLDER_IN_CONTAINER", returnStdout: true).trim()
 							archiveArtifacts(artifacts: "sandboxes/*/$spec_folder_in_container/*.yaml", allowEmptyArchive: true)
 						}
 					}
 				}
 				stage('Deploy utilities') {
 					steps {
-						sh "yashchiki/bin/yashchiki_deploy_utilities.sh"
+						sh "bash bin/yashchiki_deploy_utilities.sh"
 					}
 				}
 				stage('Create visionary recipe') {
 					steps {
-						sh "yashchiki/share/yashchiki/styles/visionary/create_recipe.sh"
+						sh "bash share/yashchiki/styles/visionary/create_recipe.sh"
 					}
 				}
 				stage('Build sandbox') {
 					steps {
-						sh "yashchiki/lib/yashchiki/build_sandbox.sh"
+						sh "bash lib/yashchiki/build_sandbox.sh"
 					}
 				}
 				stage('Build container image') {
 					steps {
-						sh "yashchiki/lib/yashchiki/build_image.sh"
+						sh "bash lib/yashchiki/build_image.sh"
 					}
 				}
 				stage('Update build cache and export container') {
 					steps {
 						script {
 							// we only want the container name, tail everything else
-							CONTAINER_IMAGE = sh(script: "yashchiki/bin/yashchiki_deploy_container.sh | tail -n 1", returnStdout: true).trim()
+							CONTAINER_IMAGE = sh(script: "bash bin/yashchiki_deploy_container.sh | tail -n 1", returnStdout: true).trim()
 						}
-						sh "yashchiki/lib/yashchiki/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
-						sh "yashchiki/bin/yashchiki_notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
+						sh "bash lib/yashchiki/update_build_cache.sh -c \"$CONTAINER_IMAGE\""
+						sh "bash bin/yashchiki_notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
 					}
 				}
 			}
 			post {
 				failure {
 					script {
-						cache_failed = sh(script: "yashchiki/lib/yashchiki/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
+						cache_failed = sh(script: "bash lib/yashchiki/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
 					}
-					sh "yashchiki/bin/yashchiki_notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
+					sh "bash bin/yashchiki_notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
 				}
 				cleanup {
 					archiveArtifacts "host.env"
@@ -206,18 +207,15 @@ pipeline {
 					}
 				}
 			}
-			environment {
-				YASHCHIKI_HOST_ENV_PATH = "${WORKSPACE}/host.env"
-			}
 			post {
 				success {
-					jesh "yashchiki/bin/yashchiki_notify_gerrit.sh -v 1 -t Tests -c '${CONTAINER_IMAGE}'"
+					jesh "bash bin/yashchiki_notify_gerrit.sh -v 1 -t Tests -c '${CONTAINER_IMAGE}'"
 				}
 				unstable {
-					jesh "yashchiki/bin/yashchiki_notify_gerrit.sh -v 0 -t Tests -c '${CONTAINER_IMAGE}'"
+					jesh "bash bin/yashchiki_notify_gerrit.sh -v 0 -t Tests -c '${CONTAINER_IMAGE}'"
 				}
 				failure {
-					jesh "yashchiki/bin/yashchiki_notify_gerrit.sh -v -1 -t Tests -c '${CONTAINER_IMAGE}'"
+					jesh "bash bin/yashchiki_notify_gerrit.sh -v -1 -t Tests -c '${CONTAINER_IMAGE}'"
 				}
 			}
 		}

@@ -36,8 +36,8 @@ From: ${DOCKER_BASE_IMAGE}
     mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${ROOT_DIR}"/share/yashchiki/styles/visionary/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${ROOT_DIR}"/lib/yashchiki/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/visionary/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av --chmod 0755 "${ROOT_DIR}"/lib/yashchiki/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     mkdir -p "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
