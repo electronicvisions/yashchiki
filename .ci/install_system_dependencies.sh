@@ -38,6 +38,7 @@ system_dependencies=(
         "linux-perf"
         "libssl-dev"
         "lshw"
+        "lsof"
         "man-db"
         "ncurses-term"
         "net-tools"
