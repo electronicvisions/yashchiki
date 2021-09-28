@@ -27,6 +27,7 @@ prerequisites=(
     "procps"
     "python3"
     "python3-yaml"
+    "python-is-python3"
     "rsync"
     "ssh"
     "sudo"
