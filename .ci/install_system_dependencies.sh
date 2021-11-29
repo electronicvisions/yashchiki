@@ -46,6 +46,7 @@ system_dependencies=(
         "qemu"
         "qemu-user-static"
         "strace"
+        "time"
         "tshark"
         "tsocks"
         "usbutils"
