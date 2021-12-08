@@ -199,6 +199,9 @@ From: ${DOCKER_BASE_IMAGE}
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
     /opt/conda/bin/conda install -y pylint pycodestyle nose pyyaml
 
+    # YS: teststand dependencies (no python in spack yet)
+    /opt/conda/bin/conda install -y numpy matplotlib
+
     # ECM: and now some abspacking
     yum -y install ccache sudo parallel
 
