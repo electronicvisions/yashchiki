@@ -55,11 +55,14 @@ source ${SPACK_INSTALL_SCRIPTS}/${CONTAINER_STYLE}_spack_custom_view.sh
 populate_views
 
 # Hide python3 in ancient (python2-based) views:
-# The host system provides a python3 binary which spack prefers over the
-# view-provided python2 binary. Since we set PYTHONHOME this leads to
+# The host system might provide a python3 binary which spack will prefer over
+# the view-provided python2 binary. Since we set PYTHONHOME this leads to
 # incompatible python libraries search paths.
 for pyf in ${MY_SPACK_VIEW_PREFIX}/visionary-*/bin/python2; do
-    ln -fs ${pyf} "$(dirname ${pyf})/python3"
+    # ignore views w/o python2
+    if [ -f ${pyf} ]; then
+        ln -fs ${pyf} "$(dirname ${pyf})/python3"
+    fi
 done
 
 umask ${OLD_UMASK}
@@ -69,4 +72,6 @@ umask ${OLD_UMASK}
 # $ singularity shell -s /opt/shell/${SHELL} /containers/stable/latest
 # which is independent of any app. Especially, this allows custom loading of
 # modules within the container.
-ln -s "$(${MY_SPACK_BIN} location -i zsh)/bin/zsh" /opt/shell/zsh
+if ${MY_SPACK_BIN} location -i zsh; then
+    ln -s "$(${MY_SPACK_BIN} location -i zsh)/bin/zsh" /opt/shell/zsh
+fi

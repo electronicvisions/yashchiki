@@ -26,5 +26,6 @@ git clone "${GOCRYPTFS_REPO}" "${GOCRYPTFS_INSTALL_PATH}"
 
 pushd "${GOCRYPTFS_INSTALL_PATH}"
 # build and install
-./build.bash
+#./build.bash
+./build-without-openssl.bash
 popd
