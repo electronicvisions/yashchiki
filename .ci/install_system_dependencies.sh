@@ -42,6 +42,7 @@ system_dependencies=(
         "man-db"
         "ncurses-term"
         "net-tools"
+        "netcat"
         "psmisc"
         "qemu"
         "qemu-user-static"
