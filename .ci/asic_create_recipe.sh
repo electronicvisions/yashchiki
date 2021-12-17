@@ -62,6 +62,9 @@ From: ${DOCKER_BASE_IMAGE}
     # ECM: disable http caching
     echo "http_caching=none" >> /etc/yum.conf
 
+    # ECM: enable strict mode to fail when packages are not found (or other installation problems appear)
+    echo "skip_missing_names_on_install=0" >> /etc/yum.conf
+
     # Apparently, upon building the CentOS docker images it has been decided that
     # (for space-saving reasons) exactly one locale (en_US.utf8) is installed.
     # We don't care about the little extra space and user experience benefits from
