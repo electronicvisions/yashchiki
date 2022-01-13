@@ -80,6 +80,7 @@ From: ${DOCKER_BASE_IMAGE}
         bison \
         bzip2 \
         chrpath \
+        compat-db47 \
         compat-libtiff3 \
         cups-client \
         diffstat \
