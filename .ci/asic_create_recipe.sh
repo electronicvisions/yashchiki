@@ -203,6 +203,11 @@ From: ${DOCKER_BASE_IMAGE}
     # YS: teststand dependencies (no python in spack yet)
     /opt/conda/bin/conda install -y numpy matplotlib
 
+    # PD: jupyter notebook and ipython for more comfort
+    /opt/conda/bin/conda install -c conda-forge -y notebook
+    /opt/conda/bin/conda install -c conda-forge -y nb_conda_kernels
+    /opt/conda/bin/conda install -c conda-forge -y jupyter_contrib_nbextensions
+
     # ECM: and now some abspacking
     yum -y install ccache sudo parallel
 
