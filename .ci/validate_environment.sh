@@ -31,6 +31,7 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
     fi
 fi
 
+export SPACK_VERBOSE=
 # source file for early validation
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
