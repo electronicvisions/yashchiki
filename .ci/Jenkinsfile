@@ -189,13 +189,6 @@ pipeline {
 					}
 				}
 
-				// HDBIOAI project code
-				stage('HDBIOAI project') {
-					steps {
-						build(job: 'bld_gerrit-model-hw-hdbioai-dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
 				// neuromorphic sampling library
 				stage('model-nmsampling-sbs') {
 					steps {
