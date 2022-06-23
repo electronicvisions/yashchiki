@@ -14,7 +14,7 @@ Closure cleanupSteps = {
 }
 
 pipeline {
-	agent none
+	agent { label 'conviz1||conviz2' }
 
 	options {
 		timestamps()
@@ -33,7 +33,6 @@ pipeline {
 
 	stages {
 		stage('Container Build') {
-			agent { label 'conviz1||conviz2' }
 			environment {
 				DOCKER_BASE_IMAGE = "debian:bullseye"
 				// FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
@@ -136,11 +135,6 @@ pipeline {
 				cleanup {
 					archiveArtifacts "jenkins.env"
 					archiveArtifacts "out_singularity_build_visionary_recipe.txt"
-					// Clean build artifacts because otherwise the latest build from each jenkins job can take up to 50GB.
-					// 2 executors and 5 Jenkins-Jobs (testing, testing-spack, testing-asic, stable, stable-asic) will slowly but surely eat away memory.
-					script {
-						cleanupSteps()
-					}
 				}
 			}
 		}
@@ -213,27 +207,21 @@ pipeline {
 			}
 			post {
 				success {
-					node('conviz1||conviz2') {
-						// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
-						inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
-							jesh "/opt/spack_install_scripts/notify_gerrit.sh -v 1 -t Tests -c '${CONTAINER_IMAGE}'"
-						}
+					// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
+					inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
+						jesh "/opt/spack_install_scripts/notify_gerrit.sh -v 1 -t Tests -c '${CONTAINER_IMAGE}'"
 					}
 				}
 				unstable {
-					node ('conviz1||conviz2') {
-						// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
-						inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
-							jesh "/opt/spack_install_scripts/notify_gerrit.sh -v 0 -t Tests -c '${CONTAINER_IMAGE}'"
-						}
+					// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
+					inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
+						jesh "/opt/spack_install_scripts/notify_gerrit.sh -v 0 -t Tests -c '${CONTAINER_IMAGE}'"
 					}
 				}
 				failure {
-					node ('conviz1||conviz2') {
-						// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
-						inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
-							jesh "/opt/spack_install_scripts/notify_gerrit.sh -v -1 -t Tests -c '${CONTAINER_IMAGE}'"
-						}
+					// singularityArgs needed because conviz is still running singularity 2.6 due to faster image build times
+					inSingularity(image: CONTAINER_IMAGE, singularityArgs: "-B /etc/passwd") {
+						jesh "/opt/spack_install_scripts/notify_gerrit.sh -v -1 -t Tests -c '${CONTAINER_IMAGE}'"
 					}
 				}
 			}
@@ -242,6 +230,13 @@ pipeline {
 	post {
 		failure {
 			notifyFailure(mattermostChannel: "#spack")
+		}
+		cleanup {
+			// Clean build artifacts because otherwise the latest build from each jenkins job can take up to 50GB.
+			// 2 executors and 5 Jenkins-Jobs (testing, testing-spack, testing-asic, stable, stable-asic) will slowly but surely eat away memory.
+			script {
+				cleanupSteps()
+			}
 		}
 	}
 }
