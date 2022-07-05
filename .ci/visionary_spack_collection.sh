@@ -1,17 +1,15 @@
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
-    "visionary-simulation~dev ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${YASHCHIKI_SPACK_GCC}"
-    "visionary-simulation ^${DEPENDENCY_PYTHON} $(get_pinned_deps simulation) %${YASHCHIKI_SPACK_GCC}"
     # START python 3 packages
-    "visionary-wafer~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer~dev+gccxml ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer) %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer-visu ^${DEPENDENCY_PYTHON3} $(get_pinned_deps wafer-visu) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer~dev ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer~dev+gccxml ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer-visu ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${YASHCHIKI_SPACK_GCC}"
-    "visionary-dls ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dls) %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
@@ -23,8 +21,6 @@ spack_views=(\
     visionary-dls-core
     visionary-dls
     visionary-dls-nodev
-    visionary-simulation
-    visionary-simulation-nodev
     visionary-slurmviz
     visionary-wafer
     visionary-wafer-nodev

@@ -169,39 +169,8 @@ fi
 # PACKAGES #
 ############
 
-# Usage: get_pinned_deps <name>
-#
-# Note: This pinning is used only to help the concretizer make suitable picks.
-# The actual incompatabilities should still be expressed in the spack packages.
-#
-# The real reason for this machinery is the fact that the concretizer, despite
-# specifying which version of the package is compatible with python 2 and 3, is
-# unable to determine the last version still compatible with python 2
-#
-# Arguments:
-#   <name> has to correspond to a list of pinned dependencies residing under
-#   <yashchiki-root>/container-build-files/pinned/<name>.list
-#   The file should contain a list of spec constraints (one spec per line).
-#   Lines starting with and everything followed by # will be considered
-#   comments and removed.
-get_pinned_deps() {
-    local depsname="${1}"
-    local filename="${COMMONS_DIR}/pinned/${depsname}.list"
-
-    if [ ! -f "${filename}" ]; then
-        echo "ERROR: No dependencies for ${depsname} found at ${filename}!" >&2
-        exit 1
-    fi
-    # The grep call removes lines starting with # as well as blank lines. sed
-    # then removes trailing comments. Afterwards we insert a tilde (^) in front
-    # of every line (i.e., dependency) and join all lines by replacing the
-    # newline character with spaces.
-    grep -v "\(^#\|^\s*$\)" "${filename}" | sed -e "s:#.*$::" \
-        | sed -e "s:^:\^:" | tr '\n' ' '
-}
-
 # the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} $(get_pinned_deps dev) %${YASHCHIKI_SPACK_GCC}"
+SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
 
 # used in VIEWS section below but needs to be defined before sourcing
 # associative array: spec to add -> view names seperated by spaces

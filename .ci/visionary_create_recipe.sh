@@ -40,7 +40,6 @@ From: ${DOCKER_BASE_IMAGE}
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${SOURCE_DIR}"/pinned "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${SOURCE_DIR}"/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     mkdir -p "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
     rsync -av "${META_DIR_OUTSIDE}"/* "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
@@ -138,10 +137,4 @@ for view in "${spack_views[@]}"; do
         generate_appenv "${view}" "${view}"
         [[ "${view}" =~ ^visionary- ]] && generate_appenv "${view#visionary-}" "${view}"
     ) >> "${RECIPE_FILENAME}"
-
-    if [ "${view}" = "visionary-simulation" ];then
-cat <<EOF >>"${RECIPE_FILENAME}"
-    export NEST_MODULES=visionarymodule
-EOF
-    fi
 done
