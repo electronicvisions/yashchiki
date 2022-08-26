@@ -14,7 +14,10 @@ TARGET_FOLDER="$(find ${YASHCHIKI_SANDBOXES} -mindepth 1 -maxdepth 1)"
 # -> it needs to be bind mounted to the sandbox folder
 sudo mount --bind "${PWD}/spack" "${TARGET_FOLDER}/opt/spack"
 
-sudo singularity build ${YASHCHIKI_IMAGE_NAME} "${TARGET_FOLDER}"
+# TODO: singularity 3.1 produces SIF w/o setuid flags on files, using a newer
+# singularity for the image build
+#sudo singularity build ${YASHCHIKI_IMAGE_NAME} "${TARGET_FOLDER}"
+sudo /usr/local/singularity/sif_builder/bin/singularity build ${YASHCHIKI_IMAGE_NAME} "${TARGET_FOLDER}"
 
 # umount spack folder afterwards
 sudo umount "${TARGET_FOLDER}/opt/spack"
