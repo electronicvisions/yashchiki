@@ -7,14 +7,17 @@ shopt -s inherit_errexit
 # installed.
 
 prerequisites=(
+    "bzip2"
     "ca-certificates"
     "ccache"
     "curl"
+    "diffutils"
     "file"
     "g++"
     "gawk"
     "gcc"
     "git"
+    "gnupg2"
     "lbzip2"
     "less"
     "libc6-dev"
