@@ -99,7 +99,7 @@ for package in "${packages_to_fetch[@]}"; do
     package_wo_compiler="${package%%%*}"
     ( set -x;
         ( specfile=$(get_specfile_name "${package_wo_compiler}");
-        ("${MY_SPACK_BIN}" spec -y "${package_wo_compiler}" > "${specfile}")
+        ("${MY_SPACK_BIN}" spec --fresh -y "${package_wo_compiler}" > "${specfile}")
         ) 2>"${tmp_err}" \
         || ( echo "CONCRETIZING FAILED" >> "${tmpfiles_concretize_err[0]}" );
     ) &

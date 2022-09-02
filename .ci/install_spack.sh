@@ -25,7 +25,7 @@ for package in "${spack_packages[@]+"${spack_packages[@]}"}"; do
         exit 1
     fi
     echo "Installing: ${package}" >&2
-    ${MY_SPACK_BIN} "${SPACK_ARGS_INSTALL[@]+"${SPACK_ARGS_INSTALL[@]}"}" install --no-cache --show-log-on-error --file "${specfile}"
+    ${MY_SPACK_BIN} "${SPACK_ARGS_INSTALL[@]+"${SPACK_ARGS_INSTALL[@]}"}" install --fresh --no-cache --show-log-on-error --file "${specfile}"
 done
 
 # create the filesystem views (exposed via singularity --app option)
