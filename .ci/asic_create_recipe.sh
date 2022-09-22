@@ -288,7 +288,7 @@ cat <<EOF
     export QUIET_CPATH=\${CPATH}
     export QUIET_C_INCLUDE_PATH=\${C_INCLUDE_PATH}
     export QUIET_CPLUS_INCLUDE_PATH=\${CPLUS_INCLUDE_PATH}
-    export PKG_CONFIG_PATH=\${SVF}/lib/pkgconfig:\${SVF}/lib64/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig\${PKG_CONFIG_PATH:+:}\${PKG_CONFIG_PATH}
+    export PKG_CONFIG_PATH=\${SVF}/lib/pkgconfig:\${SVF}/lib64/pkgconfig:\${SVF}/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig\${PKG_CONFIG_PATH:+:}\${PKG_CONFIG_PATH}
     export CMAKE_PREFIX_PATH=\${SVF}\${CMAKE_PREFIX_PATH:+:}\${CMAKE_PREFIX_PATH}
 EOF
 }
