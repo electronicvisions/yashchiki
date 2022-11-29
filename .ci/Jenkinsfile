@@ -191,13 +191,6 @@ pipeline {
 					}
 				}
 
-				// neuromorphic sampling library
-				stage('model-nmsampling-sbs') {
-					steps {
-						build(job: 'bld_gerrit_model-nmsampling-sbs_dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
 				// Visionary KiCad library
 				stage('pcb-kicad-lib') {
 					steps {
