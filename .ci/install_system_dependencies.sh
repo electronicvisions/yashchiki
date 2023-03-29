@@ -44,6 +44,7 @@ system_dependencies=(
         "ncurses-term"
         "net-tools"
         "netcat"
+        "openscad" # used for 3D modeling in F9
         "psmisc"
         "qemu"
         "qemu-user-static"
