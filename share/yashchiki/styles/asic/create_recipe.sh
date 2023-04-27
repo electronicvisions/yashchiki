@@ -65,40 +65,45 @@ From: ${DOCKER_BASE_IMAGE}
     # ECM: enable strict mode to fail when packages are not found (or other installation problems appear)
     echo "skip_missing_names_on_install=0" >> /etc/yum.conf
 
-    # Apparently, upon building the CentOS docker images it has been decided that
-    # (for space-saving reasons) exactly one locale (en_US.utf8) is installed.
-    # We don't care about the little extra space and user experience benefits from
-    # some more locales.
-    sed -i '/^override_install_langs/d' /etc/yum.conf
-    yum reinstall -y glibc-common
+    yum -y upgrade 
+
+    # install additional locales
+    yum install -y "glibc-langpack-*"
 
     # EPEL is needed for fuse-sshfs and jq
-    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-
-    # certificates of the base image are outdated -> manually install ca-certificates
-    yum install -y ca-certificates
+    dnf -y install dnf-plugins-core  # needed for `dnf config-manager`
+    dnf config-manager --set-enabled powertools  # powertools is needed by epel-release
+    dnf -y install epel-release
 
     yum -y install \
+        apr \
+        apr-devel \
         apr-util \
+        apr-util-devel \
         autoconf \
         automake \
         bc \
+        binutils-devel \
         bison \
         bzip2 \
         chrpath \
-        compat-db47 \
         compat-libtiff3 \
+        compat-openssl10 \
         cups-client \
         diffstat \
         dos2unix \
         ed \
+        elfutils-libelf \
         environment-modules \
+        expat-devel \
         file \
         flex \
         fontconfig \
         freetype \
+        freetype-devel \
         gcc \
         gcc-c++ \
+        gcc-gfortran \
         gdb \
         git \
         glib2-devel \
@@ -108,18 +113,24 @@ From: ${DOCKER_BASE_IMAGE}
         gpm-libs \
         ksh \
         less \
+        libffi-devel \
         libfontenc \
         libgcc \
         libgfortran \
+        libgcrypt-devel \
         libICE \
         libjpeg-turbo \
         libmng \
+        libnsl \
+        libnsl.i686 \
         libpng12 \
+        libpng15 \
         libSM \
         libstdc++-devel \
         libstdc++-static \
         libstdc++.i686 \
         libtool \
+        libtool-ltdl-devel \
         libuuid-devel \
         libX11-devel \
         libXau-devel \
@@ -132,6 +143,7 @@ From: ${DOCKER_BASE_IMAGE}
         libXft \
         libXi \
         libxkbfile \
+        libxml2-devel \
         libXmu \
         libXp \
         libXpm \
@@ -140,11 +152,14 @@ From: ${DOCKER_BASE_IMAGE}
         libXScrnSaver \
         libXt \
         libXtst \
+        libyaml-devel \
         lsof \
         m4 \
         mailx \
         make \
         mesa-dri-drivers \
+        mesa-libGL \
+        mesa-libGLU \
         motif \
         ncurses-devel \
         net-tools \
@@ -152,15 +167,20 @@ From: ${DOCKER_BASE_IMAGE}
         openssh \
         openssl-devel \
         patch \
-        pax \
+        patchelf \
         perl \
         perl-libintl \
         perl-Text-Unidecode \
         pixman \
         psmisc \
-        python3 \
-        python3-pip \
-        python3-setuptools \
+        pulseaudio-libs \
+        pulseaudio-libs-glib2 \
+        python2 \
+        python2-devel \
+        python39 \
+        python39-devel \
+        python39-pip \
+        python39-setuptools \
         qemu-guest-agent \
         redhat-lsb \
         rsync \
@@ -170,7 +190,6 @@ From: ${DOCKER_BASE_IMAGE}
         spax \
         fuse-sshfs \
         strace \
-        sysvinit-tools \
         tar \
         tcl \
         tcsh \
@@ -201,25 +220,6 @@ From: ${DOCKER_BASE_IMAGE}
     # gtest is F9's C++ test framework of choice
     yum -y install gtest-devel
 
-    # ECM: people (YS) just need pylint, etc. (upgrade to spack if more is needed)
-    # JJK: nose is needed as a python test runner. We want to replace it by pytest
-    # in the future
-    wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh
-    bash Miniconda3-py38_4.8.3-Linux-x86_64.sh -b -p /opt/conda
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
-    /opt/conda/bin/conda install -y pylint pycodestyle nose pytest pyyaml
-
-    # YS: teststand dependencies (no python in spack yet)
-    /opt/conda/bin/conda install -y numpy matplotlib
-
-    # PS: needed for notebook package below
-    /opt/conda/bin/conda install -c conda-forge -y importlib_metadata
-
-    # PD: jupyter notebook and ipython for more comfort
-    /opt/conda/bin/conda install -c conda-forge -y notebook
-    /opt/conda/bin/conda install -c conda-forge -y nb_conda_kernels
-    /opt/conda/bin/conda install -c conda-forge -y jupyter_contrib_nbextensions
-
     # ECM: and now some abspacking
     yum -y install ccache sudo parallel
 
@@ -228,6 +228,8 @@ From: ${DOCKER_BASE_IMAGE}
 
     # ECM: save some more space
     yum clean all
+
+    alternatives --set python /usr/bin/python3.9
 
     # create a fingerprint by which we can identify the container from within
     cat /proc/sys/kernel/random/uuid > /opt/fingerprint
@@ -268,17 +270,8 @@ From: ${DOCKER_BASE_IMAGE}
     MODULESHOME=/usr/share/Modules
     export MODULESHOME
 
-    # CentOS 7 does not support C.UTF-8; unset everything if encountered.
-    if [ "\${LANG}" = "C.UTF-8" ]; then
-        LANG=C
-        export LANG
-        unset LC_COLLATE LC_CTYPE LC_MONETARY LC_NUMERIC LC_TIME LC_MESSAGES LC_ALL
-    fi
-
-    # python now from conda... and gopath/bin (gocryptfs)
-    PATH=/opt/conda/bin:/opt/go/gopath/bin:\${PATH}
-    # ensure conda sees a clean env
-    unset PYTHONHOME
+    # gopath/bin (gocryptfs)
+    PATH=/opt/go/gopath/bin:\${PATH}
 EOF
 
 # create appenvs for all views...
@@ -292,9 +285,7 @@ cat <<EOF
     export VISIONARY_ENV=${name_view}
     SVF=/opt/spack_views/\${VISIONARY_ENV}
     export PATH=\${SVF}/bin\${PATH:+:}\${PATH}
-    # there is no python in asic app for now
-    #export PYTHONHOME=\${SVF}
-    #export SPACK_PYTHON_BINARY=\${SVF}/bin/python
+    export PYTHONPATH=\${SVF}/lib/python3.9/site-packages/:\${SVF}/lib64/python3.9/site-packages/\${PYTHONPATH:+:}\${PYTHONPATH}
     export MANPATH=\${SVF}/man:\${SVF}/share/man\${MANPATH:+:}\${MANPATH}
     export LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LIBRARY_PATH:+:}\${LIBRARY_PATH}
     export LD_LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LD_LIBRARY_PATH:+:}\${LD_LIBRARY_PATH}
@@ -316,4 +307,10 @@ for view in "${spack_views[@]}"; do
         generate_appenv "${view}" "${view}"
         [[ "${view}" =~ ^visionary- ]] && generate_appenv "${view#visionary-}" "${view}"
     ) >> "${YASHCHIKI_RECIPE_PATH}"
+
+    if [ "${view}" = "visionary-asic" ];then
+cat <<EOF >>"${YASHCHIKI_RECIPE_PATH}"
+    export IVERILOG_VPI_MODULE_PATH=\${SVF}/lib/myhdl/share
+EOF
+    fi
 done
