@@ -111,6 +111,7 @@ From: ${DOCKER_BASE_IMAGE}
         libpng12 \
         libSM \
         libstdc++-devel \
+        libstdc++-static \
         libstdc++.i686 \
         libtool \
         libuuid-devel \
