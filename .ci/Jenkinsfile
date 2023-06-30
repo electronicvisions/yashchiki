@@ -23,7 +23,7 @@ pipeline {
 
 	parameters {
 		string(name: 'BUILD_CACHE_NAME',
-			   defaultValue: 'init_from_2022-11-28_1',
+			   defaultValue: 'init_from_2023-05-10_1',
 			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
 	}
 
