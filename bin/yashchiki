@@ -52,7 +52,7 @@ parser = argparse.ArgumentParser(
 
 # mandatory
 parser.add_argument(
-    "style", type=str, choices=["visionary", "asic"],
+    "style", type=str, choices=["visionary", "asic", "f27"],
     help="Style of container to build.")
 parser.add_argument(
     "spack_dir", type=pathlib.Path,

@@ -1,0 +1,7 @@
+docker_base_image: "debian:bullseye"
+dependency_python: "3.8.2"
+spack_gcc:
+  # Whether to build the specified gcc via spack or assume existance.
+  build: true
+  # Version to use as compiler for spack build.
+  version: "11.2.0"
