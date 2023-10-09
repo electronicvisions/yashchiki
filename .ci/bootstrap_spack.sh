@@ -26,7 +26,7 @@ ccache -s
 sed -i '/ccache:/c\  ccache: true' "${MY_SPACK_FOLDER}/etc/spack/defaults/config.yaml"
 
 # build with all available processes
-sed -i "/build_jobs:/c\  build_jobs: $(nproc)" "${MY_SPACK_FOLDER}/etc/spack/defaults/config.yaml"
+sed -i "/# build_jobs:/c\  build_jobs: $(nproc)" "${MY_SPACK_FOLDER}/etc/spack/defaults/config.yaml"
 
 # add system compiler
 ${MY_SPACK_BIN} compiler add --scope site /usr/bin
