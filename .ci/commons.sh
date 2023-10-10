@@ -198,7 +198,7 @@ fi
 # they won't be able to be fetched inside the container because of missing
 # permissions.
 spack_bootstrap_dependencies=(
-    "environment-modules~X target=x86_64"
+    "environment-modules~X"
 )
 
 #########
