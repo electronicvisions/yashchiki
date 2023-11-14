@@ -10,9 +10,6 @@ spack_packages=(
     "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     "visionary-dls ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "py-jupyterhub ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "py-jupyterhub-dummyauthenticator ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "py-jupyterhub-simplespawner ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
     # END python 3 packages
 )
 
