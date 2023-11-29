@@ -202,6 +202,9 @@ From: ${DOCKER_BASE_IMAGE}
     # YS: teststand dependencies (no python in spack yet)
     /opt/conda/bin/conda install -y numpy matplotlib
 
+    # PS: needed for notebook package below
+    /opt/conda/bin/conda install -c conda-forge -y importlib_metadata
+
     # PD: jupyter notebook and ipython for more comfort
     /opt/conda/bin/conda install -c conda-forge -y notebook
     /opt/conda/bin/conda install -c conda-forge -y nb_conda_kernels
