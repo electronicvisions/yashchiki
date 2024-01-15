@@ -6,7 +6,7 @@ set -Eeuo pipefail
 
 # Define everything that needs to be defined in a normal run.
 export BUILD_CACHE_NAME=undefined
-export DEPENDENCY_PYTHON3=undefined
+export DEPENDENCY_PYTHON=undefined
 export VISIONARY_GCC=undefined
 export BUILD_URL="https://obreitwi/testing/manual.html"
 

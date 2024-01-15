@@ -2,14 +2,14 @@
 spack_packages=(
     "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
     # START python 3 packages
-    "visionary-wafer~dev ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer~dev+gccxml ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer-visu ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-clusterservices ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-dls~dev ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
-    "visionary-dls ^${DEPENDENCY_PYTHON3} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer~dev ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer~dev+gccxml ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer+gccxml ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer-visu ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-clusterservices ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls~dev ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
     # END python 3 packages
 )
 

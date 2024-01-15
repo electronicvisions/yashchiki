@@ -10,10 +10,10 @@ ${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlin
 # Strong independent packages who need no gccxml #
 ##################################################
 
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-core $(get_latest_hash visionary-dls-core "^${DEPENDENCY_PYTHON3}")
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-core $(get_latest_hash visionary-dls-core "^${DEPENDENCY_PYTHON}")
 
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls $(get_latest_hash visionary-dls+dev "^${DEPENDENCY_PYTHON3}")
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-nodev $(get_latest_hash visionary-dls~dev "^${DEPENDENCY_PYTHON3}")
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls $(get_latest_hash visionary-dls+dev "^${DEPENDENCY_PYTHON}")
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dls-nodev $(get_latest_hash visionary-dls~dev "^${DEPENDENCY_PYTHON}")
 
 # slurvmiz needs no dev-tools because it is not for end-users
 ${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-slurmviz $(get_latest_hash "visionary-slurmviz %${YASHCHIKI_SPACK_GCC}")

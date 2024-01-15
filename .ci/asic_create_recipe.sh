@@ -230,7 +230,7 @@ From: ${DOCKER_BASE_IMAGE}
     ## install locales
     #locale-gen
     # propagate environment variables to container recipe
-    export DEPENDENCY_PYTHON3="${DEPENDENCY_PYTHON3}"
+    export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
     export YASHCHIKI_BUILD_SPACK_GCC="${YASHCHIKI_BUILD_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"

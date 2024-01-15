@@ -35,7 +35,7 @@ pipeline {
 		stage('Container Build') {
 			environment {
 				DOCKER_BASE_IMAGE = "debian:bullseye"
-				DEPENDENCY_PYTHON3 = "python@3.8.2"
+				DEPENDENCY_PYTHON = "python@3.8.2"
 				YASHCHIKI_IMAGE_NAME = "singularity_visionary_temp.img"
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
