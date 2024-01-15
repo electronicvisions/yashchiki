@@ -35,12 +35,6 @@ pipeline {
 		stage('Container Build') {
 			environment {
 				DOCKER_BASE_IMAGE = "debian:bullseye"
-				// FIXME: ^${DEPENDENCY_PYTHON} is a workaround for an invalid spectrum-mpi concretization
-				DEPENDENCY_PYTHON = "python@2.7.18"
-				// This needs to be here because otherwise the default python
-				// (2.7.18) will pollute the spec and lead to a conflict
-				// can be removed as soon as the explicit preferred version
-				// is dropped
 				DEPENDENCY_PYTHON3 = "python@3.8.2"
 				YASHCHIKI_IMAGE_NAME = "singularity_visionary_temp.img"
 				YASHCHIKI_SANDBOXES = "sandboxes"
