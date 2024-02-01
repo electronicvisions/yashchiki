@@ -48,6 +48,7 @@ system_dependencies=(
         "psmisc"
         "qemu"
         "qemu-user-static"
+        "sshfs"
         "strace"
         "time"
         "tshark"

@@ -161,6 +161,7 @@ From: ${DOCKER_BASE_IMAGE}
         SDL-devel \
         socat \
         spax \
+        sshfs \
         strace \
         sysvinit-tools \
         tar \
