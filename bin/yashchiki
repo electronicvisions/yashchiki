@@ -6,6 +6,7 @@ import pathlib
 import subprocess
 import tempfile
 import textwrap
+import yaml
 from typing import Optional
 
 
@@ -136,18 +137,22 @@ paths = [
 for path_to_check in paths:
     check_no_globbing(path_to_check)
 
+config = None
+with open(os.path.join("share", "yashchiki", "styles", args.style, "config.yaml")) as config_file:
+    config = yaml.safe_load(config_file)
+
 # collection of environment variables used to configure the shell scripts'
 # behavior
 env = {
-    "DOCKER_BASE_IMAGE": "debian:bullseye" if args.style == "visionary" else "centos:7",
+    "DOCKER_BASE_IMAGE": config["docker_base_image"],
     # This needs to be here because otherwise the default python
     # (2.7.18) will pollute the spec and lead to a conflict
     # can be removed as soon as the explicit preferred version
     # is dropped
-    "DEPENDENCY_PYTHON": "python@3." + ("8.2" if args.style == "visionary" else "6.8"),
-    "YASHCHIKI_BUILD_SPACK_GCC": "1" if args.style == "visionary" else "0",
-    "YASHCHIKI_SPACK_GCC_VERSION": "11.2.0" if args.style == "visionary" else "4.8.5",
-    "YASHCHIKI_SPACK_GCC": "gcc@11.2.0" if args.style == "visionary" else "gcc@4.8.5",
+    "DEPENDENCY_PYTHON": "python@" + config["dependency_python"],
+    "YASHCHIKI_BUILD_SPACK_GCC": str(int(config["spack_gcc"]["build"])),
+    "YASHCHIKI_SPACK_GCC_VERSION": config["spack_gcc"]["version"],
+    "YASHCHIKI_SPACK_GCC": "gcc@" + config["spack_gcc"]["version"],
     "WORKSPACE": os.getcwd(), # FIXME: should not be required
     "CONTAINER_STYLE": args.style,
     "CONTAINER_BUILD_TYPE": "testing", # FIXME: should not be required
