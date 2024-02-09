@@ -22,5 +22,5 @@ ${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlin
 # dev tools #
 #############
 
-${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools $(get_latest_hash "${SPEC_VIEW_VISIONARY_DEV_TOOLS}")
+${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[@]+"${SPACK_ARGS_VIEW[@]}"} view -d yes symlink -i ${MY_SPACK_VIEW_PREFIX}/visionary-dev-tools $(get_latest_hash "visionary-dev-tools ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}")
 EOF

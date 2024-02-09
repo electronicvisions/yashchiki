@@ -1,6 +1,6 @@
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
-#    "${SPEC_VIEW_VISIONARY_DEV_TOOLS}" # FIXME
+#    "visionary-dev-tools ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}" # FIXME
     "visionary-asic ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
 )
 

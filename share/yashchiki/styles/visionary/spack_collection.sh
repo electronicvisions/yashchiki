@@ -1,6 +1,6 @@
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
-    "${SPEC_VIEW_VISIONARY_DEV_TOOLS}"
+    "visionary-dev-tools ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
     # START python 3 packages
     "visionary-wafer~dev ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"

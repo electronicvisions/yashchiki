@@ -170,9 +170,6 @@ fi
 # PACKAGES #
 ############
 
-# the version of dev tools we want in our view
-SPEC_VIEW_VISIONARY_DEV_TOOLS="visionary-dev-tools ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
-
 # used in VIEWS section below but needs to be defined before sourcing
 # associative array: spec to add -> view names seperated by spaces
 declare -A spack_add_to_view
