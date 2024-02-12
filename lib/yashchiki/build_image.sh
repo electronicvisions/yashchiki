@@ -28,8 +28,3 @@ sudo /usr/local/singularity/sif_builder/bin/singularity build ${YASHCHIKI_IMAGE_
 sudo umount "${TARGET_FOLDER}/opt/spack"
 
 sudo chown -R $(id -un) ${YASHCHIKI_IMAGE_NAME}
-
-if [[ "${CONTAINER_BUILD_TYPE}" =~ "^stable$" ]]; then
-    # allow spack user to execute image
-    chmod +rx ${YASHCHIKI_IMAGE_NAME}
-fi
