@@ -57,20 +57,6 @@ get_host_env() {
     fi
 }
 
-# Get the _{INSIDE,OUTSIDE} variant of a variable based in whether we are in a
-# complete container or not.
-#
-# Usage: get_var_in_out <variable-name>
-get_var_in_out() {
-    local var_name;
-    var_name="$1"
-    if [ -n "${SINGULARITY_NAME:-}" ]; then
-        printenv "${var_name}_INSIDE"
-    else
-        printenv "${var_name}_OUTSIDE"
-    fi
-}
-
 #####################
 # SETUP ENVIRONMENT #
 #####################
