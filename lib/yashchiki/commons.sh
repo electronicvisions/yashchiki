@@ -190,7 +190,7 @@ SPACK_ARGS_INSTALL=()
 SPACK_ARGS_REINDEX=()
 SPACK_ARGS_VIEW=()
 
-if [ -n "$(get_host_env SPACK_VERBOSE)" ]; then
+if [ -n "$(get_host_env YASHCHIKI_SPACK_VERBOSE)" ]; then
     SPACK_ARGS_INSTALL+=("--verbose")
     SPACK_ARGS_VIEW+=("--verbose")
     SPACK_ARGS_REINDEX+=("--verbose")
@@ -512,63 +512,9 @@ _install_from_buildcache() {
     ${MY_SPACK_BIN} "${SPACK_ARGS_REINDEX[@]+"${SPACK_ARGS_REINDEX[@]}"}" reindex
 }
 
-get_latest_failed_build_cache_name() {
-    local full_change_num
-    local possible_build_caches
-    local latest_patch_level
-    local latest_build_num
-
-    full_change_num="$(get_change_name)"
-    change_num="${full_change_num%%p*}"
-    possible_build_caches="$(mktemp)"
-
-    find "${BASE_BUILD_CACHE_FAILED_OUTSIDE}" -mindepth 1 -maxdepth 1 -type d -name "${change_num}*" -print0 \
-        | xargs -r -n 1 -r -0 basename > "${possible_build_caches}"
-
-    if (( $(wc -l <"${possible_build_caches}") == 0 )); then
-        return 0
-    fi
-
-    latest_patch_level="$(cat "${possible_build_caches}" \
-        | cut -d p -f 2 | cut -d _ -f 1 | sort -rg | head -n 1)"
-
-    latest_build_num="$(grep "p${latest_patch_level}_" "${possible_build_caches}" \
-        | cut -d _ -f 2 | sort -rg | head -n 1)"
-
-    echo -n "failed/${change_num}p${latest_patch_level}_${latest_build_num}"
-
-    rm "${possible_build_caches}"
-}
-
-
 #############
 # UTILITIES #
 #############
-
-get_change_name() {
-    local change_num
-    local patch_level
-
-    local gerrit_change_number
-    local gerrit_patchset_number
-    local gerrit_refspec
-
-    gerrit_change_number="$(get_host_env GERRIT_CHANGE_NUMBER)"
-    gerrit_patchset_number="$(get_host_env GERRIT_PATCHSET_NUMBER)"
-    gerrit_refspec="$(get_host_env GERRIT_REFSPEC)"
-
-    if [ -z "${gerrit_change_number:-}" ]; then
-        if [ -n "${gerrit_refspec:-}" ]; then
-            # extract gerrit change number from refspec
-            change_num="$(echo "${gerrit_refspec}" | cut -f 4 -d / )"
-            patch_level="$(echo "${gerrit_refspec}" | cut -f 5 -d / )"
-        fi
-    else
-        change_num="${gerrit_change_number}"
-        patch_level="${gerrit_patchset_number}"
-    fi
-    echo -n "c${change_num}p${patch_level}"
-}
 
 # copied from slurmviz-commons.sh
 get_latest_hash() {

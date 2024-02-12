@@ -97,7 +97,11 @@ parser.add_argument(
     "--build-cache-name", type=str, default="default",
     help="Name of build cache to use, resides under "
          "<CACHES_DIR>/build_caches/<BUILD_CACHE_NAME>.")
-
+parser.add_argument(
+    "--build-cache-on-failure-name", type=str,
+    help="Name of build cache to create upon failure, resides under "
+         "<CACHES_DIR>/build_caches/failed/<BUILD_CACHE_NAME> and is "
+         "postfix'ed with an ascending integer.")
 # optional options
 parser.add_argument(
     "--proxy-http", type=str,
@@ -108,6 +112,9 @@ parser.add_argument(
 parser.add_argument(
     "--debug", action="store_true",
     help="Enable debug-level logging.")
+parser.add_argument(
+    "--spack-verbose", action="store_true",
+    help="Enable verbose spack logging.")
 
 args = parser.parse_args()
 
@@ -157,6 +164,7 @@ env = {
     "CONTAINER_STYLE": args.style,
     "CONTAINER_BUILD_TYPE": "testing", # FIXME: should not be required
     "YASHCHIKI_DEBUG": str(int(args.debug)),
+    "YASHCHIKI_SPACK_VERBOSE": str(int(args.spack_verbose)),
     "YASHCHIKI_SANDBOXES": args.sandboxes_dir,
     "YASHCHIKI_IMAGE_NAME": args.output,
     "YASHCHIKI_SPACK_PATH": args.spack_dir,
@@ -172,6 +180,9 @@ if args.proxy_http:
 
 if args.proxy_https:
     env = env | {"YASHCHIKI_PROXY_HTTPS": args.proxy_https}
+
+if args.build_cache_on_failure_name:
+    env = env | {"YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME": args.build_cache_on_failure_name}
 
 # create directory for logs
 args.log_dir.mkdir(parents=True, exist_ok=True)
@@ -239,7 +250,7 @@ with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
         host_env_filename = temporary_directory.joinpath("host.env")
     env = env | {"YASHCHIKI_HOST_ENV_PATH": host_env_filename}
 
-    run("lib/yashchiki/validate_environment.sh", env)
+    run("lib/yashchiki/store_environment.sh", env)
     run("lib/yashchiki/create_spack_user.sh", env)
     run("lib/yashchiki/create_caches.sh", env)
     run("lib/yashchiki/fetch.sh", env)

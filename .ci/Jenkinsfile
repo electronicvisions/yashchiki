@@ -39,6 +39,7 @@ pipeline {
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
 				YASHCHIKI_PROXY_HTTPS = "http://proxy.kip.uni-heidelberg.de:8080"
+				YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME = get_build_cache_on_failure_name()
 				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
@@ -83,6 +84,16 @@ pipeline {
 					steps {
 						script {
 							try {
+								// extract options from gerrit comment
+								boolean with_debug = false
+								boolean with_spack_verbose = false
+								if (isTriggeredByGerrit()) {
+									gerrit_comment = jesh(script: "echo '${GERRIT_EVENT_COMMENT_TEXT}' | base64 -d", returnStdout: true)
+									with_debug = gerrit_comment.contains("WITH_DEBUG")
+									with_spack_verbose = gerrit_comment.contains("WITH_SPACK_VERBOSE")
+									env.BUILD_CACHE_NAME = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true)
+								}
+
 								sh "python3 bin/yashchiki visionary ${WORKSPACE}/spack singularity_visionary_temp.img " +
 								   "--log-dir=log " +
 								   "--proxy-http=${YASHCHIKI_PROXY_HTTP} " +
@@ -94,7 +105,10 @@ pipeline {
 								   "--host-env-filename=${WORKSPACE}/host.env " +
 								   "--build-cache-name=${BUILD_CACHE_NAME} " +
 								   ("${CONTAINER_BUILD_TYPE}" == "stable" ? "--update-build-cache " : "") +
-								   "--recipe-filename=${WORKSPACE}/visionary_recipe.def"
+								   "--recipe-filename=${WORKSPACE}/visionary_recipe.def " +
+								   "--build-cache-on-failure-name=${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME} " +
+								   (with_debug ? "--debug " : "") +
+								   (with_spack_verbose ? "--spack-verbose " : "")
 							} catch (Throwable t) {
 								archiveArtifacts "errors_concretization.log"
 								throw t
@@ -228,4 +242,8 @@ pipeline {
 			}
 		}
 	}
+}
+
+String get_build_cache_on_failure_name() {
+	return (CONTAINER_BUILD_TYPE == "testing" ? "c${GERRIT_CHANGE_NUMBER}p${GERRIT_PATCHSET_NUMBER}" : jesh("echo 'stable_\$(date --iso)'", returnStdout: true))
 }

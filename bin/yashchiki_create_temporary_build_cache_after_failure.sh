@@ -1,25 +1,16 @@
 #!/bin/bash
 
 # This script creates a temporary build cache via symlinks in
-# failed/c<num>p<num>_<num>.
+# failed/${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}_<num>.
 #
 # It streamlines container deployment as every container deployment will
 # restart at the last sucessfully built package.
 #
 # Echoes path to created cache relative to build_caches base directory.
 
-if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-    echo "Stable container creation failed, this should not happen." >&2
-    exit 1
-fi
-
-ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
-source "${ROOT_DIR}/lib/yashchiki/get_change_name.sh"
-
 build_num=1
-change_num="$(get_change_name)"
 
-while [ -d "${YASHCHIKI_CACHES_ROOT}/preserved_packages/${change_num}_${build_num}" ]; do
+while [ -d "${YASHCHIKI_CACHES_ROOT}/preserved_packages/${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}_${build_num}" ]; do
     (( build_num++ ))
 done
 # `build_num` is used to indicate if no preserved packages were found: After
@@ -29,8 +20,8 @@ done
 # store in the failed cache.
 (( build_num-- ))
 
-preserved_packages="${YASHCHIKI_CACHES_ROOT}/preserved_packages/${change_num}_${build_num}"
-failed_build_cache="${YASHCHIKI_CACHES_ROOT}/build_caches/failed/${change_num}_${build_num}"
+preserved_packages="${YASHCHIKI_CACHES_ROOT}/preserved_packages/${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}_${build_num}"
+failed_build_cache="${YASHCHIKI_CACHES_ROOT}/build_caches/failed/${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}_${build_num}"
 
 # expects input to be \0-printed
 link_into_failed_buildcache() {

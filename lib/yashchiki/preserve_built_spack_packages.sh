@@ -23,16 +23,10 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/commons.sh"
 source "${sourcedir}/setup_env_spack.sh"
 
-build_type=$(get_host_env CONTAINER_BUILD_TYPE)
-
 # find empty directory to dump into
 build_num=1
 while /bin/true; do
-    if [ "${build_type}" = "testing" ]; then
-        target_folder="${PRESERVED_PACKAGES_INSIDE}/$(get_change_name)_${build_num}"
-    else
-        target_folder="${PRESERVED_PACKAGES_INSIDE}/${build_type}_$(date --iso)_${build_num}"
-    fi
+    target_folder="${PRESERVED_PACKAGES_INSIDE}/${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}_${build_num}"
 
     if [ ! -d "${target_folder}" ]; then
         break
