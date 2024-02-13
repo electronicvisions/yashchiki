@@ -229,6 +229,9 @@ with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
 
     env = env | {"JOB_TMP_SPACK": temporary_directory_spack}
 
+    # make job temp folder writable for all users (i.e., spack)
+    os.chmod(temporary_directory_spack, 0o777)
+
     # singularity recipe filename defaults to temporary file
     if args.recipe_filename is not None:
         recipe_filename = args.recipe_filename

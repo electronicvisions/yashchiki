@@ -14,9 +14,6 @@ unset LC_NUMERIC
 unset LC_TIME
 unset LC_MESSAGES
 
-# make job temp folder writable for all users (i.e., spack)
-chmod 777 "${JOB_TMP_SPACK}"
-
 # build the container (using scripts from above)
 if [ -n "${YASHCHIKI_PROXY_HTTP:-}" ]; then
 	export http_proxy=${YASHCHIKI_PROXY_HTTP}
