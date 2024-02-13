@@ -77,7 +77,11 @@ pipeline {
 					steps {
 						sh "mkdir -p ${YASHCHIKI_META_DIR}"
 						sh "bash bin/yashchiki_dump_meta_info.sh"
-						sh "bash bin/yashchiki_notify_gerrit.sh -m 'Build containing this change started..'"
+						script {
+							if (isTriggeredByGerrit()) {
+								sh "bash bin/yashchiki_notify_gerrit.sh -m 'Build containing this change started..'"
+							}
+						}
 					}
 				}
 				stage('Build container image') {
@@ -110,8 +114,10 @@ pipeline {
 						script {
 							// we only want the container name, tail everything else
 							CONTAINER_IMAGE = sh(script: "bin/yashchiki_deploy_container.sh | tail -n 1", returnStdout: true).trim()
+							if (isTriggeredByGerrit()) {
+								sh "bash bin/yashchiki_notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
+							}
 						}
-						sh "bash bin/yashchiki_notify_gerrit.sh -t Build -c \"$CONTAINER_IMAGE\""
 					}
 				}
 			}
@@ -119,8 +125,10 @@ pipeline {
 				failure {
 					script {
 						cache_failed = sh(script: "lib/yashchiki/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
+						if (isTriggeredByGerrit()) {
+							sh "bash bin/yashchiki_notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
+						}
 					}
-					sh "bash bin/yashchiki_notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
 				}
 				cleanup {
 					archiveArtifacts "host.env"

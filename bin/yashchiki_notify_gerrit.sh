@@ -16,8 +16,7 @@ if ! [ "${CONTAINER_BUILD_TYPE:-}" = "testing" ]; then
 fi
 
 ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
-source "${ROOT_DIR}/lib/yashchiki/dummy_variables.sh"
-source "${ROOT_DIR}/lib/yashchiki/commons.sh"
+source "${ROOT_DIR}/lib/yashchiki/gerrit.sh"
 
 container_name=""
 result_type=""
@@ -54,7 +53,7 @@ if [ -z "${result}" ] && [ -n "${verified}" ]; then
     fi
 fi
 
-message="[$(get_host_env BUILD_URL)] \
+message="[$(echo "${BUILD_URL}")] \
 ${container_name:+Change included in container: ${container_name}} \
 ${custom_message:-} \
 ${result:+${result_type:+${result_type} }Result: ${result}}"
@@ -65,26 +64,19 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
     # Notify all changes involved that they got built into the current container
 
     # yashchiki changes
-    meta_dir="$(get_var_in_out META_DIR)"
-    if [ -f "${meta_dir}/current_changes-yashchiki.dat" ]; then
-        cat "${meta_dir}/current_changes-yashchiki.dat" >> "${tmpfile_commits}"
+    if [ -f "${YASHCHIKI_META_DIR}/current_changes-yashchiki.dat" ]; then
+        cat "${YASHCHIKI_META_DIR}/current_changes-yashchiki.dat" >> "${tmpfile_commits}"
     fi
 
     # spack changes
-    if [ -f "${meta_dir}/current_changes-spack.dat" ]; then
-        cat "${meta_dir}/current_changes-spack.dat" >> "${tmpfile_commits}"
+    if [ -f "${YASHCHIKI_META_DIR}/current_changes-spack.dat" ]; then
+        cat "${YASHCHIKI_META_DIR}/current_changes-spack.dat" >> "${tmpfile_commits}"
     fi
 
     readarray -t commits < <(grep -v "^$" "${tmpfile_commits}")
 
-    # if we are in a singularity container we need to go to the spack
-    # repository so the gerrit notifier can extract gerrit settings all
-    if [ -n "${SINGULARITY_CONTAINER:-}" ]; then
-        pushd "${MY_SPACK_FOLDER}" &>/dev/null || exit 1
-    fi
-
     # needs to be in git repo for gerrit_notify_change to work
-    cd ${WORKSPACE}/yashchiki
+    cd ${YASHCHIKI_INSTALL}
     for change in "${commits[@]}"; do
         if ! gerrit_notify_change -c "${change}" \
             -v "${verified}" \
@@ -92,10 +84,6 @@ if [ "${CONTAINER_BUILD_TYPE}" = "testing" ]; then
             echo "ERROR during gerrit notification regarding: ${change}" >&2
         fi
     done
-
-    if [ -n "${SINGULARITY_CONTAINER:-}" ]; then
-        popd &>/dev/null || exit 1
-    fi
 
     rm -v "${tmpfile_commits}" 1>&2
 fi
