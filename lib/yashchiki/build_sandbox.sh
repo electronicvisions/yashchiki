@@ -14,13 +14,6 @@ unset LC_NUMERIC
 unset LC_TIME
 unset LC_MESSAGES
 
-echo "creating ${YASHCHIKI_RECIPE_PATH}" >&2
-ROOT_DIR="$(dirname "$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")")"
-bash "${ROOT_DIR}/share/yashchiki/styles/${CONTAINER_STYLE}/create_recipe.sh"
-
-echo "created ${YASHCHIKI_RECIPE_PATH}" >&2
-cat "${YASHCHIKI_RECIPE_PATH}"
-
 # check if host-user-owned temp folder for spack build exists
 if [ ! -d "${JOB_TMP_SPACK}" ]; then
     echo "${JOB_TMP_SPACK} should exist, aborting!" >&2
