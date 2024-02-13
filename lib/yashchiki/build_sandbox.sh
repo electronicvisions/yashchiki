@@ -24,10 +24,6 @@ fi
 
 TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
-# Do not change: special sudo permit for the host user... (with env var resolved by host user)
-# When changing the env var value the sudo permit needs changing as well
-sudo rm -rf ${YASHCHIKI_SANDBOXES}/
-
 mkdir ${YASHCHIKI_SANDBOXES}
 
 # Do not change: special sudo permit for the host user...
