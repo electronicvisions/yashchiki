@@ -27,10 +27,6 @@ pipeline {
 			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
 	}
 
-	environment {
-		YASHCHIKI_HOST_ENV_PATH = "${WORKSPACE}/host.env"
-	}
-
 	stages {
 		stage('Container Build') {
 			// TODO: remove once unused
