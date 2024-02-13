@@ -7,7 +7,7 @@ shopt -s inherit_errexit
 #       Think twice before adding any output!
 
 ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
-source "${ROOT_DIR}/lib/yashchiki/commons.sh"
+source "${ROOT_DIR}/lib/yashchiki/get_change_name.sh"
 
 INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
 FALLBACK_DIR="${HOME}/container_mount_full"
