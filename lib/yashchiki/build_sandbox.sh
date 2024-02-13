@@ -14,12 +14,6 @@ unset LC_NUMERIC
 unset LC_TIME
 unset LC_MESSAGES
 
-# check if host-user-owned temp folder for spack build exists
-if [ ! -d "${JOB_TMP_SPACK}" ]; then
-    echo "${JOB_TMP_SPACK} should exist, aborting!" >&2
-    exit 1
-fi
-
 # make job temp folder writable for all users (i.e., spack)
 chmod 777 "${JOB_TMP_SPACK}"
 
