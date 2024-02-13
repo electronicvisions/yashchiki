@@ -124,7 +124,7 @@ pipeline {
 			post {
 				failure {
 					script {
-						cache_failed = sh(script: "lib/yashchiki/create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
+						cache_failed = sh(script: "bin/yashchiki_create_temporary_build_cache_after_failure.sh", returnStdout: true).trim()
 						if (isTriggeredByGerrit()) {
 							sh "bash bin/yashchiki_notify_gerrit.sh -v -1 -t Build -m \"Successfully built packages stored in cache. Resume by issuing:\nWITH_CACHE_NAME=${cache_failed}\n\nIn your next gerrit comment, NOT commit message!\""
 						}

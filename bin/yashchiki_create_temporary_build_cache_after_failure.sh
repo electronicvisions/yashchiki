@@ -13,13 +13,13 @@ if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     exit 1
 fi
 
-SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
-source "${SOURCE_DIR}/commons.sh"
+ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
+source "${ROOT_DIR}/lib/yashchiki/get_change_name.sh"
 
 build_num=1
 change_num="$(get_change_name)"
 
-while [ -d "${PRESERVED_PACKAGES_OUTSIDE}/${change_num}_${build_num}" ]; do
+while [ -d "${YASHCHIKI_CACHES_ROOT}/preserved_packages/${change_num}_${build_num}" ]; do
     (( build_num++ ))
 done
 # `build_num` is used to indicate if no preserved packages were found: After
@@ -29,8 +29,8 @@ done
 # store in the failed cache.
 (( build_num-- ))
 
-preserved_packages="${PRESERVED_PACKAGES_OUTSIDE}/${change_num}_${build_num}"
-failed_build_cache="${BASE_BUILD_CACHE_FAILED_OUTSIDE}/${change_num}_${build_num}"
+preserved_packages="${YASHCHIKI_CACHES_ROOT}/preserved_packages/${change_num}_${build_num}"
+failed_build_cache="${YASHCHIKI_CACHES_ROOT}/build_caches/failed/${change_num}_${build_num}"
 
 # expects input to be \0-printed
 link_into_failed_buildcache() {
@@ -41,7 +41,7 @@ link_into_failed_buildcache() {
 # ensure that we have preserved packages and that these packages have not
 # already been pushed to a failed build cache
 if (( build_num > 0 )) && \
-    [ ! -d "${BASE_BUILD_CACHE_FAILED_OUTSIDE}/${change_num}_${build_num}" ]; then
+    [ ! -d "${YASHCHIKI_CACHES_ROOT}/build_caches/failed/${change_num}_${build_num}" ]; then
 
     mkdir -vp "${failed_build_cache}" >&2
 
@@ -50,10 +50,10 @@ if (( build_num > 0 )) && \
     find "${preserved_packages}" -name "*.tar.gz" -print0 | link_into_failed_buildcache
 
     # link everything not present in preserved packages that is in build cache
-    find "${BUILD_CACHE_OUTSIDE}" -name "*.tar.gz" -print0 | link_into_failed_buildcache
+    find "${YASHCHIKI_CACHES_ROOT}/build_caches/${BUILD_CACHE_NAME}" -name "*.tar.gz" -print0 | link_into_failed_buildcache
 
     # echo created failed buildcache
-    echo "${failed_build_cache#${BASE_BUILD_CACHE_OUTSIDE}/}"
+    echo "${failed_build_cache#${YASHCHIKI_CACHES_ROOT}/build_caches/}"
 else
     echo "<no preserved packages found>"
 fi
