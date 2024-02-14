@@ -39,7 +39,7 @@ From: ${DOCKER_BASE_IMAGE}
     mount --no-mtab --bind "${YASHCHIKI_SPACK_CONFIG}" "\${SINGULARITY_ROOTFS}/tmp/spack_config"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/visionary/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/${CONTAINER_STYLE}/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av --chmod 0755 "${ROOT_DIR}"/lib/yashchiki/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
@@ -74,7 +74,7 @@ From: ${DOCKER_BASE_IMAGE}
     locale-gen
     # propagate environment variables to container recipe
     export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON}"
-    export YASHCHIKI_BUILD_SPACK_GCC=${YASHCHIKI_BUILD_SPACK_GCC}
+    export YASHCHIKI_BUILD_SPACK_GCC="${YASHCHIKI_BUILD_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
     export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"

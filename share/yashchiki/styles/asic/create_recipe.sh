@@ -13,10 +13,10 @@ From: ${DOCKER_BASE_IMAGE}
 %setup
     # bind-mount spack-folder as moving involves copying the complete download cache
     mkdir \${SINGULARITY_ROOTFS}/opt/spack
-    mount --no-mtab --bind "${WORKSPACE}/spack" "\${SINGULARITY_ROOTFS}/opt/spack"
+    mount --no-mtab --bind "${YASHCHIKI_SPACK_PATH}" "\${SINGULARITY_ROOTFS}/opt/spack"
     # bind-mount ccache
     mkdir \${SINGULARITY_ROOTFS}/opt/ccache
-    mount --no-mtab --bind "${HOME}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
+    mount --no-mtab --bind "${YASHCHIKI_CACHES_ROOT}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
     # bind-mount build_cache
     mkdir -p "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
     # create buildcache directory if it does not exist
@@ -34,7 +34,7 @@ From: ${DOCKER_BASE_IMAGE}
     mount --no-mtab --bind "${YASHCHIKI_SPACK_CONFIG}" "\${SINGULARITY_ROOTFS}/tmp/spack_config"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/asic/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/${CONTAINER_STYLE}/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av --chmod 0755 "${ROOT_DIR}"/lib/yashchiki/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
@@ -303,10 +303,4 @@ for view in "${spack_views[@]}"; do
         generate_appenv "${view}" "${view}"
         [[ "${view}" =~ ^visionary- ]] && generate_appenv "${view#visionary-}" "${view}"
     ) >> "${YASHCHIKI_RECIPE_PATH}"
-
-    if [ "${view}" = "visionary-simulation" ];then
-cat <<EOF >>"${YASHCHIKI_RECIPE_PATH}"
-    export NEST_MODULES=visionarymodule
-EOF
-    fi
 done
