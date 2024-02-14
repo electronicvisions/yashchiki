@@ -104,12 +104,6 @@ parser.add_argument(
          "postfix'ed with an ascending integer.")
 # optional options
 parser.add_argument(
-    "--proxy-http", type=str,
-    help="HTTP proxy to use when required.")
-parser.add_argument(
-    "--proxy-https", type=str,
-    help="HTTPS proxy to use when required.")
-parser.add_argument(
     "--debug", action="store_true",
     help="Enable debug-level logging.")
 parser.add_argument(
@@ -172,14 +166,6 @@ env = {
     "TMPDIR": os.path.join(tempfile.gettempdir(), args.tmp_subdir),
     "YASHCHIKI_CACHES_ROOT": args.caches_dir,
 } | os.environ
-
-
-# optionally forward http{,s} proxy if argument given
-if args.proxy_http:
-    env = env | {"YASHCHIKI_PROXY_HTTP": args.proxy_http}
-
-if args.proxy_https:
-    env = env | {"YASHCHIKI_PROXY_HTTPS": args.proxy_https}
 
 if args.build_cache_on_failure_name:
     env = env | {"YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME": args.build_cache_on_failure_name}

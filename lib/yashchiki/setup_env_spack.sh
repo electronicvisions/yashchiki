@@ -30,11 +30,3 @@ fi
 if [ ! -d "${TMPDIR}" ]; then
     mkdir -p "${TMPDIR}"
 fi
-
-# pip alterrrr
-if [ -n "${YASHCHIKI_PROXY_HTTP:-}" ]; then
-	export http_proxy=${YASHCHIKI_PROXY_HTTP}
-fi
-if [ -n "${YASHCHIKI_PROXY_HTTPS:-}" ]; then
-	export https_proxy=${YASHCHIKI_PROXY_HTTPS}
-fi

@@ -14,14 +14,6 @@ unset LC_NUMERIC
 unset LC_TIME
 unset LC_MESSAGES
 
-# build the container (using scripts from above)
-if [ -n "${YASHCHIKI_PROXY_HTTP:-}" ]; then
-	export http_proxy=${YASHCHIKI_PROXY_HTTP}
-fi
-if [ -n "${YASHCHIKI_PROXY_HTTPS:-}" ]; then
-	export https_proxy=${YASHCHIKI_PROXY_HTTPS}
-fi
-
 TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
 mkdir ${YASHCHIKI_SANDBOXES}

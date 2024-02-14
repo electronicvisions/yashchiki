@@ -37,8 +37,6 @@ pipeline {
 				YASHCHIKI_CACHES_ROOT = "${HOME}"
 				YASHCHIKI_SPACK_PATH = "${env.WORKSPACE}/spack"
 				YASHCHIKI_SANDBOXES = "sandboxes"
-				YASHCHIKI_PROXY_HTTP = "http://proxy.kip.uni-heidelberg.de:8080"
-				YASHCHIKI_PROXY_HTTPS = "http://proxy.kip.uni-heidelberg.de:8080"
 				YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME = get_build_cache_on_failure_name()
 				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
@@ -97,8 +95,6 @@ pipeline {
 
 								sh "python3 bin/yashchiki visionary ${WORKSPACE}/spack singularity_asic_temp.img " +
 								   "--log-dir=log " +
-								   "--proxy-${YASHCHIKI_PROXY_HTTP} " +
-								   "--proxy-https=${YASHCHIKI_PROXY_HTTPS} " +
 								   "--tmp-subdir=${env.NODE_NAME} " +
 								   "--meta-dir=${YASHCHIKI_META_DIR} " +
 								   "--caches-dir=${YASHCHIKI_CACHES_ROOT} " +

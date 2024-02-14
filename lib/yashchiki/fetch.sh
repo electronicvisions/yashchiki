@@ -45,14 +45,6 @@ compilers:
     spec: ${YASHCHIKI_SPACK_GCC}
 EOF
 
-# May need proxy to fetch all the packages (also needed in container due to pip)
-if [ -n "${YASHCHIKI_PROXY_HTTP:-}" ]; then
-	export http_proxy=${YASHCHIKI_PROXY_HTTP}
-fi
-if [ -n "${YASHCHIKI_PROXY_HTTPS:-}" ]; then
-	export https_proxy=${YASHCHIKI_PROXY_HTTPS}
-fi
-
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
 
