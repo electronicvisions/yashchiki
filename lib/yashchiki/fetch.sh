@@ -11,17 +11,24 @@ mkdir -p "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
 find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
     | xargs -r -n 1 "-I{}" -0 cp -vrl '{}' "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
 
+# temporary spack config scope directory for fetching
+tmp_config_scope=("$(mktemp -d)")
+
 # set download mirror stuff to prefill outside of container
 export MY_SPACK_FOLDER="${YASHCHIKI_SPACK_PATH}"
+# here we need the spack path outside of the container, but in commons.sh
+# the inside-container location is defined
 export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
-
-PATH_COMPILERS="${MY_SPACK_FOLDER}/etc/spack/compilers.yaml"
+# therefore we also need to redefine this command variable
+export MY_SPACK_CMD="${MY_SPACK_BIN} --config-scope ${tmp_config_scope}"
 
 # Add fake system compiler (needed for fetching)
+# We create a compilers.yaml file in a temporary directory and
+# add it as a scope.
 # This is NOT the correct version but we need to concretize with the same
 # version as we intend to build.
 # TODO: Spack needs to support concretizing with non-existent compiler.
-cat >"${PATH_COMPILERS}" <<EOF
+cat >"${tmp_config_scope}/compilers.yaml" <<EOF
 compilers:
 - compiler:
     paths:
@@ -29,7 +36,7 @@ compilers:
       cxx: /usr/bin/g++
       f77: /usr/bin/gfortran
       fc: /usr/bin/gfortran
-    operating_system: $(${MY_SPACK_BIN} arch -o)
+    operating_system: $(${MY_SPACK_CMD} arch -o)
     target: x86_64
     modules: []
     environment: {}
@@ -61,10 +68,11 @@ packages_to_fetch=(
 # some warnings that are also printed to stderr during fetching)
 tmpfiles_concretize_err=("$(mktemp)")
 
-rm_tmp_fetch_err() {
+rm_tmp_files() {
     rm -v "${tmpfiles_concretize_err[@]}"
+    rm -r $tmp_config_scope
 }
-trap rm_tmp_fetch_err EXIT
+trap rm_tmp_files EXIT
 
 
 # Concretize a trivial spec to regenerate
@@ -74,7 +82,7 @@ trap rm_tmp_fetch_err EXIT
 # Unfortunately, right now reindexing spack does not cause the index file to be
 # generated.
 echo "Regenerating database index." >&2
-${MY_SPACK_BIN} spec aida >/dev/null
+${MY_SPACK_CMD} spec aida >/dev/null
 
 # for some reason the exit code of shopt indicates if option is set despite -q not being specified
 oldstate="$(shopt -po xtrace)" || true
@@ -97,7 +105,7 @@ for package in "${packages_to_fetch[@]}"; do
     package_wo_compiler="${package%%%*}"
     ( set -x;
         ( specfile=$(get_specfile_name "${package_wo_compiler}");
-        ("${MY_SPACK_BIN}" spec --fresh -y "${package_wo_compiler}" > "${specfile}")
+        (${MY_SPACK_CMD} spec --fresh -y "${package_wo_compiler}" > "${specfile}")
         ) 2>"${tmp_err}" \
         || ( echo "CONCRETIZING FAILED" >> "${tmpfiles_concretize_err[0]}" );
     ) &
@@ -156,7 +164,7 @@ for package in "${packages_to_fetch[@]}"; do
     fi
     fetch_specfiles+=( "${specfile}" )
 done
-if ! ${MY_SPACK_BIN} fetch -D "${fetch_specfiles[@]/^/-f }"; then
+if ! ${MY_SPACK_CMD} fetch -D "${fetch_specfiles[@]/^/-f }"; then
     fetch_failed=1
 else
     fetch_failed=0
@@ -171,6 +179,3 @@ if (( fetch_failed != 0 )); then
 fi
 
 echo
-
-# remove f***ing compiler config
-[ -f "${PATH_COMPILERS}" ] && rm "${PATH_COMPILERS}"
