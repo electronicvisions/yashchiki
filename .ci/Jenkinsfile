@@ -13,6 +13,44 @@ Closure cleanupSteps = {
 	        deleteDirs: true)
 }
 
+Map<String, Object> verificationStages = [
+	visionary: [
+		// BSS1
+		[name: "NMPM Software",
+		 job: "bld_gerrit-meta-nmpm-software",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		// BSS2
+		[name: "PPU Toolchain",
+		 job: "bld_gerrit-ppu-toolchain-dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		[name: "haldls",
+		 job: "bld_gerrit-haldls-dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		[name: "hxtorch",
+		 job: "bld_gerrit-hxtorch-dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		[name: "pynn-brainscales",
+		 job: "bld_gerrit-pynn-brainscales-dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		[name: "documentation-brainscales2",
+		 job: "doc_gerrit_documentation-brainscales2-dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		// Visionary KiCad library
+		[name: "pcb-kicad-lib",
+		 job: "bld_gerrit_pcb-kicad-lib_dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		// Visionary lab tools
+		[name: "labcontrol",
+		 job: "bld_gerrit_labcontrol_dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"]
+	],
+	asic: [
+		[name: "tools-xilinx",
+		 job: "bld_gerrit_tools-xilinx_dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_ASIC_CONTAINER_IMAGE"]
+	]
+]
+
 pipeline {
 	agent { label 'conviz1||conviz2' }
 
@@ -21,17 +59,11 @@ pipeline {
 		skipDefaultCheckout()
 	}
 
-	parameters {
-		string(name: 'BUILD_CACHE_NAME',
-			   defaultValue: 'init_from_2023-10-24',
-			   description: 'Which buildcache to use? They reside under $HOME/build_caches/$BUILD_CACHE_NAME and will be created if they do not exist.')
-	}
-
 	stages {
 		stage('Container Build') {
 			// TODO: remove once unused
 			environment {
-				CONTAINER_STYLE = "visionary"
+				CONTAINER_STYLE = "${params.CONTAINER_STYLE}"
 				YASHCHIKI_INSTALL = "${WORKSPACE}/yashchiki"
 				YASHCHIKI_META_DIR = "${WORKSPACE}/meta"
 				YASHCHIKI_CACHES_ROOT = "${HOME}"
@@ -92,7 +124,7 @@ pipeline {
 									env.BUILD_CACHE_NAME = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true)
 								}
 
-								sh "python3 bin/yashchiki visionary ${WORKSPACE}/spack singularity_visionary_temp.img " +
+								sh "python3 bin/yashchiki ${CONTAINER_STYLE} ${WORKSPACE}/spack singularity_visionary_temp.img " +
 								   "--log-dir=log " +
 								   "--tmp-subdir=${env.NODE_NAME} " +
 								   "--meta-dir=${YASHCHIKI_META_DIR} " +
@@ -137,68 +169,23 @@ pipeline {
 				}
 				cleanup {
 					archiveArtifacts "host.env"
-					archiveArtifacts "out_singularity_build_visionary_recipe.txt"
+					archiveArtifacts "out_singularity_build_recipe.txt"
 				}
 			}
 		}
 
 		// Container verification stage: Build visionary metaprojects
 		stage('Container Verification') {
-			parallel {
-
-				// BSS1
-				stage('NMPM Software') {
-					steps {
-						build(job: 'bld_gerrit-meta-nmpm-software',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
+			steps {
+				script {
+					def branches = [:]
+					verificationStages[params.CONTAINER_STYLE].each {
+						project -> branches[project.name] = {
+							build(job: project.job,
+							      parameters: [string(name: project.container_image_parameter, value: CONTAINER_IMAGE)])
+						}
 					}
-				}
-
-				// BSS2
-				stage('PPU Toolchain') {
-					steps {
-						build(job: 'bld_gerrit-ppu-toolchain-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
-				stage('haldls') {
-					steps {
-						build(job: 'bld_gerrit-haldls-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
-				stage('hxtorch') {
-					steps {
-						build(job: 'bld_gerrit-hxtorch-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
-				stage('pynn-brainscales') {
-					steps {
-						build(job: 'bld_gerrit-pynn-brainscales-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
-				stage('documentation-brainscales2') {
-					steps {
-						build(job: 'doc_gerrit_documentation-brainscales2-dependencies',
-						      parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
-
-				// Visionary KiCad library
-				stage('pcb-kicad-lib') {
-					steps {
-						build(job: 'bld_gerrit_pcb-kicad-lib_dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
-				}
-				// Visionary lab tools
-				stage('labcontrol') {
-					steps {
-						build(job: 'bld_gerrit_labcontrol_dependencies',
-							  parameters: [string(name: 'OVERWRITE_DEFAULT_CONTAINER_IMAGE', value: CONTAINER_IMAGE)])
-					}
+					parallel branches
 				}
 			}
 			post {
