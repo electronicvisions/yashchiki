@@ -15,7 +15,7 @@ source "${SOURCE_DIR}/commons.sh"
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/bootstrap_spack.sh"
 
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_spack.sh" && \
-sudo -Eu spack ${MY_SPACK_BIN} compiler add --scope site /usr/bin && \
+sudo -Eu spack ${MY_SPACK_CMD} compiler add --scope site /usr/bin && \
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/restore_spack_user_settings.sh" && \
 # remove temporary cache folder
 rm -rfv /opt/spack/.spack

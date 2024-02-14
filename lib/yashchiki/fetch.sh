@@ -20,7 +20,7 @@ export MY_SPACK_FOLDER="${YASHCHIKI_SPACK_PATH}"
 # the inside-container location is defined
 export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
 # therefore we also need to redefine this command variable
-export MY_SPACK_CMD="${MY_SPACK_BIN} --config-scope ${tmp_config_scope}"
+export MY_SPACK_CMD="${MY_SPACK_BIN} --config-scope ${YASHCHIKI_SPACK_CONFIG} --config-scope ${tmp_config_scope}"
 
 # Add fake system compiler (needed for fetching)
 # We create a compilers.yaml file in a temporary directory and

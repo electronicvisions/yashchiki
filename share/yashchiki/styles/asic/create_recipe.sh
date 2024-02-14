@@ -29,6 +29,9 @@ From: ${DOCKER_BASE_IMAGE}
     # bind-mount tmp-folder
     mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack"
     mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
+    # bind-mount spack config tmp-folder
+    mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack_config"
+    mount --no-mtab --bind "${YASHCHIKI_SPACK_CONFIG}" "\${SINGULARITY_ROOTFS}/tmp/spack_config"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/asic/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
@@ -233,6 +236,7 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_BUILD_SPACK_GCC="${YASHCHIKI_BUILD_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
+    export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post_as_root.sh"
     wait

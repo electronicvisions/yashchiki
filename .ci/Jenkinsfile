@@ -136,7 +136,8 @@ pipeline {
 								   "--recipe-filename=${WORKSPACE}/visionary_recipe.def " +
 								   "--build-cache-on-failure-name=${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME} " +
 								   (with_debug ? "--debug " : "") +
-								   (with_spack_verbose ? "--spack-verbose " : "")
+								   (with_spack_verbose ? "--spack-verbose " : "") +
+								   "--jobs=" + jesh(script: "nproc", returnStdout: true).trim() + " "
 							} catch (Throwable t) {
 								archiveArtifacts "errors_concretization.log"
 								throw t

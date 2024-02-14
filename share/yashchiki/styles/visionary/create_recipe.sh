@@ -34,6 +34,9 @@ From: ${DOCKER_BASE_IMAGE}
     # bind-mount tmp-folder
     mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack"
     mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
+    # bind-mount spack config tmp-folder
+    mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack_config"
+    mount --no-mtab --bind "${YASHCHIKI_SPACK_CONFIG}" "\${SINGULARITY_ROOTFS}/tmp/spack_config"
     # copy install scripts
     mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/visionary/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
@@ -74,6 +77,8 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_BUILD_SPACK_GCC=${YASHCHIKI_BUILD_SPACK_GCC}
     export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
+    export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"
+    export YASHCHIKI_CACHES_ROOT="${YASHCHIKI_CACHES_ROOT}"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     # Improve efficiency by installing system packages in the background (even
     # though we set the number of worker to \$(nproc), often times - e.g. when

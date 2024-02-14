@@ -12,10 +12,10 @@ source "${sourcedir}/commons.sh"
 source "${sourcedir}/setup_env_spack.sh"
 
 # rebuild all modules
-${MY_SPACK_BIN} module tcl refresh -y
+${MY_SPACK_CMD} module tcl refresh -y
 # remove the generated cache again to avoid permission problems in the final
 # container
-${MY_SPACK_BIN} clean --misc-cache
+${MY_SPACK_CMD} clean --misc-cache
 
 # non-spack user/group shall be allowed to read/execute everything we installed here
 chmod -R o+rX "${MY_SPACK_VIEW_PREFIX}"
@@ -26,7 +26,7 @@ find "${MY_SPACK_FOLDER}" \
     \) -o -not -type l -exec chmod o+rX '{}' \;
 
 # remove build_cache again (prior to changing modules)
-${MY_SPACK_BIN} mirror rm --scope site build_mirror
+${MY_SPACK_CMD} mirror rm --scope site build_mirror
 
 # allow non-spack users to install new packages
 # Note: modified packages can be loaded by bind-mounting the /var-subdirectory
@@ -38,12 +38,3 @@ chmod -R 777 ${MY_SPACK_FOLDER}/share/spack/modules || /bin/true
 
 # Make db accessible for all to allow for spack modifications within container
 chmod -R 777 /opt/spack/opt/spack/.spack-db
-
-# disable ccache after everything has been build -> make manual spack overlay
-# builds oe step less manual
-sed -i '/ccache:/c\  ccache: false'\
-    "${MY_SPACK_FOLDER}/etc/spack/defaults/config.yaml"
-
-# Restore default build_jobs setting
-sed -i '/build_jobs:/c\  # build_jobs: 4'\
-    "${MY_SPACK_FOLDER}/etc/spack/defaults/config.yaml"

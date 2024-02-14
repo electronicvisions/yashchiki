@@ -104,6 +104,9 @@ parser.add_argument(
          "postfix'ed with an ascending integer.")
 # optional options
 parser.add_argument(
+    "-j", "--jobs", type=int, default=1,
+    help="Number of parallel jobs to use when concurt execution of tasks is available.")
+parser.add_argument(
     "--debug", action="store_true",
     help="Enable debug-level logging.")
 parser.add_argument(
@@ -165,6 +168,7 @@ env = {
     "YASHCHIKI_BUILD_CACHE_NAME": args.build_cache_name,
     "TMPDIR": os.path.join(tempfile.gettempdir(), args.tmp_subdir),
     "YASHCHIKI_CACHES_ROOT": args.caches_dir,
+    "YASHCHIKI_JOBS": str(args.jobs),
 } | os.environ
 
 if args.build_cache_on_failure_name:
@@ -210,8 +214,28 @@ def run(script: str, env: dict, script_args: list = []):
 
 with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
         as temporary_directory_spack, \
-        tempfile.TemporaryDirectory() as temporary_directory:
+        tempfile.TemporaryDirectory() as temporary_directory, \
+        tempfile.TemporaryDirectory() as temporary_directory_spack_config:
     temporary_directory = pathlib.Path(temporary_directory)
+    temporary_directory_spack_config = \
+        pathlib.Path(temporary_directory_spack_config)
+
+    # set spack config directory
+    env = env | {"YASHCHIKI_SPACK_CONFIG": temporary_directory_spack_config}
+
+    # make spack config directory readable for all users (i.e., spack)
+    temporary_directory_spack_config.chmod(0o755)
+
+    # set spack config
+    spack_config = {
+        "config": {
+            "build_jobs": args.jobs,
+            "ccache": True,
+        }
+    }
+    with temporary_directory_spack_config.joinpath("config.yaml").open("wt") \
+            as spack_config_file:
+        spack_config_file.write(yaml.dump(spack_config))
 
     env = env | {"JOB_TMP_SPACK": temporary_directory_spack}
 

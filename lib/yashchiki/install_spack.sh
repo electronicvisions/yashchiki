@@ -33,7 +33,7 @@ for package in "${spack_packages[@]+"${spack_packages[@]}"}"; do
         exit 1
     fi
     echo "Installing: ${package}" >&2
-    ${MY_SPACK_BIN} "${SPACK_ARGS_INSTALL[@]+"${SPACK_ARGS_INSTALL[@]}"}" install --fresh --no-cache --show-log-on-error --file "${specfile}"
+    ${MY_SPACK_CMD} "${SPACK_ARGS_INSTALL[@]+"${SPACK_ARGS_INSTALL[@]}"}" install --fresh --no-cache --show-log-on-error --file "${specfile}"
 done
 
 # create the filesystem views (exposed via singularity --app option)
@@ -79,6 +79,6 @@ umask ${OLD_UMASK}
 # $ singularity shell -s /opt/shell/${SHELL} /containers/stable/latest
 # which is independent of any app. Especially, this allows custom loading of
 # modules within the container.
-if ${MY_SPACK_BIN} location -i zsh; then
-    ln -s "$(${MY_SPACK_BIN} location -i zsh)/bin/zsh" /opt/shell/zsh
+if ${MY_SPACK_CMD} location -i zsh; then
+    ln -s "$(${MY_SPACK_CMD} location -i zsh)/bin/zsh" /opt/shell/zsh
 fi

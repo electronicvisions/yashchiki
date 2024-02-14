@@ -73,6 +73,7 @@ set_debug_output_from_env
 
 export MY_SPACK_FOLDER=/opt/spack
 export MY_SPACK_BIN=/opt/spack/bin/spack
+export MY_SPACK_CMD="${MY_SPACK_BIN} --config-scope ${YASHCHIKI_SPACK_CONFIG}"
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 export LOCK_FILENAME=lock
@@ -253,7 +254,7 @@ populate_views() {
         local dependencies="${spack_add_to_view_with_dependencies["${addition}"]}"
         {
             for viewname in ${spack_add_to_view["${addition}"]}; do
-                echo "${MY_SPACK_BIN} ${SPACK_ARGS_VIEW[*]+"${SPACK_ARGS_VIEW[*]}"} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
+                echo "${MY_SPACK_CMD} ${SPACK_ARGS_VIEW[*]+"${SPACK_ARGS_VIEW[*]}"} view -d ${dependencies} symlink -i \"${MY_SPACK_VIEW_PREFIX}/${viewname}\" \"${addition}\""
             done
         } | parallel_cmds
     done
@@ -362,7 +363,7 @@ get_hashes_in_buildcache() {
 
 get_hashes_in_spack() {
     # we only return hashes that are actually IN spack, i.e., that reside under /opt/spack/opt/spack
-    ${MY_SPACK_BIN} find --no-groups -Lp | awk '$3 ~ /^\/opt\/spack\/opt\/spack\// { print $1 }' | sort
+    ${MY_SPACK_CMD} find --no-groups -Lp | awk '$3 ~ /^\/opt\/spack\/opt\/spack\// { print $1 }' | sort
 }
 
 
@@ -412,7 +413,7 @@ get_specfiles() {
     local idx=0
     for package in "${@}"; do
         if [ ! -f "${specfiles[${idx}]}" ]; then
-            echo "${MY_SPACK_BIN} spec -y \"${package}\" > ${specfiles[${idx}]}"
+            echo "${MY_SPACK_CMD} spec -y \"${package}\" > ${specfiles[${idx}]}"
         fi
         idx=$((idx + 1))
     done
@@ -495,7 +496,7 @@ _install_from_buildcache() {
         < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
 
     # have spack reindex its install contents to find the new packages
-    ${MY_SPACK_BIN} "${SPACK_ARGS_REINDEX[@]+"${SPACK_ARGS_REINDEX[@]}"}" reindex
+    ${MY_SPACK_CMD} "${SPACK_ARGS_REINDEX[@]+"${SPACK_ARGS_REINDEX[@]}"}" reindex
 }
 
 #############
@@ -525,6 +526,6 @@ get_latest_hash() {
   printf("%s%%%s%s /%s\\n", substr(\$2, 0, idx-1), compiler, substr(\$2, idx), \$1)
 }
 EOF
-  ${MY_SPACK_BIN} find -vL "$@" | awk -f "${FILE_AWK}"| sort -V | cut -d ' ' -f 2 | tail -n 1
+  ${MY_SPACK_CMD} find -vL "$@" | awk -f "${FILE_AWK}"| sort -V | cut -d ' ' -f 2 | tail -n 1
   rm "${FILE_AWK}"
 }
