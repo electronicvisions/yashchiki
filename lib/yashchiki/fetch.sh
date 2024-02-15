@@ -6,11 +6,6 @@ shopt -s inherit_errexit
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
-# hard-link source cache into spack folder to avoid duplication.
-mkdir -p "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
-find "${SOURCE_CACHE_DIR}" -mindepth 1 -maxdepth 1 -print0 \
-    | xargs -r -n 1 "-I{}" -0 cp -vrl '{}' "${YASHCHIKI_SPACK_PATH}/var/spack/cache/"
-
 # temporary spack config scope directory for fetching
 tmp_config_scope=("$(mktemp -d)")
 
@@ -43,6 +38,11 @@ compilers:
     extra_rpaths: []
     flags: {}
     spec: ${YASHCHIKI_SPACK_GCC}
+EOF
+
+cat >"${tmp_config_scope}/config.yaml" <<EOF
+config:
+  source_cache: ${YASHCHIKI_CACHES_ROOT}/download_cache
 EOF
 
 # fetch "everything" (except for pip shitness)
@@ -152,15 +152,6 @@ for package in "${packages_to_fetch[@]}"; do
     fetch_specfiles+=( "${specfile}" )
 done
 if ! ${MY_SPACK_CMD} fetch -D "${fetch_specfiles[@]/^/-f }"; then
-    fetch_failed=1
-else
-    fetch_failed=0
-fi
-
-# update cache in any case to store successfully loaded files
-rsync -av "${MY_SPACK_FOLDER}/var/spack/cache/" "${SOURCE_CACHE_DIR}/"
-
-if (( fetch_failed != 0 )); then
     # propagate error
     exit 1
 fi

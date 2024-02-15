@@ -11,38 +11,37 @@ Bootstrap: docker
 From: ${DOCKER_BASE_IMAGE}
 
 %setup
-    # bind-mount spack-folder as moving involves copying the complete download cache
-    mkdir \${SINGULARITY_ROOTFS}/opt/spack
-    mount --no-mtab --bind "${YASHCHIKI_SPACK_PATH}" "\${SINGULARITY_ROOTFS}/opt/spack"
-    # bind-mount ccache
-    mkdir \${SINGULARITY_ROOTFS}/opt/ccache
-    mount --no-mtab --bind "${YASHCHIKI_CACHES_ROOT}/spack_ccache" "\${SINGULARITY_ROOTFS}/opt/ccache"
-    # bind-mount build_cache
-    mkdir -p "\${SINGULARITY_ROOTFS}${BUILD_CACHE_INSIDE}"
-    # create buildcache directory if it does not exist
+    # location to bind-mount spack-folder
+    mkdir \${APPTAINER_ROOTFS}/opt/spack
+    # location to bind-mount spack-source-cache-folder
+    mkdir -p \${APPTAINER_ROOTFS}/opt/spack/var/spack/cache/
+    # copy spack repo
+    rsync -av ${YASHCHIKI_SPACK_PATH}/ \${APPTAINER_ROOTFS}/opt/spack
+    # location to bind-mount ccache
+    mkdir \${APPTAINER_ROOTFS}/opt/ccache
+    # location to bind-mount build_cache
+    mkdir -p "\${APPTAINER_ROOTFS}${BUILD_CACHE_INSIDE}"
+    # # create buildcache directory if it does not exist
     [ ! -d "${BUILD_CACHE_OUTSIDE}" ] && mkdir -p "${BUILD_CACHE_OUTSIDE}"
-    # mount the full build cache folder into container because some files might be symlinked to other buildcaches
-    mount --no-mtab --bind "${BASE_BUILD_CACHE_OUTSIDE}" "\${SINGULARITY_ROOTFS}${BASE_BUILD_CACHE_INSIDE}"
-    # bind-mount preserved packages in case the build fails
-    mkdir -p "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
-    mount --no-mtab --bind "${PRESERVED_PACKAGES_OUTSIDE}" "\${SINGULARITY_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
-    # bind-mount tmp-folder
-    mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack"
-    mount --no-mtab --bind "${JOB_TMP_SPACK}" "\${SINGULARITY_ROOTFS}/tmp/spack"
-    # bind-mount spack config tmp-folder
-    mkdir -p "\${SINGULARITY_ROOTFS}/tmp/spack_config"
-    mount --no-mtab --bind "${YASHCHIKI_SPACK_CONFIG}" "\${SINGULARITY_ROOTFS}/tmp/spack_config"
+    # location to mount the full build cache folder into container because some files might be symlinked to other buildcaches
+    # mount --no-mtab --bind "${BASE_BUILD_CACHE_OUTSIDE}" "\${APPTAINER_ROOTFS}${BASE_BUILD_CACHE_INSIDE}"
+    # location to bind-mount preserved packages in case the build fails
+    mkdir -p "\${APPTAINER_ROOTFS}${PRESERVED_PACKAGES_INSIDE}"
+    # location to bind-mount tmp-folder
+    mkdir -p "\${APPTAINER_ROOTFS}/tmp/spack"
+    # location to bind-mount spack config tmp-folder
+    mkdir -p "\${APPTAINER_ROOTFS}/tmp/spack_config"
     # copy install scripts
-    mkdir "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/${CONTAINER_STYLE}/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av --chmod 0755 "${ROOT_DIR}"/lib/yashchiki/*.sh "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
-    mkdir -p "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
-    rsync -av "${META_DIR_OUTSIDE}/" "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
+    mkdir "\${APPTAINER_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/${CONTAINER_STYLE}/*.sh "\${APPTAINER_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av --chmod 0755 "${ROOT_DIR}"/lib/yashchiki/*.sh "\${APPTAINER_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${APPTAINER_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${APPTAINER_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
+    mkdir -p "\${APPTAINER_ROOTFS}/${META_DIR_INSIDE}"
+    rsync -av "${META_DIR_OUTSIDE}/" "\${APPTAINER_ROOTFS}/${META_DIR_INSIDE}"
     # init scripts for user convenience
-    mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
-    rsync -av "${ROOT_DIR}"/share/yashchiki/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
+    mkdir -p "\${APPTAINER_ROOTFS}/opt/init"
+    rsync -av "${ROOT_DIR}"/share/yashchiki/misc-files/init/*.sh "\${APPTAINER_ROOTFS}/opt/init"
 
 %files
     # NOTE: Due to a bug in singularity 2.6 all paths in this section _cannot_
@@ -254,14 +253,14 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_SPACK_VERBOSE="${YASHCHIKI_SPACK_VERBOSE}"
     export YASHCHIKI_DEBUG=${YASHCHIKI_DEBUG}
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
-    "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post_as_root.sh"
+    "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post.sh"
     wait
     (
-        "${SPACK_INSTALL_SCRIPTS}/install_singularity_as_root.sh" && \
-        "${SPACK_INSTALL_SCRIPTS}/install_gocryptfs_as_root.sh"
+        "${SPACK_INSTALL_SCRIPTS}/install_singularity.sh" && \
+        "${SPACK_INSTALL_SCRIPTS}/install_gocryptfs.sh"
     ) || \
     (
-    sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&
+        "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&
         exit 1  # propagate the error
     )
 
