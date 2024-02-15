@@ -160,7 +160,7 @@ env = {
     "YASHCHIKI_SPACK_VERBOSE": str(int(args.spack_verbose)),
     "YASHCHIKI_SANDBOXES": args.sandboxes_dir,
     "YASHCHIKI_IMAGE_NAME": args.output,
-    "YASHCHIKI_SPACK_PATH": args.spack_dir,
+    "YASHCHIKI_SPACK_PATH": args.spack_dir.resolve(),
     "YASHCHIKI_BUILD_CACHE_NAME": args.build_cache_name,
     "TMPDIR": os.path.join(tempfile.gettempdir(), args.tmp_subdir),
     "YASHCHIKI_CACHES_ROOT": args.caches_dir,
@@ -269,4 +269,3 @@ with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
     run("lib/yashchiki/build_image.sh", env)
     if args.update_build_cache:
         run("lib/yashchiki/update_build_cache.sh", env, ["-c", args.output])
-    run("lib/yashchiki/restore_host_user_ownership.sh", env)

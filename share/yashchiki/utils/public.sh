@@ -69,7 +69,7 @@ check_container_inner() {
     fi
 
     # check that there are no blacklisted packages in the container
-    if singularity shell "${container}" -l \
+    if /skretch/opt/apptainer/1.2.5/bin/apptainer shell "${container}" -l \
         -c "spack find | grep -q \"$(get_grep_pattern_blacklisted)\"" \
         &>/dev/null; then
         # do NOT use container if blacklisted package present
