@@ -16,12 +16,6 @@ spack_views_gccxml=(
 )
 
 
-spack_gid="nogroup"
-
-spack_create_user_cmd() {
-    adduser spack --uid 888 --no-create-home --home /opt/spack --disabled-password --system --shell /bin/bash
-}
-
 # all views get the default gcc except those in spack_views_no_default_gcc
 # (defined above)
 spack_add_to_view_with_dependencies["${YASHCHIKI_SPACK_GCC}"]="no"

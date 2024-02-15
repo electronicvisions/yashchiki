@@ -18,5 +18,11 @@ TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
 mkdir -p ${YASHCHIKI_SANDBOXES}
 
-# Do not change: special sudo permit for the host user...
-sudo -E singularity build --sandbox "${TARGET_FOLDER}" "${YASHCHIKI_RECIPE_PATH}" | tee out_singularity_build_recipe.txt
+/skretch/opt/apptainer/1.2.5/bin/apptainer build \
+    --bind ${YASHCHIKI_CACHES_ROOT}/download_cache:/opt/spack/var/spack/cache \
+    --bind ${YASHCHIKI_CACHES_ROOT}/spack_ccache:/opt/ccache \
+    --bind ${YASHCHIKI_CACHES_ROOT}/build_caches:/opt/build_cache \
+    --bind ${YASHCHIKI_CACHES_ROOT}/preserved_packages:/opt/preserved_packages \
+    --bind ${JOB_TMP_SPACK}:/tmp/spack \
+    --bind ${YASHCHIKI_SPACK_CONFIG}:/tmp/spack_config \
+    --fakeroot --sandbox "${TARGET_FOLDER}" "${YASHCHIKI_RECIPE_PATH}" | tee out_singularity_build_recipe.txt

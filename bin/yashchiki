@@ -267,7 +267,6 @@ else:
     meta_dir.mkdir(parents=True)
 env = env | {"YASHCHIKI_META_DIR": meta_dir}
 
-run("lib/yashchiki/create_spack_user.sh", env)
 run("lib/yashchiki/create_caches.sh", env)
 run("lib/yashchiki/fetch.sh", env)
 run(str(pathlib.Path("share", "yashchiki", "styles", args.style,
@@ -277,7 +276,6 @@ run("lib/yashchiki/build_sandbox.sh", env)
 run("lib/yashchiki/build_image.sh", env)
 if args.update_build_cache:
     run("lib/yashchiki/update_build_cache.sh", env, ["-c", args.output])
-run("lib/yashchiki/restore_host_user_ownership.sh", env)
 
 if args.tmpdir is None:
     shutil.rmtree(tmpdir)

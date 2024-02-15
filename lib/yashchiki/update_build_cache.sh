@@ -29,7 +29,7 @@ source "${SOURCE_DIR}/commons.sh"
 # update script inside the container
 set +e
 # Arugments needed once we switch to singularity3: --writable-tmpfs
-sudo -E singularity exec\
+/skretch/opt/apptainer/1.2.5/bin/apptainer exec\
     -B "${BUILD_CACHE_OUTSIDE}:${BUILD_CACHE_INSIDE}:rw"\
     "${IMAGE_NAME}" \
-    sudo -Eu spack /opt/spack_install_scripts/update_build_cache_in_container.sh -j ${YASHCHIKI_JOBS} -q || exit 0
+    /opt/spack_install_scripts/update_build_cache_in_container.sh -j ${YASHCHIKI_JOBS} -q || exit 0

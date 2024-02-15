@@ -171,7 +171,7 @@ pipeline {
 					archiveArtifacts(artifacts: "sandboxes/*/opt/spack_specs/*.yaml", allowEmptyArchive: true)
 					archiveArtifacts(artifacts: "log/*.log", allowEmptyArchive: true)
 					// zip spack stages and archive them
-					sh "tar -C ${YASHCHIKI_TMPDIR}/tmp_spack/tmp/ -czf spack_stage.tar.gz spack-stage"
+					sh "tar -C ${YASHCHIKI_TMPDIR}/tmp_spack/tmp/root -czf spack_stage.tar.gz spack-stage"
 					archiveArtifacts(artifacts: "spack_stage.tar.gz", allowEmptyArchive: true)
 				}
 			}
