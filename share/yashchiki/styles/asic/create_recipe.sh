@@ -236,6 +236,7 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_BUILD_SPACK_GCC="${YASHCHIKI_BUILD_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
+    export YASHCHIKI_JOBS="${YASHCHIKI_JOBS}"
     export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post_as_root.sh"

@@ -86,9 +86,9 @@ fi
 cd ${MY_SPACK_FOLDER}
 
 get_hashes_to_store \
-    | parallel -r ${args_progress} -j$(nproc) \
+    | parallel -r ${args_progress} -j${YASHCHIKI_JOBS} \
         tar Pcfz "${destination_folder}/{}.tar.gz" \"\$\(spack location -i /{}\)\"
 
 # verify integrity (of actual files, not possible symlinks)
 find "${destination_folder}" -type f -name "*.tar.gz" -print0 \
-    | parallel -r -0 -j$(nproc) "tar Ptf '{}' 1>/dev/null"
+    | parallel -r -0 -j${YASHCHIKI_JOBS} "tar Ptf '{}' 1>/dev/null"

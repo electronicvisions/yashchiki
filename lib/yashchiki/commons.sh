@@ -231,7 +231,7 @@ fi
 parallel_cmds() {
     local num_jobs
     local opts OPTIND OPTARG
-    num_jobs="$(nproc)"
+    num_jobs="${YASHCHIKI_JOBS}"
     while getopts ":j:" opts
     do
         case $opt in
@@ -417,7 +417,7 @@ get_specfiles() {
         fi
         idx=$((idx + 1))
     done
-    ) | parallel -r -j$(nproc) 1>/dev/null
+    ) | parallel -r -j${YASHCHIKI_JOBS} 1>/dev/null
 
     # TODO: DELME
     for sf in "${specfiles[@]}"; do
@@ -483,7 +483,7 @@ _install_from_buildcache() {
 
     # get all top-level directories that have to be created so that each tar process only creates its own directory
     local toplevel_dirs
-    mapfile -t toplevel_dirs < <(parallel -j "$(nproc)" \
+    mapfile -t toplevel_dirs < <(parallel -j "${YASHCHIKI_JOBS}" \
         "bash -c 'tar Ptf ${BUILD_CACHE_INSIDE}/{}.tar.gz | head -n 1'" < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}" \
         | xargs -r dirname | sort | uniq )
 
@@ -492,7 +492,7 @@ _install_from_buildcache() {
         [ ! -d "${dir}" ] && mkdir -p "${dir}"
     done
 
-    parallel -v -j $(nproc) tar Pxf "${BUILD_CACHE_INSIDE}/{}.tar.gz" \
+    parallel -v -j ${YASHCHIKI_JOBS} tar Pxf "${BUILD_CACHE_INSIDE}/{}.tar.gz" \
         < "${FILE_HASHES_TO_INSTALL_FROM_BUILDCACHE}"
 
     # have spack reindex its install contents to find the new packages

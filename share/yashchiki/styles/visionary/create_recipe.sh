@@ -77,11 +77,12 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_BUILD_SPACK_GCC="${YASHCHIKI_BUILD_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC="${YASHCHIKI_SPACK_GCC}"
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
+    export YASHCHIKI_JOBS="${YASHCHIKI_JOBS}"
     export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"
     export YASHCHIKI_CACHES_ROOT="${YASHCHIKI_CACHES_ROOT}"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     # Improve efficiency by installing system packages in the background (even
-    # though we set the number of worker to \$(nproc), often times - e.g. when
+    # though we set the number of worker to \${YASHCHIKI_JOBS}, often times - e.g. when
     # concretizing - only one process will be active.)
     # NOTE: For this to work all spack-related dependencies need to be
     # specified under "Inlucde:" above. install_system_dependencies.sh should

@@ -83,7 +83,7 @@ for package in "${packages_to_fetch[@]}"; do
     echo "Concretizing ${package:0:30} for fetching.." >&2
     # pause if we have sufficient concretizing jobs
     set +x  # do not clobber build log so much
-    while (( $(jobs | wc -l) >= $(nproc) )); do
+    while (( $(jobs | wc -l) >= ${YASHCHIKI_JOBS} )); do
         # call jobs because otherwise we will not exit the loop
         jobs &>/dev/null
         sleep 1
