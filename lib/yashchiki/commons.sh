@@ -6,64 +6,13 @@ shopt -s inherit_errexit 2>/dev/null || true
 ROOT_DIR="$(dirname "$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")")"
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 
-HOST_ENV_FILE_INSIDE="/tmp/spack/host.env"
-if [ -n "${WORKSPACE:-}" ]; then
-    # we are not in container
-    HOST_ENV_FILE="${YASHCHIKI_HOST_ENV_PATH}"
-else
-    HOST_ENV_FILE="${HOST_ENV_FILE_INSIDE}"
-fi
-
-# Usage:
-#   get_host_env <variable-name> [<default>]
-#
-# Get <variable-name> from the host environment dumped at the start of the
-# host job.  If the host environment was not dumped at the beginning of
-# the host job, the regular environment is taken.
-#
-# If the variable is not found and no default value is specified, return 1.
-get_host_env() {
-    # match on variable name at the beginning of line and then delete everyting
-    # up to and including the first equal sign
-    local default default_specified name
-    if (( $# < 0 )); then
-        echo "ERR: Did not specify variable name to query from host env.">&2
-        return 1
-    else
-        name="$1"
-    fi
-
-    if (( $# > 1 )); then
-        default="$2"
-        default_specified=1
-    else
-        default=""
-        default_specified=0
-    fi
-
-    if ! {
-        if [ -f "${HOST_ENV_FILE}" ]; then
-            cat "${HOST_ENV_FILE}"
-        else
-            env
-        fi
-    } | grep "^${name}=" | sed -e "s:^[^=]*=::"; then
-        if (( default_specified )); then
-            echo "${default}"
-        else
-            echo "Variable not found in environment: ${name}" >&2
-            return 1
-        fi
-    fi
-}
-
 #####################
 # SETUP ENVIRONMENT #
 #####################
 
 set_debug_output_from_env() {
     # Enable debug if YASHCHIKI_DEBUG is NOT (-n) empty string
-    if [ -n "$(get_host_env YASHCHIKI_DEBUG "")" ]; then
+    if [ -n "${YASHCHIKI_DEBUG:-}" ]; then
         set -x
     else
         set +x
@@ -78,38 +27,35 @@ export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
 export LOCK_FILENAME=lock
 
-BUILD_CACHE_NAME="$(get_host_env BUILD_CACHE_NAME visionary_manual)"
-export BUILD_CACHE_NAME
-
 # NOTE: build caches contain relavite symlinks to preserved_packages, so the
 # relation that build_caches and preserved_packages are in the same folder
 # should be maintained inside the container!
 # --obreitwi, 17-06-20 12:53:20
 
-BASE_BUILD_CACHE_OUTSIDE="$(get_host_env YASHCHIKI_CACHES_ROOT)/build_caches"
-BASE_BUILD_CACHE_FAILED_OUTSIDE="$(get_host_env YASHCHIKI_CACHES_ROOT)/build_caches/failed"
-BUILD_CACHE_OUTSIDE="${BASE_BUILD_CACHE_OUTSIDE}/${BUILD_CACHE_NAME}"
+BASE_BUILD_CACHE_OUTSIDE="${YASHCHIKI_CACHES_ROOT}/build_caches"
+BASE_BUILD_CACHE_FAILED_OUTSIDE="${YASHCHIKI_CACHES_ROOT}/build_caches/failed"
+BUILD_CACHE_OUTSIDE="${BASE_BUILD_CACHE_OUTSIDE}/${YASHCHIKI_BUILD_CACHE_NAME}"
 export BASE_BUILD_CACHE_OUTSIDE
 export BASE_BUILD_CACHE_FAILED_OUTSIDE
 export BUILD_CACHE_OUTSIDE
 
 BASE_BUILD_CACHE_INSIDE="/opt/build_cache"
-BUILD_CACHE_INSIDE="${BASE_BUILD_CACHE_INSIDE}/${BUILD_CACHE_NAME}"
+BUILD_CACHE_INSIDE="${BASE_BUILD_CACHE_INSIDE}/${YASHCHIKI_BUILD_CACHE_NAME}"
 BUILD_CACHE_LOCK="${BUILD_CACHE_INSIDE}/${LOCK_FILENAME}"
 export BASE_BUILD_CACHE_INSIDE
 export BUILD_CACHE_INSIDE
 export BUILD_CACHE_LOCK
 
-SOURCE_CACHE_DIR="$(get_host_env YASHCHIKI_CACHES_ROOT)/download_cache"
+SOURCE_CACHE_DIR="${YASHCHIKI_CACHES_ROOT}/download_cache"
 export SOURCE_CACHE_DIR
 
 PRESERVED_PACKAGES_INSIDE="/opt/preserved_packages"
-PRESERVED_PACKAGES_OUTSIDE="$(get_host_env YASHCHIKI_CACHES_ROOT)/preserved_packages"
+PRESERVED_PACKAGES_OUTSIDE="${YASHCHIKI_CACHES_ROOT}/preserved_packages"
 export PRESERVED_PACKAGES_INSIDE
 export PRESERVED_PACKAGES_OUTSIDE
 
 META_DIR_INSIDE="/opt/meta"
-META_DIR_OUTSIDE="$(get_host_env YASHCHIKI_META_DIR)"
+META_DIR_OUTSIDE="${YASHCHIKI_META_DIR:-}"
 export META_DIR_INSIDE
 export META_DIR_OUTSIDE
 
@@ -177,7 +123,7 @@ SPACK_ARGS_INSTALL=()
 SPACK_ARGS_REINDEX=()
 SPACK_ARGS_VIEW=()
 
-if [ -n "$(get_host_env YASHCHIKI_SPACK_VERBOSE)" ]; then
+if [ -n "${YASHCHIKI_SPACK_VERBOSE:-}" ]; then
     SPACK_ARGS_INSTALL+=("--verbose")
     SPACK_ARGS_VIEW+=("--verbose")
     SPACK_ARGS_REINDEX+=("--verbose")

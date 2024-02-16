@@ -82,10 +82,6 @@ parser.add_argument(
     help="Folder where to store meta information to be copied into the "
          "container. If not provided, a temporary directory is used.")
 parser.add_argument(
-    "--host-env-filename", type=pathlib.Path,
-    help="Location of host environment storage file to use within container "
-         "build. If not provided, a temporary location is used.")
-parser.add_argument(
     "--tmp-subdir", type=pathlib.Path, default="",
     help=f"Directory under {tempfile.gettempdir()} which to use as root for "
          "temporary files to be owned by spack.")
@@ -133,7 +129,6 @@ paths = [
     args.log_dir,
     args.sandboxes_dir,
     args.meta_dir,
-    args.host_env_filename,
     args.tmp_subdir,
     args.recipe_filename
 ]
@@ -257,14 +252,6 @@ with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
         meta_dir.mkdir(parents=True)
     env = env | {"YASHCHIKI_META_DIR": meta_dir}
 
-    # host environment storage filename defaults to temporary file
-    if args.host_env_filename is not None:
-        host_env_filename = args.host_env_filename
-    else:
-        host_env_filename = temporary_directory.joinpath("host.env")
-    env = env | {"YASHCHIKI_HOST_ENV_PATH": host_env_filename}
-
-    run("lib/yashchiki/store_environment.sh", env)
     run("lib/yashchiki/create_spack_user.sh", env)
     run("lib/yashchiki/create_caches.sh", env)
     run("lib/yashchiki/fetch.sh", env)

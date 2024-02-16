@@ -59,7 +59,6 @@ From: ${DOCKER_BASE_IMAGE}
     ${ROOT_DIR}/share/yashchiki/misc-files/locale.gen /etc/locale.gen
     ${ROOT_DIR}/share/yashchiki/misc-files/locale.alias /etc/locale.alias
     ${ROOT_DIR}/share/yashchiki/misc-files/sudoers /etc/sudoers
-    ${HOST_ENV_FILE} ${HOST_ENV_FILE_INSIDE}
 
 %post
     # create a fingerprint by which we can identify the container from within
@@ -80,6 +79,9 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_JOBS="${YASHCHIKI_JOBS}"
     export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"
     export YASHCHIKI_CACHES_ROOT="${YASHCHIKI_CACHES_ROOT}"
+    export YASHCHIKI_BUILD_CACHE_NAME="${YASHCHIKI_BUILD_CACHE_NAME}"
+    export YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME="${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}"
+    export YASHCHIKI_SPACK_VERBOSE="${YASHCHIKI_SPACK_VERBOSE}"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     # Improve efficiency by installing system packages in the background (even
     # though we set the number of worker to \${YASHCHIKI_JOBS}, often times - e.g. when

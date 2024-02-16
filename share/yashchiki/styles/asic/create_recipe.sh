@@ -54,7 +54,6 @@ From: ${DOCKER_BASE_IMAGE}
     ${ROOT_DIR}/share/yashchiki/misc-files/locale.gen /etc/locale.gen
     ${ROOT_DIR}/share/yashchiki/misc-files/locale.alias /etc/locale.alias
     ${ROOT_DIR}/share/yashchiki/misc-files/sudoers /etc/sudoers
-    ${HOST_ENV_FILE} ${HOST_ENV_FILE_INSIDE}
 
 %post
     # ECM: drop docker image caches (often outdated)
@@ -238,6 +237,10 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_SPACK_GCC_VERSION="${YASHCHIKI_SPACK_GCC_VERSION}"
     export YASHCHIKI_JOBS="${YASHCHIKI_JOBS}"
     export YASHCHIKI_SPACK_CONFIG="/tmp/spack_config"
+    export YASHCHIKI_CACHES_ROOT="${YASHCHIKI_CACHES_ROOT}"
+    export YASHCHIKI_BUILD_CACHE_NAME="${YASHCHIKI_BUILD_CACHE_NAME}"
+    export YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME="${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME}"
+    export YASHCHIKI_SPACK_VERBOSE="${YASHCHIKI_SPACK_VERBOSE}"
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post_as_root.sh"
     wait
