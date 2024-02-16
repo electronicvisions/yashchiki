@@ -254,6 +254,7 @@ with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
         meta_dir = args.meta_dir
     else:
         meta_dir = temporary_directory.joinpath("meta")
+        meta_dir.mkdir(parents=True)
     env = env | {"YASHCHIKI_META_DIR": meta_dir}
 
     # host environment storage filename defaults to temporary file

@@ -39,7 +39,7 @@ From: ${DOCKER_BASE_IMAGE}
     rsync -av "${ROOT_DIR}"/lib/yashchiki/*.awk "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     rsync -av "${ROOT_DIR}"/share/yashchiki/patches "\${SINGULARITY_ROOTFS}/${SPACK_INSTALL_SCRIPTS}"
     mkdir -p "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
-    rsync -av "${META_DIR_OUTSIDE}"/* "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
+    rsync -av "${META_DIR_OUTSIDE}/" "\${SINGULARITY_ROOTFS}/${META_DIR_INSIDE}"
     # init scripts for user convenience
     mkdir -p "\${SINGULARITY_ROOTFS}/opt/init"
     rsync -av "${ROOT_DIR}"/share/yashchiki/misc-files/init/*.sh "\${SINGULARITY_ROOTFS}/opt/init"
