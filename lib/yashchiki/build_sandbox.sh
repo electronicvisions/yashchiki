@@ -16,7 +16,7 @@ unset LC_MESSAGES
 
 TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
-mkdir ${YASHCHIKI_SANDBOXES}
+mkdir -p ${YASHCHIKI_SANDBOXES}
 
 # Do not change: special sudo permit for the host user...
 sudo -E singularity build --sandbox "${TARGET_FOLDER}" "${YASHCHIKI_RECIPE_PATH}" | tee out_singularity_build_recipe.txt
