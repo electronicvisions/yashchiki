@@ -73,6 +73,7 @@ pipeline {
 				YASHCHIKI_SPACK_PATH = "${env.WORKSPACE}/spack"
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME = get_build_cache_on_failure_name()
+				YASHCHIKI_IMAGE_NAME = "singularity_temp.img"
 				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
@@ -127,7 +128,7 @@ pipeline {
 									env.BUILD_CACHE_NAME = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true)
 								}
 
-								sh "python3 bin/yashchiki ${CONTAINER_STYLE} ${WORKSPACE}/spack singularity_visionary_temp.img " +
+								sh "python3 bin/yashchiki ${CONTAINER_STYLE} ${WORKSPACE}/spack ${YASHCHIKI_IMAGE_NAME} " +
 								   "--log-dir=log " +
 								   "--tmp-subdir=${env.NODE_NAME} " +
 								   "--meta-dir=${YASHCHIKI_META_DIR} " +
