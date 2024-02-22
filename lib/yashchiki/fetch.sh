@@ -6,6 +6,11 @@ shopt -s inherit_errexit
 SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
+if [ -z "${YASHCHIKI_ENABLE_STAGE_FETCH:-}" ]; then
+    echo "Skipping stage fetch."
+    exit 0
+fi
+
 # temporary spack config scope directory for fetching
 tmp_config_scope=("$(mktemp -d)")
 

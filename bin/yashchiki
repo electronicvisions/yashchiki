@@ -51,6 +51,8 @@ parser = argparse.ArgumentParser(
               to OUTPUT.
     """))
 
+all_stages=["fetch", "build-base", "build-spack", "image"]
+
 # mandatory
 parser.add_argument(
     "style", type=str, choices=["visionary", "asic", "f27"],
@@ -65,6 +67,9 @@ parser.add_argument(
 parser.add_argument(
     "--update-build-cache", action="store_true",
     help="Update build cache.")
+parser.add_argument(
+    "--stages", type=str, nargs="+", choices=all_stages, default=all_stages,
+    help="Stages of build to perform.")
 # optional with persistent default
 parser.add_argument(
     "--caches-dir", type=pathlib.Path,
@@ -167,6 +172,22 @@ env = {
     "YASHCHIKI_CACHES_ROOT": args.caches_dir,
     "YASHCHIKI_JOBS": str(args.jobs),
 } | os.environ
+
+if "fetch" in args.stages:
+    env = env | {"YASHCHIKI_ENABLE_STAGE_FETCH": "1"}
+
+if "build-base" in args.stages:
+    env = env | {"YASHCHIKI_ENABLE_STAGE_BUILD_BASE": "1"}
+
+if "build-spack" in args.stages:
+    env = env | {"YASHCHIKI_ENABLE_STAGE_BUILD_SPACK": "1"}
+
+if "image" in args.stages:
+    env = env | {"YASHCHIKI_ENABLE_STAGE_IMAGE": "1"}
+
+if args.stages != all_stages:
+    if not pathlib.Path(args.sandboxes_dir, args.style).exists():
+        raise RuntimeError("Using yashchiki with incomplete set of stages is only possible for using an existing sandbox.")
 
 if args.build_cache_on_failure_name:
     env = env | {"YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME": args.build_cache_on_failure_name}
