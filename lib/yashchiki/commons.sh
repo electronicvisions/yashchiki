@@ -25,8 +25,6 @@ export MY_SPACK_BIN=/opt/spack/bin/spack
 export MY_SPACK_CMD="${MY_SPACK_BIN} --config-scope ${YASHCHIKI_SPACK_CONFIG}"
 export MY_SPACK_VIEW_PREFIX="/opt/spack_views"
 
-export LOCK_FILENAME=lock
-
 # NOTE: build caches contain relavite symlinks to preserved_packages, so the
 # relation that build_caches and preserved_packages are in the same folder
 # should be maintained inside the container!
@@ -41,10 +39,8 @@ export BUILD_CACHE_OUTSIDE
 
 BASE_BUILD_CACHE_INSIDE="/opt/build_cache"
 BUILD_CACHE_INSIDE="${BASE_BUILD_CACHE_INSIDE}/${YASHCHIKI_BUILD_CACHE_NAME}"
-BUILD_CACHE_LOCK="${BUILD_CACHE_INSIDE}/${LOCK_FILENAME}"
 export BASE_BUILD_CACHE_INSIDE
 export BUILD_CACHE_INSIDE
-export BUILD_CACHE_LOCK
 
 SOURCE_CACHE_DIR="${YASHCHIKI_CACHES_ROOT}/download_cache"
 export SOURCE_CACHE_DIR
@@ -204,63 +200,6 @@ populate_views() {
 
 
 
-#################################
-# HELPER FUNCTIONS NEEDED BELOW #
-#################################
-
-# Usage:
-#       lock_file [-e] [-w <sec>] <file>
-#
-# Lock the given file, the file will be unlocked once the process exits. Make
-# sure to only use it in subshells to automatically unlock afterwards.
-#
-# Args:
-#   -e          Lock exculsively (otherwise shared)
-#   -w <secs>   How long to wait for lock until retrying. [default: 10]
-#
-lock_file() {
-    local OPTIND
-    local opt
-    local args_flock=()
-    local exclusive=0
-    local info_exclusive=""
-    local wait_secs=10
-    local opts OPTIND OPTARG
-
-    while getopts ":ew:" opt
-    do
-        case "${opt}" in
-            e) exclusive=1 ;;
-            w) wait_secs="${OPTARG}" ;;
-            *) echo -e "Invalid option to lock_file(): $OPTARG\n" >&2; exit 1 ;;
-        esac
-    done
-    shift $(( OPTIND - 1 ))
-
-    local fd_lock
-    local filename_lock="$1"
-    # ensure that we can always access lockfile 
-    if [ ! -f "${filename_lock}" ]; then
-        touch "${filename_lock}"
-        chmod 777 "${filename_lock}"
-    fi
-    exec {fd_lock}>"${filename_lock}"
-
-    if (( exclusive == 1 )); then
-        args_flock+=( "-e" )
-        info_exclusive="(exclusively) "
-    else
-        args_flock+=( "-s" )
-        info_exclusive="(shared) "
-    fi
-
-    while /bin/true; do
-        echo "Obtaining build_cache lock ${info_exclusive}from ${filename_lock}." 1>&2
-        flock ${args_flock[*]} -w "${wait_secs}" ${fd_lock} && break \
-            || echo "Could not lock ${filename_lock}, retrying in ${wait_secs} seconds.." 1>&2
-    done
-}
-
 ###################################
 # HELPER FUNCTIONS FOR BUILDCACHE #
 ###################################
@@ -382,9 +321,7 @@ get_specfiles() {
 # Install the given set of packages from yashchiki's buildcache.
 install_from_buildcache() {
     local install_failed=0
-    # don't forget to unlock builcache in case of error, but then propagate
     (
-        lock_file "${BUILD_CACHE_LOCK}"
         _install_from_buildcache "${@}"
     ) || install_failed=1
 

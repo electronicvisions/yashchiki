@@ -3,7 +3,6 @@
 # General plan of action:
 #
 # Create a hard-linked copy, update that copy and only copy new additions back.
-# This ensure minimum locking time.
 #
 
 set -euo pipefail
@@ -69,14 +68,6 @@ get_hashes_to_store() {
     comm -13 <(get_hashes_in_buildcache "${base_buildcache}") <(get_hashes_in_spack)
 }
 
-if [ "${destination_folder}" = "${base_buildcache}" ]; then
-    # if the destination folder is the same as the base buildcache, we need to
-    # lock exclusively since we put things into the buildcache
-    lock_file -e "${base_buildcache}/${LOCK_FILENAME}"
-else
-    lock_file "${base_buildcache}/${LOCK_FILENAME}"
-fi
-
 args_progress="--eta"
 if (( quiet == 1 )); then
     args_progress=""
@@ -85,10 +76,23 @@ fi
 # find requires current working directory to be readable by spack user
 cd ${MY_SPACK_FOLDER}
 
+# Create tmpdir in destination folder to compress into,
+# atomically move compressed files into the destination folder afterwards
+tmpdir_in_destination_folder="$(mktemp -d --tmpdir=${destination_folder})"
+
+rm_tmpdir() {
+    rm -r $tmpdir_in_destination_folder
+}
+trap rm_tmpdir EXIT
+
 get_hashes_to_store \
     | parallel -r ${args_progress} -j${YASHCHIKI_JOBS} \
-        tar Pcfz "${destination_folder}/{}.tar.gz" \"\$\(spack location -i /{}\)\"
+        tar Pcfz "${tmpdir_in_destination_folder}/{}.tar.gz" \"\$\(spack location -i /{}\)\"
 
 # verify integrity (of actual files, not possible symlinks)
-find "${destination_folder}" -type f -name "*.tar.gz" -print0 \
+find "${tmpdir_in_destination_folder}" -type f -name "*.tar.gz" -print0 \
     | parallel -r -0 -j${YASHCHIKI_JOBS} "tar Ptf '{}' 1>/dev/null"
+
+# atomically move files into destination folder
+find "${tmpdir_in_destination_folder}" -type f -name "*.tar.gz" -print0 \
+    | parallel -r -0 -j${YASHCHIKI_JOBS} "mv '{}' ${destination_folder} 1>/dev/null"
