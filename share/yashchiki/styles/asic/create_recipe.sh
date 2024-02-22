@@ -55,186 +55,11 @@ From: ${DOCKER_BASE_IMAGE}
     ${ROOT_DIR}/share/yashchiki/misc-files/sudoers /etc/sudoers
 
 %post
-    # ECM: drop docker image caches (often outdated)
-    yum clean all
-
-    # ECM: disable http caching
-    echo "http_caching=none" >> /etc/yum.conf
-
-    # ECM: enable strict mode to fail when packages are not found (or other installation problems appear)
-    echo "skip_missing_names_on_install=0" >> /etc/yum.conf
-
-    yum -y upgrade
-
-    # install additional locales
-    yum install -y "glibc-langpack-*"
-
-    # EPEL is needed for fuse-sshfs and jq
-    dnf -y install dnf-plugins-core  # needed for `dnf config-manager`
-    dnf config-manager --set-enabled powertools  # powertools is needed by epel-release
-    dnf -y install epel-release
-
-    yum -y install \
-        apr \
-        apr-devel \
-        apr-util \
-        apr-util-devel \
-        autoconf \
-        automake \
-        bc \
-        binutils-devel \
-        bison \
-        bzip2 \
-        chrpath \
-        compat-libtiff3 \
-        compat-openssl10 \
-        cups-client \
-        diffstat \
-        dos2unix \
-        ed \
-        elfutils-libelf \
-        environment-modules \
-        expat-devel \
-        file \
-        flex \
-        fontconfig \
-        freetype \
-        freetype-devel \
-        gcc \
-        gcc-c++ \
-        gcc-gfortran \
-        gdb \
-        git \
-        glib2-devel \
-        glibc-devel \
-        glibc-devel.i686 \
-        glibc.i686 \
-        gpm-libs \
-        ksh \
-        less \
-        libffi-devel \
-        libfontenc \
-        libgcc \
-        libgfortran \
-        libgcrypt-devel \
-        libICE \
-        libjpeg-turbo \
-        libmng \
-        libnsl \
-        libnsl.i686 \
-        libpng12 \
-        libpng15 \
-        libSM \
-        libstdc++-devel \
-        libstdc++-static \
-        libstdc++.i686 \
-        libtool \
-        libtool-ltdl-devel \
-        libuuid-devel \
-        libX11-devel \
-        libXau-devel \
-        libXaw \
-        libXdamage-devel \
-        libXdmcp \
-        libXext-devel \
-        libXfixes-devel \
-        libXfont2 \
-        libXft \
-        libXi \
-        libxkbfile \
-        libxml2-devel \
-        libXmu \
-        libXp \
-        libXpm \
-        libXrandr \
-        libXrender-devel \
-        libXScrnSaver \
-        libXt \
-        libXtst \
-        libyaml-devel \
-        lsof \
-        m4 \
-        mailx \
-        make \
-        mesa-dri-drivers \
-        mesa-libGL \
-        mesa-libGLU \
-        motif \
-        ncurses-devel \
-        net-tools \
-        numactl-libs \
-        openssh \
-        openssl-devel \
-        patch \
-        patchelf \
-        perl \
-        perl-libintl \
-        perl-Text-Unidecode \
-        pixman \
-        psmisc \
-        pulseaudio-libs \
-        pulseaudio-libs-glib2 \
-        python2 \
-        python2-devel \
-        python39 \
-        python39-devel \
-        python39-pip \
-        python39-setuptools \
-        qemu-guest-agent \
-        redhat-lsb \
-        rsync \
-        screen \
-        SDL-devel \
-        socat \
-        spax \
-        fuse-sshfs \
-        strace \
-        tar \
-        tcl \
-        tcsh \
-        texinfo \
-        unzip \
-        uuid-devel \
-        vim-common \
-        vim-minimal \
-        wget \
-        which \
-        xkeyboard-config \
-        xorg-x11-fonts-100dpi \
-        xorg-x11-fonts-75dpi \
-        xorg-x11-fonts-ISO8859-1-100dpi \
-        xorg-x11-fonts-ISO8859-1-75dpi \
-        xorg-x11-fonts-misc \
-        xorg-x11-fonts-Type1 \
-        xorg-x11-server-Xvfb \
-        xorg-x11-xauth \
-        xorg-x11-xkb-utils \
-        xterm \
-        zlib \
-        zlib.i686
-
-    # VK introduced jq into build flow
-    yum -y install jq
-
-    # gtest is F9's C++ test framework of choice
-    yum -y install gtest-devel
-
-    # ECM: and now some abspacking
-    yum -y install ccache sudo parallel
-
-    # ECM: and userspace mount stuff
-    yum -y install fuse3
-
-    # ECM: save some more space
-    yum clean all
-
-    alternatives --set python /usr/bin/python3.9
-
     # create a fingerprint by which we can identify the container from within
     cat /proc/sys/kernel/random/uuid > /opt/fingerprint
 
-    ## prerequisites
-    #"${SPACK_INSTALL_SCRIPTS}/install_prerequisites.sh" || exit 1
+    # prerequisites
+    "${SPACK_INSTALL_SCRIPTS}/install_prerequisites.sh" || exit 1
     ## cannot specify permissions in files-section
     #chmod 440 /etc/sudoers
     #chown root:root /etc/sudoers
@@ -254,6 +79,7 @@ From: ${DOCKER_BASE_IMAGE}
     export YASHCHIKI_DEBUG=${YASHCHIKI_DEBUG}
     export CONTAINER_STYLE="${CONTAINER_STYLE}"
     "${SPACK_INSTALL_SCRIPTS}/complete_spack_install_routine_called_in_post.sh"
+    "${SPACK_INSTALL_SCRIPTS}/install_system_dependencies.sh"
     wait
     (
         "${SPACK_INSTALL_SCRIPTS}/install_singularity.sh" && \
