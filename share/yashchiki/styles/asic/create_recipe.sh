@@ -260,14 +260,14 @@ From: ${DOCKER_BASE_IMAGE}
     export MODULESHOME
 
     # CentOS 7 does not support C.UTF-8; unset everything if encountered.
-    if [ "${LANG}" = "C.UTF-8" ]; then
+    if [ "\${LANG}" = "C.UTF-8" ]; then
         LANG=C
         export LANG
         unset LC_COLLATE LC_CTYPE LC_MONETARY LC_NUMERIC LC_TIME LC_MESSAGES LC_ALL
     fi
 
     # python now from conda... and gopath/bin (gocryptfs)
-    PATH=/opt/conda/bin:/opt/go/gopath/bin:${PATH}
+    PATH=/opt/conda/bin:/opt/go/gopath/bin:\${PATH}
     # ensure conda sees a clean env
     unset PYTHONHOME
 EOF
