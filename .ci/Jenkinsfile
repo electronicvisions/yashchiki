@@ -231,5 +231,5 @@ pipeline {
 }
 
 String get_build_cache_on_failure_name() {
-	return (CONTAINER_BUILD_TYPE == "testing" ? "c${GERRIT_CHANGE_NUMBER}p${GERRIT_PATCHSET_NUMBER}" : jesh("echo 'stable_\$(date --iso)'", returnStdout: true))
+	return (CONTAINER_BUILD_TYPE == "testing" ? "c${GERRIT_CHANGE_NUMBER}p${GERRIT_PATCHSET_NUMBER}" : jesh(script: "echo 'stable_\$(date --iso)'", returnStdout: true))
 }
