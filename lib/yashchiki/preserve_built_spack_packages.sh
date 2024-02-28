@@ -23,6 +23,11 @@ sourcedir="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${sourcedir}/commons.sh"
 source "${sourcedir}/setup_env_spack.sh"
 
+if [ -z "${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME:-}" ]; then
+    echo "No name for build cache on failure given, skipping saving preserved packages."
+    exit 0
+fi
+
 # find empty directory to dump into
 build_num=1
 while /bin/true; do
