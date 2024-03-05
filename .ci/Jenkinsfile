@@ -74,7 +74,6 @@ pipeline {
 				YASHCHIKI_SANDBOXES = "sandboxes"
 				YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME = get_build_cache_on_failure_name()
 				YASHCHIKI_IMAGE_NAME = "singularity_temp.img"
-				BUILD_CACHE_NAME = "${params.BUILD_CACHE_NAME}"  // propagate parameter to environment
 			}
 			stages {
 				stage('Pre-build Cleanup') {
@@ -121,11 +120,12 @@ pipeline {
 								// extract options from gerrit comment
 								boolean with_debug = false
 								boolean with_spack_verbose = false
+								String build_cache_name = "${params.BUILD_CACHE_NAME}"
 								if (isTriggeredByGerrit()) {
 									gerrit_comment = jesh(script: "echo '${GERRIT_EVENT_COMMENT_TEXT}' | base64 -d", returnStdout: true)
 									with_debug = gerrit_comment.contains("WITH_DEBUG")
 									with_spack_verbose = gerrit_comment.contains("WITH_SPACK_VERBOSE")
-									env.BUILD_CACHE_NAME = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true)
+									build_cache_name = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true).trim()
 								}
 
 								sh "python3 bin/yashchiki ${CONTAINER_STYLE} ${WORKSPACE}/spack ${YASHCHIKI_IMAGE_NAME} " +
@@ -134,7 +134,7 @@ pipeline {
 								   "--meta-dir=${YASHCHIKI_META_DIR} " +
 								   "--caches-dir=${YASHCHIKI_CACHES_ROOT} " +
 								   "--sandboxes-dir=${YASHCHIKI_SANDBOXES} " +
-								   "--build-cache-name=${BUILD_CACHE_NAME} " +
+								   "--build-cache-name=${build_cache_name} " +
 								   ("${CONTAINER_BUILD_TYPE}" == "stable" ? "--update-build-cache " : "") +
 								   "--recipe-filename=${WORKSPACE}/visionary_recipe.def " +
 								   "--build-cache-on-failure-name=${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME} " +
