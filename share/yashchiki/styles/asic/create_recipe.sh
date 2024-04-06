@@ -201,10 +201,12 @@ From: ${DOCKER_BASE_IMAGE}
     yum -y install gtest-devel
 
     # ECM: people (YS) just need pylint, etc. (upgrade to spack if more is needed)
+    # JJK: nose is needed as a python test runner. We want to replace it by pytest
+    # in the future
     wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh
     bash Miniconda3-py38_4.8.3-Linux-x86_64.sh -b -p /opt/conda
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
-    /opt/conda/bin/conda install -y pylint pycodestyle nose pyyaml
+    /opt/conda/bin/conda install -y pylint pycodestyle nose pytest pyyaml
 
     # YS: teststand dependencies (no python in spack yet)
     /opt/conda/bin/conda install -y numpy matplotlib
