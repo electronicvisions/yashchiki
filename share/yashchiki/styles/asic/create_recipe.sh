@@ -72,6 +72,9 @@ From: ${DOCKER_BASE_IMAGE}
     sed -i '/^override_install_langs/d' /etc/yum.conf
     yum reinstall -y glibc-common
 
+    # EPEL is needed for fuse-sshfs and jq
+    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
     yum -y install \
         apr-util \
         autoconf \
@@ -161,7 +164,7 @@ From: ${DOCKER_BASE_IMAGE}
         SDL-devel \
         socat \
         spax \
-        sshfs \
+        fuse-sshfs \
         strace \
         sysvinit-tools \
         tar \
@@ -189,7 +192,6 @@ From: ${DOCKER_BASE_IMAGE}
         zlib.i686
 
     # VK introduced jq into build flow
-    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     yum -y install jq
 
     # gtest is F9's C++ test framework of choice
