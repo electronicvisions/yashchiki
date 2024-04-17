@@ -75,6 +75,9 @@ From: ${DOCKER_BASE_IMAGE}
     # EPEL is needed for fuse-sshfs and jq
     yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
+    # certificates of the base image are outdated -> manually install ca-certificates
+    yum install -y ca-certificates
+
     yum -y install \
         apr-util \
         autoconf \
