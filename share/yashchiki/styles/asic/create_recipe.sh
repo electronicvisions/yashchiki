@@ -285,7 +285,9 @@ cat <<EOF
     export VISIONARY_ENV=${name_view}
     SVF=/opt/spack_views/\${VISIONARY_ENV}
     export PATH=\${SVF}/bin\${PATH:+:}\${PATH}
-    export PYTHONPATH=\${SVF}/lib/python3.9/site-packages/:\${SVF}/lib64/python3.9/site-packages/\${PYTHONPATH:+:}\${PYTHONPATH}
+    # externally provided python, i.e. PYTHONHOME is system installation
+    export PYTHONPATH=\${SVF}/lib/python3.9/site-packages:\${SVF}/lib64/python3.9/site-packages\${PYTHONPATH:+:}\${PYTHONPATH}
+    export SPACK_PYTHON_BINARY=/usr/bin/python
     export MANPATH=\${SVF}/man:\${SVF}/share/man\${MANPATH:+:}\${MANPATH}
     export LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LIBRARY_PATH:+:}\${LIBRARY_PATH}
     export LD_LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LD_LIBRARY_PATH:+:}\${LD_LIBRARY_PATH}
