@@ -65,7 +65,7 @@ From: ${DOCKER_BASE_IMAGE}
     # ECM: enable strict mode to fail when packages are not found (or other installation problems appear)
     echo "skip_missing_names_on_install=0" >> /etc/yum.conf
 
-    yum -y upgrade 
+    yum -y upgrade
 
     # install additional locales
     yum install -y "glibc-langpack-*"
@@ -286,6 +286,7 @@ cat <<EOF
     SVF=/opt/spack_views/\${VISIONARY_ENV}
     export PATH=\${SVF}/bin\${PATH:+:}\${PATH}
     # externally provided python, i.e. PYTHONHOME is system installation
+    export -n PYTHONHOME
     export PYTHONPATH=\${SVF}/lib/python3.9/site-packages:\${SVF}/lib64/python3.9/site-packages\${PYTHONPATH:+:}\${PYTHONPATH}
     export SPACK_PYTHON_BINARY=/usr/bin/python
     export MANPATH=\${SVF}/man:\${SVF}/share/man\${MANPATH:+:}\${MANPATH}
