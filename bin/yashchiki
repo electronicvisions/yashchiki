@@ -5,6 +5,7 @@ import os
 import pathlib
 import subprocess
 import shutil
+import sys
 import tempfile
 import textwrap
 import yaml
@@ -179,33 +180,37 @@ pathlib.Path(env["TMPDIR"]).mkdir(exist_ok=True, parents=True)
 def run(script: str, env: dict, script_args: list = []):
     """
     Execute the given script.
+    If global args.debug is set, we pass stdout through line-wise.
 
     :param script: Script to execute.
     :param env: Enviroment to use for execution.
     :param script_args: Arguments to supply to the script.
     """
-    stdout = ""
-    try:
-        if args.debug:
-            print(f"executing: {script} {script_args}")
-        out = subprocess.run(
-            ["bash", os.path.join(root_dir, script)] + script_args,
-            env=env, check=True, stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT, encoding="utf-8")
-        stdout = out.stdout
-        if args.debug:
+    stdout = b""
+    if args.debug:
+        print(f"executing: {script} {script_args}")
+    cmd  =["bash", os.path.join(root_dir, script)] + script_args
+    out = subprocess.Popen(
+        cmd, env=env, stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT)
+    while True:
+        line = out.stdout.readline()
+        if line:
+            if args.debug:
+                sys.stdout.buffer.write(line)
+                sys.stdout.flush()
+            stdout += line
+        else:
+            break
+    out.wait()
+    stdout = str(stdout, encoding="utf-8")
+    with args.log_dir.joinpath(
+            script.replace("/", "_") + ".log").open("w+") as file:
+        file.write(stdout)
+    if out.returncode != 0:
+        if not args.debug:
             print(stdout)
-    except subprocess.CalledProcessError as error:
-        stdout = error.stdout
-        print(stdout)
-        with args.log_dir.joinpath(
-                script.replace("/", "_") + ".log").open("w+") as file:
-            file.write(stdout)
-        raise
-    else:
-        with args.log_dir.joinpath(
-                script.replace("/", "_") + ".log").open("w+") as file:
-            file.write(stdout)
+        raise subprocess.CalledProcessError(out.returncode, cmd)
 
 
 with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
