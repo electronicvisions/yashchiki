@@ -129,13 +129,9 @@ if [ -n "${YASHCHIKI_SPACK_VERBOSE:-}" ]; then
     SPACK_ARGS_REINDEX+=("--verbose")
 fi
 
-# TODO: Keep in sync with <spack-repo>/lib/spack/spack/cmd/bootstrap.py since
-# there is no straight-forward way to extract bootstrap dependencies
-# automatically. If bootstrap dependencies should change we will notice because
-# they won't be able to be fetched inside the container because of missing
-# permissions.
-spack_bootstrap_dependencies=(
-    "environment-modules~X"
+# Dependencies needed by yashchiki
+yashchiki_dependencies=(
+    "environment-modules~X"  # needed for module generation
 )
 
 #########

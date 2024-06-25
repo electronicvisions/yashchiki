@@ -12,7 +12,7 @@ SOURCE_DIR="$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")"
 source "${SOURCE_DIR}/commons.sh"
 
 "${SPACK_INSTALL_SCRIPTS}/prepare_spack_as_root.sh"
-sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/bootstrap_spack.sh"
+sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_dependencies.sh"
 
 sudo -Eu spack "${SPACK_INSTALL_SCRIPTS}/install_spack.sh" && \
 sudo -Eu spack ${MY_SPACK_CMD} compiler add --scope site /usr/bin && \

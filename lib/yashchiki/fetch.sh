@@ -51,7 +51,7 @@ echo "FETCHING..."
 # concretize all spack packages in parallel
 packages_to_fetch=(
     "${YASHCHIKI_SPACK_GCC}"
-    "${spack_bootstrap_dependencies[@]}"
+    "${yashchiki_dependencies[@]}"
     "${spack_packages[@]}"
 )
 # verify that all concretizations were successful

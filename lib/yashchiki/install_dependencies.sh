@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# Prepare spack by bootstrapping and installing the compiler via spack
+# Install dependencies needed during the spack install
+# process and the container creation.
 #
 set -euo pipefail
 shopt -s inherit_errexit 2>/dev/null || true
@@ -25,32 +26,8 @@ ccache -s
 # add system compiler
 ${MY_SPACK_CMD} compiler add --scope site /usr/bin
 
-# provide spack support for environment modules
-echo "BOOTSTRAPPING"
-
 # add build_cache
 ${MY_SPACK_CMD} mirror add --scope site build_mirror file://${BUILD_CACHE_DIR}
-
-install_from_buildcache "${spack_bootstrap_dependencies[@]}"
-
-# We install all packages needed by boostrap here
-for bootstrap_spec in "${spack_bootstrap_dependencies[@]}"; do
-    ${MY_SPACK_CMD} "${SPACK_ARGS_INSTALL[@]+"${SPACK_ARGS_INSTALL[@]}"}" install --no-cache --show-log-on-error "${bootstrap_spec}"
-done
-
-num_packages_pre_boostrap="$(${MY_SPACK_CMD} find 2>&1 | head -n 1 | awk '/installed packages/ { print $2 }')"
-
-
-num_packages_post_boostrap="$(${MY_SPACK_CMD} find 2>&1 | head -n 1 | awk '/installed packages/ { print $2 }')"
-
-if (( num_packages_pre_boostrap < num_packages_post_boostrap )); then
-cat <<EOF | tr '\n' ' ' >&2
-ERROR: spack bootstrap command did install some packages on its own, this
-should not happen, aborting..!
-EOF
-echo ""
-    exit 1
-fi
 
 if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
     # check if it can be specialized
@@ -74,3 +51,12 @@ if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
     # add fresh compiler to spack
     ${MY_SPACK_CMD} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${YASHCHIKI_SPACK_GCC_VERSION}-*
 fi
+
+echo "INSTALL YASHCHIKI DEPENDENCIES"
+
+install_from_buildcache "${yashchiki_dependencies[@]}"
+
+# We install all packages needed by yashchiki here
+for dep_spec in "${yashchiki_dependencies[@]}"; do
+    ${MY_SPACK_CMD} "${SPACK_ARGS_INSTALL[@]+"${SPACK_ARGS_INSTALL[@]}"}" install --no-cache --show-log-on-error "${dep_spec}"
+done
