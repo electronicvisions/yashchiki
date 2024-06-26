@@ -22,38 +22,9 @@ export MY_SPACK_BIN="${MY_SPACK_FOLDER}/bin/spack"
 # therefore we also need to redefine this command variable
 export MY_SPACK_CMD="${MY_SPACK_BIN} --config-scope ${YASHCHIKI_SPACK_CONFIG} --config-scope ${tmp_config_scope}"
 
-# Add fake system compiler (needed for fetching)
-# We create a compilers.yaml file in a temporary directory and
-# add it as a scope.
-# This is NOT the correct version but we need to concretize with the same
-# version as we intend to build.
-# TODO: Spack needs to support concretizing with non-existent compiler.
-cat >"${tmp_config_scope}/compilers.yaml" <<EOF
-compilers:
-- compiler:
-    paths:
-      cc: /usr/bin/gcc
-      cxx: /usr/bin/g++
-      f77: /usr/bin/gfortran
-      fc: /usr/bin/gfortran
-    operating_system: $(${MY_SPACK_CMD} arch -o)
-    target: x86_64
-    modules: []
-    environment: {}
-    extra_rpaths: []
-    flags: {}
-    spec: ${YASHCHIKI_SPACK_GCC}
-EOF
-
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
 
-# concretize all spack packages in parallel
-packages_to_fetch=(
-    "${YASHCHIKI_SPACK_GCC}"
-    "${yashchiki_dependencies[@]}"
-    "${spack_packages[@]}"
-)
 # verify that all concretizations were successful
 
 # first entry is just a statefile to indicate fetching failed (as opposed to
@@ -79,7 +50,54 @@ ${MY_SPACK_CMD} spec aida >/dev/null
 # for some reason the exit code of shopt indicates if option is set despite -q not being specified
 oldstate="$(shopt -po xtrace)" || true
 
-for package in "${packages_to_fetch[@]}"; do
+# Fetch GCC while system compiler is still available
+echo "CONCRETIZE GCC"
+if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
+    echo "Concretizing ${YASHCHIKI_SPACK_GCC} for fetching.." >&2
+    set +x  # do not clobber build log so much
+    eval "${oldstate}"
+    tmp_err="$(mktemp)"
+    tmpfiles_concretize_err+=("${tmp_err}")
+    ( set -x;
+        ( specfile=$(get_specfile_name "${YASHCHIKI_SPACK_GCC}");
+        (${MY_SPACK_CMD} spec --fresh -y "${YASHCHIKI_SPACK_GCC}" > "${specfile}")
+        ) 2>"${tmp_err}" \
+        || ( echo "CONCRETIZING FAILED" >> "${tmpfiles_concretize_err[0]}" );
+    )
+fi
+
+# Add fake system compiler (needed for fetching)
+# We create a compilers.yaml file in a temporary directory and
+# add it as a scope.
+# This is NOT the correct version but we need to concretize with the same
+# version as we intend to build.
+# Furthermore, we overwrite the compiler settings which are set with lower
+# precedence.
+# TODO: Spack needs to support concretizing with non-existent compiler.
+cat >"${tmp_config_scope}/compilers.yaml" <<EOF
+compilers::  # two colons to overwrite lower-precedence settings, i.e. system compiler.
+- compiler:
+    paths:
+      cc: /usr/bin/gcc
+      cxx: /usr/bin/g++
+      f77: /usr/bin/gfortran
+      fc: /usr/bin/gfortran
+    operating_system: $(${MY_SPACK_CMD} arch -o)
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
+    flags: {}
+    spec: ${YASHCHIKI_SPACK_GCC}
+EOF
+
+
+echo "CONCRETIZE PACKAGES IN PARALLEL"
+packages_to_spec=(
+    "${yashchiki_dependencies[@]}"
+    "${spack_packages[@]}"
+)
+for package in "${packages_to_spec[@]}"; do
     echo "Concretizing ${package:0:30} for fetching.." >&2
     # pause if we have sufficient concretizing jobs
     set +x  # do not clobber build log so much
@@ -142,9 +160,17 @@ find "${MY_SPACK_FOLDER}/var/spack/repos" -type f -print0 \
 # --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< --- 8< ---
 
 # now fetch everything that is needed in order
+packages_to_fetch=(
+    "${YASHCHIKI_SPACK_GCC}"
+    "${yashchiki_dependencies[@]}"
+    "${spack_packages[@]}"
+)
 fetch_specfiles=()
 for package in "${packages_to_fetch[@]}"; do
     specfile="$(get_specfile_name "${package}")"
+	echo "Specfile for ${package} is ${specfile}."
+	word_count=$(wc -l <"${specfile}")
+    echo "Word count ${word_count}"
     if (( $(wc -l <"${specfile}") == 0 )); then
         echo "${package} failed to concretize!" >&2
         exit 1
