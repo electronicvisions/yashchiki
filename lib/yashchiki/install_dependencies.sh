@@ -42,12 +42,6 @@ if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
     set -x
     ${MY_SPACK_CMD} "${SPACK_ARGS_INSTALL[@]}" install --no-cache --show-log-on-error "${spec_compiler}"
 
-    # remove system compilers from spack to avoid conflicting concretization
-    echo "$(${MY_SPACK_CMD} compiler list)"
-    for system_compiler in ${system_compilers}; do
-        ${MY_SPACK_CMD} compiler rm --scope site "${system_compiler}"
-    done
-
     # add fresh compiler to spack
     ${MY_SPACK_CMD} compiler add --scope site ${MY_SPACK_FOLDER}/opt/spack/linux-*/*/gcc-${YASHCHIKI_SPACK_GCC_VERSION}-*
 fi
