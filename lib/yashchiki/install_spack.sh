@@ -13,14 +13,6 @@ cd "$HOME"
 
 install_from_buildcache "${spack_packages[@]+"${spack_packages[@]}"}"
 
-echo "DUMMY-INSTALLING PACKAGES"
-for package in "${spack_packages[@]+"${spack_packages[@]}"}"; do
-    specfile="$(get_specfiles "${package}")"
-    if (( $(wc -l <"${specfile}") == 0 )); then
-        echo "ERROR: Failed to concretize ${package} for install." >&2
-    fi
-done
-
 echo "INSTALLING PACKAGES"
 for package in "${spack_packages[@]+"${spack_packages[@]}"}"; do
     # Disable cache because we already installed from build cache.
