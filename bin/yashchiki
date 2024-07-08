@@ -84,9 +84,13 @@ parser.add_argument(
     help="Folder where to store meta information to be copied into the "
          "container. If not provided, a temporary directory is used.")
 parser.add_argument(
-    "--tmp-subdir", type=pathlib.Path, default="",
-    help=f"Directory under {tempfile.gettempdir()} which to use as root for "
-         "temporary files to be owned by spack.")
+    "--tmpdir", type=pathlib.Path, default="",
+    help=f"Directory in which temporary files are saved. This includes "
+         "spack stages, temporary spack config as well as the meta dir "
+         "(if not provided as an argument). If this argument is given "
+         "the folder will *not* be deleted afterwards. If not provided, "
+         "a temporary directory is used which will be deleted after "
+         "completion.")
 parser.add_argument(
     "--recipe-filename", type=pathlib.Path,
     help=f"Explicit filename for singularity recipe to construct. If not "
@@ -131,7 +135,7 @@ paths = [
     args.log_dir,
     args.sandboxes_dir,
     args.meta_dir,
-    args.tmp_subdir,
+    args.tmpdir,
     args.recipe_filename
 ]
 # ensure no globbing is performed in the paths for shell scripts to work
@@ -141,6 +145,10 @@ for path_to_check in paths:
 config = None
 with open(os.path.join("share", "yashchiki", "styles", args.style, "config.yaml")) as config_file:
     config = yaml.safe_load(config_file)
+
+tmpdir = pathlib.Path(args.tmpdir) if args.tmpdir else \
+    pathlib.Path(tempfile.TemporaryDirectory(prefix="yashchiki-tmp-dir-"))
+tmpdir.mkdir(exist_ok=True, parents=True)
 
 # collection of environment variables used to configure the shell scripts'
 # behavior
@@ -163,7 +171,7 @@ env = {
     "YASHCHIKI_IMAGE_NAME": args.output,
     "YASHCHIKI_SPACK_PATH": args.spack_dir,
     "YASHCHIKI_BUILD_CACHE_NAME": args.build_cache_name,
-    "TMPDIR": os.path.join(tempfile.gettempdir(), args.tmp_subdir),
+    "TMPDIR": tmpdir,
     "YASHCHIKI_CACHES_ROOT": args.caches_dir,
     "YASHCHIKI_JOBS": str(args.jobs),
 } | os.environ
@@ -173,8 +181,6 @@ if args.build_cache_on_failure_name:
 
 # create directory for logs
 args.log_dir.mkdir(parents=True, exist_ok=True)
-
-pathlib.Path(env["TMPDIR"]).mkdir(exist_ok=True, parents=True)
 
 
 def run(script: str, env: dict, script_args: list = []):
@@ -214,65 +220,64 @@ def run(script: str, env: dict, script_args: list = []):
         raise subprocess.CalledProcessError(out.returncode, cmd)
 
 
-with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
-        as temporary_directory_spack, \
-        tempfile.TemporaryDirectory() as temporary_directory, \
-        tempfile.TemporaryDirectory() as temporary_directory_spack_config:
-    temporary_directory = pathlib.Path(temporary_directory)
-    temporary_directory_spack_config = \
-        pathlib.Path(temporary_directory_spack_config)
+# Temporary directory for spack
+temporary_directory_spack = tmpdir.joinpath('tmp_spack')
+temporary_directory_spack.mkdir(exist_ok=True, parents=True)
+env = env | {"JOB_TMP_SPACK": temporary_directory_spack}
+# make job temp folder writable for all users (i.e., spack)
+os.chmod(temporary_directory_spack, 0o777)
 
-    # set spack config directory
-    env = env | {"YASHCHIKI_SPACK_CONFIG": temporary_directory_spack_config}
+# Directory for (temporary) spack configuration
+temporary_directory_spack_config = tmpdir.joinpath('spack_config')
+temporary_directory_spack_config.mkdir(exist_ok=True, parents=True)
+env = env | {"YASHCHIKI_SPACK_CONFIG": temporary_directory_spack_config}
+# make spack config directory readable for all users (i.e., spack)
+temporary_directory_spack_config.chmod(0o755)
 
-    # make spack config directory readable for all users (i.e., spack)
-    temporary_directory_spack_config.chmod(0o755)
-
-    # set spack config
-    spack_config = {
-        "config": {
-            "build_jobs": args.jobs,
-            "ccache": True,
-        }
+# set spack config
+spack_config = {
+    "config": {
+        "build_jobs": args.jobs,
+        "ccache": True,
     }
-    with temporary_directory_spack_config.joinpath("config.yaml").open("wt") \
-            as spack_config_file:
-        spack_config_file.write(yaml.dump(spack_config))
+}
+with temporary_directory_spack_config.joinpath("config.yaml").open("wt") \
+        as spack_config_file:
+    spack_config_file.write(yaml.dump(spack_config))
 
-    spack_packages = pathlib.Path("share", "yashchiki", "styles", args.style, "packages.yaml")
-    if spack_packages.exists():
-        shutil.copy(
-            spack_packages,
-            temporary_directory_spack_config.joinpath("packages.yaml"))
+spack_packages = pathlib.Path("share", "yashchiki", "styles", args.style, "packages.yaml")
+if spack_packages.exists():
+    shutil.copy(
+        spack_packages,
+        temporary_directory_spack_config.joinpath("packages.yaml"))
 
-    env = env | {"JOB_TMP_SPACK": temporary_directory_spack}
 
-    # make job temp folder writable for all users (i.e., spack)
-    os.chmod(temporary_directory_spack, 0o777)
+# singularity recipe filename defaults to temporary file
+if args.recipe_filename is not None:
+    recipe_filename = args.recipe_filename
+else:
+    recipe_filename = tmpdir.joinpath("recipe.def")
+env = env | {"YASHCHIKI_RECIPE_PATH": recipe_filename}
 
-    # singularity recipe filename defaults to temporary file
-    if args.recipe_filename is not None:
-        recipe_filename = args.recipe_filename
-    else:
-        recipe_filename = temporary_directory.joinpath("recipe.def")
-    env = env | {"YASHCHIKI_RECIPE_PATH": recipe_filename}
+# meta data directory defaults to temporary folder
+if args.meta_dir is not None:
+    meta_dir = args.meta_dir
+else:
+    meta_dir = tmpdir.joinpath("meta")
+    meta_dir.mkdir(parents=True)
+env = env | {"YASHCHIKI_META_DIR": meta_dir}
 
-    # meta data directory defaults to temporary folder
-    if args.meta_dir is not None:
-        meta_dir = args.meta_dir
-    else:
-        meta_dir = temporary_directory.joinpath("meta")
-        meta_dir.mkdir(parents=True)
-    env = env | {"YASHCHIKI_META_DIR": meta_dir}
+run("lib/yashchiki/create_spack_user.sh", env)
+run("lib/yashchiki/create_caches.sh", env)
+run("lib/yashchiki/fetch.sh", env)
+run(str(pathlib.Path("share", "yashchiki", "styles", args.style,
+                     "create_recipe.sh")),
+    env)
+run("lib/yashchiki/build_sandbox.sh", env)
+run("lib/yashchiki/build_image.sh", env)
+if args.update_build_cache:
+    run("lib/yashchiki/update_build_cache.sh", env, ["-c", args.output])
+run("lib/yashchiki/restore_host_user_ownership.sh", env)
 
-    run("lib/yashchiki/create_spack_user.sh", env)
-    run("lib/yashchiki/create_caches.sh", env)
-    run("lib/yashchiki/fetch.sh", env)
-    run(str(pathlib.Path("share", "yashchiki", "styles", args.style,
-                         "create_recipe.sh")),
-        env)
-    run("lib/yashchiki/build_sandbox.sh", env)
-    run("lib/yashchiki/build_image.sh", env)
-    if args.update_build_cache:
-        run("lib/yashchiki/update_build_cache.sh", env, ["-c", args.output])
-    run("lib/yashchiki/restore_host_user_ownership.sh", env)
+if args.tmpdir is None:
+    shutil.rmtree(tmpdir)
