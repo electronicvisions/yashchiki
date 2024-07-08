@@ -116,37 +116,30 @@ pipeline {
 				stage('Build container image') {
 					steps {
 						script {
-							try {
-								// extract options from gerrit comment
-								boolean with_debug = false
-								boolean with_spack_verbose = false
-								String build_cache_name = "${params.BUILD_CACHE_NAME}"
-								if (isTriggeredByGerrit()) {
-									gerrit_comment = jesh(script: "echo '${GERRIT_EVENT_COMMENT_TEXT}' | base64 -d", returnStdout: true)
-									with_debug = gerrit_comment.contains("WITH_DEBUG")
-									with_spack_verbose = gerrit_comment.contains("WITH_SPACK_VERBOSE")
-									build_cache_name = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true).trim()
-								}
-
-								sh "python3 bin/yashchiki ${CONTAINER_STYLE} ${WORKSPACE}/spack ${YASHCHIKI_IMAGE_NAME} " +
-								   "--log-dir=log " +
-								   "--tmp-subdir=${env.NODE_NAME} " +
-								   "--meta-dir=${YASHCHIKI_META_DIR} " +
-								   "--caches-dir=${YASHCHIKI_CACHES_ROOT} " +
-								   "--sandboxes-dir=${YASHCHIKI_SANDBOXES} " +
-								   "--build-cache-name=${build_cache_name} " +
-								   ("${CONTAINER_BUILD_TYPE}" == "stable" ? "--update-build-cache " : "") +
-								   "--recipe-filename=${WORKSPACE}/visionary_recipe.def " +
-								   "--build-cache-on-failure-name=${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME} " +
-								   (with_debug ? "--debug " : "") +
-								   (with_spack_verbose ? "--spack-verbose " : "") +
-								   "--jobs=" + jesh(script: "nproc", returnStdout: true).trim() + " "
-							} catch (Throwable t) {
-								archiveArtifacts "errors_concretization.log"
-								throw t
+							// extract options from gerrit comment
+							boolean with_debug = false
+							boolean with_spack_verbose = false
+							String build_cache_name = "${params.BUILD_CACHE_NAME}"
+							if (isTriggeredByGerrit()) {
+								gerrit_comment = jesh(script: "echo '${GERRIT_EVENT_COMMENT_TEXT}' | base64 -d", returnStdout: true)
+								with_debug = gerrit_comment.contains("WITH_DEBUG")
+								with_spack_verbose = gerrit_comment.contains("WITH_SPACK_VERBOSE")
+								build_cache_name = jesh(script: "bash bin/yashchiki_get_build_cache_name.sh", returnStdout: true).trim()
 							}
-							archiveArtifacts(artifacts: "sandboxes/*/opt/spack_specs/*.yaml", allowEmptyArchive: true)
-							archiveArtifacts(artifacts: "log/*.log", allowEmptyArchive: true)
+
+							sh "python3 bin/yashchiki ${CONTAINER_STYLE} ${WORKSPACE}/spack ${YASHCHIKI_IMAGE_NAME} " +
+							   "--log-dir=log " +
+							   "--tmp-subdir=${env.NODE_NAME} " +
+							   "--meta-dir=${YASHCHIKI_META_DIR} " +
+							   "--caches-dir=${YASHCHIKI_CACHES_ROOT} " +
+							   "--sandboxes-dir=${YASHCHIKI_SANDBOXES} " +
+							   "--build-cache-name=${build_cache_name} " +
+							   ("${CONTAINER_BUILD_TYPE}" == "stable" ? "--update-build-cache " : "") +
+							   "--recipe-filename=${WORKSPACE}/visionary_recipe.def " +
+							   "--build-cache-on-failure-name=${YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME} " +
+							   (with_debug ? "--debug " : "") +
+							   (with_spack_verbose ? "--spack-verbose " : "") +
+							   "--jobs=" + jesh(script: "nproc", returnStdout: true).trim() + " "
 						}
 					}
 				}
@@ -173,6 +166,9 @@ pipeline {
 				}
 				cleanup {
 					archiveArtifacts "out_singularity_build_recipe.txt"
+					archiveArtifacts(artifacts: "errors_concretization.log", allowEmptyArchive: true)
+					archiveArtifacts(artifacts: "sandboxes/*/opt/spack_specs/*.yaml", allowEmptyArchive: true)
+					archiveArtifacts(artifacts: "log/*.log", allowEmptyArchive: true)
 				}
 			}
 		}
