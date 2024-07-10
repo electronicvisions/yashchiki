@@ -22,6 +22,7 @@ Options:
                       buildcache will not be dumped.
     -c <container>    Path to container which to dump.
     -d <destination>  Directory into which to dump the packages.
+    -j <num_jobs>     Number of parallel jobs to use
     -v                Display script version.
 EOF
 }
@@ -30,7 +31,9 @@ EOF
 #  Handle command line arguments
 #-----------------------------------------------------------------------
 
-while getopts ":hvb:c:d:" opt
+num_jobs=1
+
+while getopts ":hvb:c:d:j:" opt
 do
   case $opt in
 
@@ -43,6 +46,8 @@ do
     c )  container="${OPTARG}" ;;
 
     d )  destination="${OPTARG}" ;;
+
+    j )  num_jobs="${OPTARG}" ;;
 
     * )  echo -e "\n  Option does not exist : $OPTARG\n"
           usage; exit 1   ;;
@@ -85,6 +90,7 @@ args+=(
     "${container}"
     "/opt/spack_install_scripts/update_build_cache_in_container.sh"
     "-d" "/opt/dumptarget"
+    "-j" "${num_jobs}"
 )
 
 if [ -n "${buildcache:-}" ]; then

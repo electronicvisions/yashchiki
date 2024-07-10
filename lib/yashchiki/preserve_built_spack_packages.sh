@@ -37,7 +37,7 @@ done
 
 mkdir -p "${target_folder}"
 
-"${sourcedir}/update_build_cache_in_container.sh" -d "${target_folder}" -q || /bin/true  # do not fail!
+"${sourcedir}/update_build_cache_in_container.sh" -d "${target_folder}" -q -j ${YASHCHIKI_JOBS} || /bin/true  # do not fail!
 
 # preserve the specs that were concretized
 pushd "${SPEC_FOLDER_IN_CONTAINER}"

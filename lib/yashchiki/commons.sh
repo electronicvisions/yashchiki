@@ -220,37 +220,12 @@ remove_tmp_files() {
 add_cleanup_step remove_tmp_files
 
 
-# get hashes in buildcache [<build_cache-directory>]
-# <buildcache-directory> defaults to ${BUILD_CACHE_INSIDE} if not supplied.
-get_hashes_in_buildcache() {
-    local buildcache_dir
-    buildcache_dir="${1:-${BUILD_CACHE_INSIDE}}"
-
-    local resultsfile
-    resultsfile=$(mktemp)
-
-    if [ -d "${buildcache_dir}" ]; then
-        # Naming scheme in the build_cache is <checksum>.tar.gz -> extract from full path
-        ( find "${buildcache_dir}" -name "*.tar.gz" -mindepth 1 -maxdepth 1 -print0 \
-            | xargs -r -0 -n 1 basename \
-            | sed -e "s:\.tar\.gz$::g" \
-	    | sort >"${resultsfile}") || /bin/true
-    fi
-    echo "DEBUG: Found $(wc -l <"${resultsfile}") hashes in buildcache: ${buildcache_dir}" >&2
-    cat "${resultsfile}"
-    rm "${resultsfile}"
-}
-
-
-get_hashes_in_spack() {
-    # we only return hashes that are actually IN spack, i.e., that reside under /opt/spack/opt/spack
-    ${MY_SPACK_CMD} find --no-groups -Lp | awk '$3 ~ /^\/opt\/spack\/opt\/spack\// { print $1 }' | sort
-}
+source ${SOURCE_DIR}/get_hashes_in_buildcache.sh
 
 
 compute_hashes_buildcache() {
     # extract all available package hashes from buildcache
-    get_hashes_in_buildcache >"${FILE_HASHES_BUILDCACHE}"
+    get_hashes_in_buildcache ${BUILD_CACHE_INSIDE} >"${FILE_HASHES_BUILDCACHE}"
 }
 
 

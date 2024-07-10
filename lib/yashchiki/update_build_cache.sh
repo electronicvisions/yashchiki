@@ -32,4 +32,4 @@ set +e
 sudo -E singularity exec\
     -B "${BUILD_CACHE_OUTSIDE}:${BUILD_CACHE_INSIDE}:rw"\
     "${IMAGE_NAME}" \
-    sudo -Eu spack /opt/spack_install_scripts/update_build_cache_in_container.sh -q || exit 0
+    sudo -Eu spack /opt/spack_install_scripts/update_build_cache_in_container.sh -j ${YASHCHIKI_JOBS} -q || exit 0
