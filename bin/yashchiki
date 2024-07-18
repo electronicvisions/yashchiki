@@ -193,14 +193,15 @@ def run(script: str, env: dict, script_args: list = []):
     out = subprocess.Popen(
         cmd, env=env, stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
+    os.set_blocking(out.stdout.fileno(), False)
     while True:
-        line = out.stdout.readline()
-        if line:
+        data = out.stdout.read()
+        if data:
             if args.debug:
-                sys.stdout.buffer.write(line)
+                sys.stdout.buffer.write(data)
                 sys.stdout.flush()
-            stdout += line
-        else:
+            stdout += data
+        if out.poll() is not None:
             break
     out.wait()
     stdout = str(stdout, encoding="utf-8")
