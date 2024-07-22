@@ -18,7 +18,7 @@ TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
 mkdir -p ${YASHCHIKI_SANDBOXES}
 
-/skretch/opt/apptainer/1.2.5/bin/apptainer build \
+apptainer build \
     --bind ${YASHCHIKI_CACHES_ROOT}/download_cache:/opt/spack/var/spack/cache \
     --bind ${YASHCHIKI_CACHES_ROOT}/spack_ccache:/opt/ccache \
     --bind ${YASHCHIKI_CACHES_ROOT}/build_caches:/opt/build_cache \

@@ -28,8 +28,8 @@ source "${SOURCE_DIR}/commons.sh"
 # since the spack user cannot read home of the host user we need to mount the
 # update script inside the container
 set +e
-# Arugments needed once we switch to singularity3: --writable-tmpfs
-/skretch/opt/apptainer/1.2.5/bin/apptainer exec\
+# Arguments needed once we switch to singularity3: --writable-tmpfs
+apptainer exec\
     -B "${BUILD_CACHE_OUTSIDE}:${BUILD_CACHE_INSIDE}:rw"\
     "${IMAGE_NAME}" \
     /opt/spack_install_scripts/update_build_cache_in_container.sh -j ${YASHCHIKI_JOBS} -q || exit 0

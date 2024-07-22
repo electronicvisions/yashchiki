@@ -10,4 +10,4 @@ if test -f "${YASHCHIKI_IMAGE_NAME}"; then
     exit 1
 fi
 
-/skretch/opt/apptainer/1.2.5/bin/apptainer build --fakeroot ${YASHCHIKI_IMAGE_NAME} "${TARGET_FOLDER}"
+apptainer build --fakeroot ${YASHCHIKI_IMAGE_NAME} "${TARGET_FOLDER}"
