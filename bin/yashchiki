@@ -53,9 +53,11 @@ parser = argparse.ArgumentParser(
 
 all_stages=["fetch", "build-base", "build-spack", "image"]
 
+all_styles = list(os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/../share/yashchiki/styles/"))
+
 # mandatory
 parser.add_argument(
-    "style", type=str, choices=["visionary", "asic", "f27"],
+    "style", type=str, choices=all_styles,
     help="Style of container to build.")
 parser.add_argument(
     "spack_dir", type=pathlib.Path,
