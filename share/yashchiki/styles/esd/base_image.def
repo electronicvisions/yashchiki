@@ -1,0 +1,30 @@
+Bootstrap: docker
+From: debian:bookworm
+
+%setup
+    # copy install scripts
+    chmod 777 "${SINGULARITY_ROOTFS}/opt"
+    mkdir "${SINGULARITY_ROOTFS}/opt/spack_install_scripts"
+    rsync -aLv --chmod 0755 "${ROOT_DIR}"/share/yashchiki/styles/${CONTAINER_STYLE}/*.sh "${SINGULARITY_ROOTFS}/opt/spack_install_scripts"
+    rsync -aLv --chmod 0755 "${ROOT_DIR}"/lib/yashchiki/*.sh "${SINGULARITY_ROOTFS}/opt/spack_install_scripts"
+    rsync -aLv "${ROOT_DIR}"/lib/yashchiki/*.awk "${SINGULARITY_ROOTFS}/opt/spack_install_scripts"
+    rsync -aLv "${ROOT_DIR}"/share/yashchiki/patches "${SINGULARITY_ROOTFS}/opt/spack_install_scripts"
+
+%post
+    # create a fingerprint by which we can identify the container from within
+    cat /proc/sys/kernel/random/uuid > /opt/fingerprint
+
+    # FIXME: use yashchiki variables instead of abspaths below
+
+    # prerequisites
+    ls /opt/spack_install_scripts
+    /opt/spack_install_scripts/install_prerequisites.sh || exit 1
+    # cannot specify permissions in files-section
+    chmod 440 /etc/sudoers
+    chown root:root /etc/sudoers
+    # install locales
+    locale-gen
+
+    # FIXME: no qemu, etc. in bookworm?
+    # ECM: serializes due to needs-network-property
+    #/opt/spack_install_scripts/install_system_dependencies.sh || exit 1

@@ -1,0 +1,14 @@
+git clone https://gitlab.ebrains.eu/ri/tech-hub/platform/esd/spack esd_spack
+chmod +x bin/yashchiki
+
+## all_stages=["fetch", "build-base-image", "build-base", "build-spack", "image"]
+
+# needs "internet"
+export http_proxy="http://proxy.kip.uni-heidelberg.de:8080"
+export https_proxy="http://proxy.kip.uni-heidelberg.de:8080"
+bin/yashchiki --debug --stages fetch build-base-image -- esd esd_spack esd_output
+
+# offline build
+#export -n http_proxy # FIXME: fails download of ca-certificates-mozilla-2023-05-30…!
+#export -n https_proxy
+bin/yashchiki --debug --stages build-base build-spack image -- esd esd_spack esd_output

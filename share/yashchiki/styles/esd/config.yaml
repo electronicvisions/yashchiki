@@ -1,0 +1,9 @@
+docker_base_image: "debian:bookworm"
+dependency_python:
+  build: false
+  version: "3.11.2"
+spack_gcc:
+  # Whether to build the specified gcc via spack or assume existance.
+  build: false
+  # Version to use as compiler for spack build.
+  version: "12.2.0"

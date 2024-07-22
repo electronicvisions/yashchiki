@@ -51,7 +51,7 @@ parser = argparse.ArgumentParser(
               to OUTPUT.
     """))
 
-all_stages=["fetch", "build-base", "build-spack", "image"]
+all_stages=set(["fetch", "build-base-image", "build-base", "build-spack", "image"])
 
 all_styles = list(os.listdir(os.path.dirname(os.path.realpath(__file__)) + "/../share/yashchiki/styles/"))
 
@@ -169,28 +169,36 @@ env = {
     "YASHCHIKI_SPACK_VERBOSE": str(int(args.spack_verbose)),
     "YASHCHIKI_SANDBOXES": args.sandboxes_dir,
     "YASHCHIKI_IMAGE_NAME": args.output,
+    "YASHCHIKI_BASEIMAGE_NAME": str(args.output) + "_base", # FIXME: nicer, it's a path on the left!
     "YASHCHIKI_SPACK_PATH": args.spack_dir,
     "YASHCHIKI_BUILD_CACHE_NAME": args.build_cache_name,
     "TMPDIR": os.path.join(tempfile.gettempdir(), args.tmp_subdir),
     "YASHCHIKI_CACHES_ROOT": args.caches_dir,
     "YASHCHIKI_JOBS": str(args.jobs),
+    "ROOT_DIR": root_dir,
 } | os.environ
 
 if "fetch" in args.stages:
     env = env | {"YASHCHIKI_ENABLE_STAGE_FETCH": "1"}
 
+if "build-base-image" in args.stages:
+    env = env | {"YASHCHIKI_ENABLE_STAGE_BUILD_BASE_IMAGE": "1"}
+
+# FIXME: better called build-sandbox, etc.?
 if "build-base" in args.stages:
     env = env | {"YASHCHIKI_ENABLE_STAGE_BUILD_BASE": "1"}
 
+# FIXME: unused?
 if "build-spack" in args.stages:
     env = env | {"YASHCHIKI_ENABLE_STAGE_BUILD_SPACK": "1"}
 
 if "image" in args.stages:
     env = env | {"YASHCHIKI_ENABLE_STAGE_IMAGE": "1"}
 
-if args.stages != all_stages:
-    if not pathlib.Path(args.sandboxes_dir, args.style).exists():
-        raise RuntimeError("Using yashchiki with incomplete set of stages is only possible for using an existing sandbox.")
+# FIXME: readd this reasonably
+#if (args.stages != set('fetch', ']) and (args.stages != all_stages):
+#    if not pathlib.Path(args.sandboxes_dir, args.style).exists():
+#        raise RuntimeError("Using yashchiki with incomplete set of stages is only possible for using an existing sandbox.")
 
 if args.build_cache_on_failure_name:
     env = env | {"YASHCHIKI_BUILD_CACHE_ON_FAILURE_NAME": args.build_cache_on_failure_name}
@@ -200,7 +208,7 @@ args.log_dir.mkdir(parents=True, exist_ok=True)
 
 pathlib.Path(env["TMPDIR"]).mkdir(exist_ok=True, parents=True)
 
-
+import time
 def run(script: str, env: dict, script_args: list = []):
     """
     Execute the given script.
@@ -305,6 +313,10 @@ with tempfile.TemporaryDirectory(prefix="spack-", dir=env["TMPDIR"]) \
 
     run("lib/yashchiki/create_caches.sh", env)
     run("lib/yashchiki/fetch.sh", env)
+    base_sandbox_recipe = str(pathlib.Path("share", "yashchiki", "styles",
+        args.style, "base_image.def"))
+    if os.path.exists(base_sandbox_recipe):
+        run("lib/yashchiki/build_base_sandbox.sh", env, [base_sandbox_recipe])
     run(str(pathlib.Path("share", "yashchiki", "styles", args.style,
                          "create_recipe.sh")),
         env)
