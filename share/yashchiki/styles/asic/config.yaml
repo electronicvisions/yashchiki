@@ -1,6 +1,8 @@
 docker_base_image: "rockylinux:8"
 # ECM: it's 3.9.18 really, but that's not yet in the current spack; fix when ready
-dependency_python: "3.9.16"
+dependency_python:
+  build: false
+  version: "3.9.16"
 spack_gcc:
   build: false
   version: "8.5.0"
