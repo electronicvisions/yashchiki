@@ -1,0 +1,55 @@
+stages:
+  - frontend
+  - buildnode
+
+fetch:
+  stage: frontend
+  tags:
+    - docker-runner
+    - read-only
+  image: $GITLAB_BUILD_ENV_DOCKER_IMAGE
+  variables:
+    SPACK_DEV_ENV: ebrains-dev
+  script:
+    - git clone https://gitlab.ebrains.eu/ri/tech-hub/platform/esd/spack esd_spack
+    - chmod +x bin/yashchiki
+    - bin/yashchiki --debug --stages fetch -- esd esd_spack esd_output
+  artifacts:
+    paths:
+      # spack's package sources
+      - esd_spack/
+      - $HOME/.yashchiki/
+  timeout: 2 days
+
+
+build-base-image:
+  stage: frontend
+  tags:
+    - docker-runner
+    - read-only
+  image: $GITLAB_BUILD_ENV_DOCKER_IMAGE
+  variables:
+    SPACK_DEV_ENV: ebrains-dev
+  script:
+    - bin/yashchiki --debug --stages build-base-image -- esd esd_spack esd_output
+  artifacts:
+    paths:
+      # the output base image
+      - esd_output_base
+  timeout: 2 days
+
+
+buildnode_stuff:
+  stage: buildnode
+  dependencies:
+    - fetch
+    - build-base-image
+  tags:
+    - docker-runner
+    - read-only
+  image: $GITLAB_BUILD_ENV_DOCKER_IMAGE
+  variables:
+    SPACK_DEV_ENV: ebrains-dev
+  script:
+    - bin/yashchiki --debug --stages build-base build-spack image -- esd esd_spack esd_output
+  timeout: 2 days
