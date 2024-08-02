@@ -161,10 +161,17 @@ find "${MY_SPACK_FOLDER}/var/spack/repos" -type f -print0 \
 
 # now fetch everything that is needed in order
 packages_to_fetch=(
-    "${YASHCHIKI_SPACK_GCC}"
     "${yashchiki_dependencies[@]}"
     "${spack_packages[@]}"
 )
+
+if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
+	packages_to_fetch=(
+		"${YASHCHIKI_SPACK_GCC}"
+		"${packages_to_fetch[@]}"
+	)
+fi
+
 fetch_specfiles=()
 for package in "${packages_to_fetch[@]}"; do
     specfile="$(get_specfile_name "${package}")"
