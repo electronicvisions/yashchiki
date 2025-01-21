@@ -18,11 +18,15 @@ TARGET_FOLDER="${YASHCHIKI_SANDBOXES}/${CONTAINER_STYLE}"
 
 mkdir -p ${YASHCHIKI_SANDBOXES}
 
-apptainer build \
+# we need sudo here in order to build CUDA, since there untar doesn't work otherwise
+sudo -E apptainer build \
     --bind ${YASHCHIKI_CACHES_ROOT}/download_cache:/opt/spack/var/spack/cache \
     --bind ${YASHCHIKI_CACHES_ROOT}/spack_ccache:/opt/ccache \
     --bind ${YASHCHIKI_CACHES_ROOT}/build_caches:/opt/build_cache \
     --bind ${YASHCHIKI_CACHES_ROOT}/preserved_packages:/opt/preserved_packages \
     --bind ${JOB_TMP_SPACK}:/tmp/spack \
     --bind ${YASHCHIKI_SPACK_CONFIG}:/tmp/spack_config \
-    --fakeroot --sandbox "${TARGET_FOLDER}" "${YASHCHIKI_RECIPE_PATH}" | tee out_singularity_build_recipe.txt
+    --sandbox "${TARGET_FOLDER}" "${YASHCHIKI_RECIPE_PATH}" | tee out_singularity_build_recipe.txt
+
+sudo chown -R vis_jenkins:jenkins "${TARGET_FOLDER}"
+sudo chown -R vis_jenkins:jenkins /tmp/conviz1/yashchiki-tmp-dir/tmp_spack
