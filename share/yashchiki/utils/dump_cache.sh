@@ -101,7 +101,6 @@ fi
 # Set variables that need to be defined but are irrelevant to buildcache
 # dumping (TODO: keep in sync with lib/yashchiki/dummy_variables.sh!).
 export BUILD_CACHE_NAME="${BUILD_CACHE_NAME:-undefined}"
-export DEPENDENCY_PYTHON="${DEPENDENCY_PYTHON:-undefined}"
 export VISIONARY_GCC="${VISIONARY_GCC:-undefined}"
 export WORKSPACE="${WORKSPACE:-undefined}"
 

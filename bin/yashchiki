@@ -158,7 +158,6 @@ env = {
     # (2.7.18) will pollute the spec and lead to a conflict
     # can be removed as soon as the explicit preferred version
     # is dropped
-    "DEPENDENCY_PYTHON": "python@" + config["dependency_python"],
     "YASHCHIKI_BUILD_SPACK_GCC": str(int(config["spack_gcc"]["build"])),
     "YASHCHIKI_SPACK_GCC_VERSION": config["spack_gcc"]["version"],
     "YASHCHIKI_SPACK_GCC": "gcc@" + config["spack_gcc"]["version"],

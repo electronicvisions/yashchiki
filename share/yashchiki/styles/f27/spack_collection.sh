@@ -1,7 +1,7 @@
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
-    "f27-ido ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
-    "f27-niklas ^${DEPENDENCY_PYTHON} %${YASHCHIKI_SPACK_GCC}"
+    "f27-ido %${YASHCHIKI_SPACK_GCC}"
+    "f27-niklas %${YASHCHIKI_SPACK_GCC}"
 )
 
 spack_views=(\
