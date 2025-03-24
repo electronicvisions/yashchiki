@@ -160,6 +160,7 @@ From: ${DOCKER_BASE_IMAGE}
         mesa-libGL \
         mesa-libGLU \
         motif \
+        readline-devel \
         ncurses-devel \
         net-tools \
         numactl-libs \
