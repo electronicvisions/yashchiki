@@ -22,6 +22,11 @@ config:
   source_cache: ${YASHCHIKI_CACHES_ROOT}/download_cache
 EOF
 
+# initialze submodules of spack
+pushd $MY_SPACK_FOLDER
+git submodule update --init
+popd
+
 # fetch "everything" (except for pip shitness)
 echo "FETCHING..."
 
