@@ -172,7 +172,7 @@ if [ ${YASHCHIKI_BUILD_SPACK_GCC} -eq 1 ]; then
 	)
 fi
 
-fetch_specfiles=()
+# first check if concretization worked for all packages
 for package in "${packages_to_fetch[@]}"; do
     specfile="$(get_specfile_name "${package}")"
 	echo "Specfile for ${package} is ${specfile}."
@@ -182,11 +182,14 @@ for package in "${packages_to_fetch[@]}"; do
         echo "${package} failed to concretize!" >&2
         exit 1
     fi
-    fetch_specfiles+=( "${specfile}" )
 done
-if ! ${MY_SPACK_CMD} fetch -D "${fetch_specfiles[@]/^/-f }"; then
-    # propagate error
-    exit 1
-fi
-
-echo
+# then fetch one package after another
+for package in "${packages_to_fetch[@]}"; do
+    specfile="$(get_specfile_name "${package}")"
+	echo "Fetch ${package} (file: ${specfile})."
+	if ! ${MY_SPACK_CMD} fetch -D "${specfile}"; then
+		echo "ERROR: Fetching ${package} failed."
+		# propagate error
+		exit 1
+	fi
+done
