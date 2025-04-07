@@ -2,13 +2,13 @@
 spack_packages=(
     "visionary-dev-tools %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer~dev %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer+dev %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer~dev+gccxml %${YASHCHIKI_SPACK_GCC}"
-    "visionary-wafer+gccxml %${YASHCHIKI_SPACK_GCC}"
+    "visionary-wafer+dev+gccxml %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer-visu %${YASHCHIKI_SPACK_GCC}"
     "visionary-clusterservices %${YASHCHIKI_SPACK_GCC}"
     "visionary-dls~dev %${YASHCHIKI_SPACK_GCC}"
-    "visionary-dls %${YASHCHIKI_SPACK_GCC}"
+    "visionary-dls+dev %${YASHCHIKI_SPACK_GCC}"
 )
 
 spack_views=(\
