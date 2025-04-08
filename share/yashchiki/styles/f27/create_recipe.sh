@@ -118,8 +118,6 @@ From: ${DOCKER_BASE_IMAGE}
         "${SPACK_INSTALL_SCRIPTS}/preserve_built_spack_packages.sh" &&
         exit 1  # propagate the error
     )
-    # apply some system-level patching (TODO: remove this as soon as gccxml dependency is gone)
-    "${SPACK_INSTALL_SCRIPTS}/manual_system_level_patching_routine_called_in_post_as_root.sh"
 EOF
 
 # create appenvs for all views...
