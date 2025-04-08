@@ -1,6 +1,5 @@
 # All spack packages that should be fetched/installed in the container
 spack_packages=(
-    "visionary-dev-tools %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer~dev %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer+dev %${YASHCHIKI_SPACK_GCC}"
     "visionary-wafer~dev+gccxml %${YASHCHIKI_SPACK_GCC}"
