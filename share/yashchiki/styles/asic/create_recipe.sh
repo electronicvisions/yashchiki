@@ -112,6 +112,7 @@ From: ${DOCKER_BASE_IMAGE}
         gpm-libs \
         ksh \
         less \
+        libcurl-devel \
         libffi-devel \
         libfontenc \
         libgcc \
