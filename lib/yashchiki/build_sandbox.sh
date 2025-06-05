@@ -29,4 +29,4 @@ sudo -E apptainer build \
     --sandbox "${TARGET_FOLDER}" "${YASHCHIKI_RECIPE_PATH}" | tee out_singularity_build_recipe.txt
 
 sudo chown -R vis_jenkins:jenkins "${TARGET_FOLDER}"
-sudo chown -R vis_jenkins:jenkins /tmp/conviz1/yashchiki-tmp-dir/tmp_spack
+sudo chown -R vis_jenkins:jenkins "${JOB_TMP_SPACK}"
