@@ -123,7 +123,7 @@ cat <<EOF
     export SPACK_PYTHON_BINARY=\${SVF}/bin/python
     export MANPATH=\${SVF}/man:\${SVF}/share/man\${MANPATH:+:}\${MANPATH}
     export LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LIBRARY_PATH:+:}\${LIBRARY_PATH}
-    export LD_LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64\${LD_LIBRARY_PATH:+:}\${LD_LIBRARY_PATH}
+    export LD_LIBRARY_PATH=\${SVF}/lib:\${SVF}/lib64:\${SVF}/targets/x86_64-linux/lib:\${LD_LIBRARY_PATH:+:}\${LD_LIBRARY_PATH}
     export TCLLIBPATH=\${SVF}/lib\${TCLLIBPATH:+:}\${TCLLIBPATH}
     export CPATH=\${SVF}/include\${CPATH:+:}\${CPATH}
     export C_INCLUDE_PATH=\${SVF}/include\${C_INCLUDE_PATH:+:}\${C_INCLUDE_PATH}
