@@ -45,6 +45,10 @@ Map<String, Object> verificationStages = [
 		// Visionary lab tools
 		[name: "labcontrol",
 		 job: "bld_gerrit_labcontrol_dependencies",
+		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"],
+		// Genpybind
+		[name: "genpybind",
+		 job: "bld_gerrit-genpybind-dependencies",
 		 container_image_parameter: "OVERWRITE_DEFAULT_CONTAINER_IMAGE"]
 	],
 	asic: [
