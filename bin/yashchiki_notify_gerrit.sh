@@ -53,7 +53,7 @@ if [ -z "${result}" ] && [ -n "${verified}" ]; then
     fi
 fi
 
-message="[$(echo "${BUILD_URL}")] \
+message="$(echo "${BUILD_URL}"): \
 ${container_name:+Change included in container: ${container_name}} \
 ${custom_message:-} \
 ${result:+${result_type:+${result_type} }Result: ${result}}"
