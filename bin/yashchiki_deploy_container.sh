@@ -9,7 +9,7 @@ shopt -s inherit_errexit
 ROOT_DIR="$(dirname "$(dirname "$(readlink -m "${BASH_SOURCE[0]}")")")"
 source "${ROOT_DIR}/lib/yashchiki/get_change_name.sh"
 
-INSTALL_DIR="/containers/${CONTAINER_BUILD_TYPE}"
+INSTALL_DIR="/einc/containers/${CONTAINER_BUILD_TYPE}"
 FALLBACK_DIR="${HOME}/container_mount_full"
 DATE=$(date --iso)
 
@@ -49,7 +49,7 @@ cp "${YASHCHIKI_IMAGE_NAME}" "${CONTAINER_NAME}" || (
 )
 
 if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
-    ln -sf "./$(basename ${CONTAINER_NAME})" /containers/stable/${CONTAINER_PREFIX}${CONTAINER_PREFIX:+_}latest
+    ln -sf "./$(basename ${CONTAINER_NAME})" /einc/containers/stable/${CONTAINER_PREFIX}${CONTAINER_PREFIX:+_}latest
 
     # Announce new container in "Building & Deployment" channel
     # Since the output of this script is used in other parts, we have to hide curl's output
@@ -61,8 +61,7 @@ if [ "${CONTAINER_BUILD_TYPE}" = "stable" ]; then
     container_basename="$(basename ${CONTAINER_NAME})"
     container_basename="${container_basename%%.*}"
 
-    /containers/utils/extract_dna.sh -c "${CONTAINER_NAME}" -d "/containers/dna/${container_basename}"
-
+    /einc/containers/utils/extract_dna.sh -c "${CONTAINER_NAME}" -d "/einc/containers/dna/${container_basename}"
 fi
 
 # delete temporary image
